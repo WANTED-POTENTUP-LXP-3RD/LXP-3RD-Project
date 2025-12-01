@@ -1,1 +1,13 @@
-spring.application.name=A_Plus
+spring:
+  datasource:
+    url:
+    username: jeong
+    password: jeong
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+      format_sql: true
