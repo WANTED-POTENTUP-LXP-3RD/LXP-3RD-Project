@@ -18,11 +18,10 @@ public abstract class BaseAggregateRoot extends BaseTimeEntity {
     @Transient
     private final List<Object> domainEvents = new ArrayList<>();
 
-    protected <T> T registerEvent(T event) {
+    protected <T> void registerEvent(T event) {
         if (event != null) {
             this.domainEvents.add(event);
         }
-        return event;
     }
 
     /**
