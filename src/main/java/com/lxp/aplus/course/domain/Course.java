@@ -1,35 +1,61 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "courses")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Course extends BaseAggregateRoot {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
+    private Long instructorId;
+
+    @Column(nullable = false)
+    private Long categoryId;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
+    private String summary;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
-    private Long instructorId;
+    private String thumbnailUrl;
 
     @Column(nullable = false)
     private int price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CourseStatus courseStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CourseLevel courseLevel;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 }
