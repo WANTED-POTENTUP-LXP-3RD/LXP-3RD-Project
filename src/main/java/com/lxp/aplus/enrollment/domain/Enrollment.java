@@ -1,14 +1,14 @@
 package com.lxp.aplus.enrollment.domain;
 
-import com.lxp.aplus.common.domain.BaseTimeEntity;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
+import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "enrollments",
@@ -20,8 +20,13 @@ import java.time.LocalDateTime;
         }
 )
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Enrollment extends BaseTimeEntity {
+public class Enrollment extends BaseAggregateRoot {
+
+    private static final int MIN_PROGRESS_RATE = 0;
+    private static final int MAX_PROGRESS_RATE = 100;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,63 +39,61 @@ public class Enrollment extends BaseTimeEntity {
     private Long courseId;
 
     @Enumerated(EnumType.STRING)
-    private EnrollmentStatus status;
+    @Builder.Default
+    private EnrollmentStatus status = EnrollmentStatus.ENROLLED;
 
     @Column(nullable = false)
-    private Integer progressRate;
+    @Builder.Default
+    private int progressRate = MIN_PROGRESS_RATE;
 
     @Column(nullable = false)
     private LocalDateTime expiredAt;
 
-    @Builder(access = AccessLevel.PRIVATE)
-    private Enrollment(Long studentId, Long courseId, EnrollmentStatus status, Integer progressRate, LocalDateTime expiredAt) {
-        Assert.notNull(studentId, "studentId는 null일 수 없습니다.");
-        Assert.notNull(courseId, "courseId는 null일 수 없습니다.");
-        Assert.notNull(status, "status는 null일 수 없습니다.");
-
-        this.studentId = studentId;
-        this.courseId = courseId;
-        this.status = status;
-        this.progressRate = progressRate;
-        this.expiredAt = expiredAt;
-    }
-
-    public static Enrollment enroll(Long studentId, Long courseId, LocalDateTime expiredAt) {
-        Assert.notNull(expiredAt, "expiredAt은 null일 수 없습니다.");
+    public static Enrollment of(Long studentId, Long courseId, LocalDateTime expiredAt) {
+        if (Objects.isNull(studentId) || Objects.isNull(courseId) || Objects.isNull(expiredAt)) {
+            throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+        }
 
         return Enrollment.builder()
                 .studentId(studentId)
                 .courseId(courseId)
-                .status(EnrollmentStatus.ENROLLED)
-                .progressRate(0)
                 .expiredAt(expiredAt)
                 .build();
     }
 
     public void cancel() {
         if (this.status == EnrollmentStatus.COMPLETED) {
-            throw new IllegalStateException("이미 수료한 강의는 취소할 수 없습니다.");
+            throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_COMPLETED_ENROLLMENT);
+        }
+        if (this.status == EnrollmentStatus.CANCELED) {
+            throw new BusinessException(EnrollmentErrorCode.ALREADY_CANCELLED_ENROLLMENT);
+        }
+        if (isExpired()) {
+            throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_EXPIRED_ENROLLMENT);
         }
         this.status = EnrollmentStatus.CANCELED;
     }
 
     public void updateProgress(int newProgressRate) {
         if (this.status != EnrollmentStatus.ENROLLED) {
-            throw new IllegalStateException("수강 중인 강의만 진도율을 업데이트할 수 있습니다.");
+            throw new BusinessException(EnrollmentErrorCode.CANNOT_UPDATE_PROGRESS_FOR_NON_ENROLLED);
         }
-        if (newProgressRate < 0 || newProgressRate > 100) {
-            throw new IllegalArgumentException("진도율은 0~100 사이여야 합니다.");
+        if (isExpired()) {
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_EXPIRED_PROGRESS_UPDATE_DENIED);
+        }
+        if (newProgressRate < MIN_PROGRESS_RATE || newProgressRate > MAX_PROGRESS_RATE) {
+            throw new BusinessException(EnrollmentErrorCode.INVALID_PROGRESS_RATE);
         }
 
         this.progressRate = newProgressRate;
 
-        if (this.progressRate == 100) {
+        if (this.progressRate == MAX_PROGRESS_RATE) {
             this.complete();
         }
     }
 
-    public void complete() {
-        this.progressRate = 100;
+    private void complete() {
+        this.progressRate = MAX_PROGRESS_RATE;
         this.status = EnrollmentStatus.COMPLETED;
     }
 
