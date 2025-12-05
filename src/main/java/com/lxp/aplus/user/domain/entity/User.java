@@ -1,11 +1,10 @@
 package com.lxp.aplus.user.domain.entity;
 
+import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.user.domain.enums.RoleType;
 import com.lxp.aplus.user.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class User {
+public class User extends BaseAggregateRoot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,22 +49,22 @@ public class User {
     @Builder.Default
     private UserStatus status = UserStatus.PENDING;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public void addRole(RoleType roleType) {
-        Role role = Role.builder()
-                .userId(this.id)
-                .roleType(roleType)
+    public static User of(String name, String email, String password) {
+        User user = User.builder()
+                .name(name)
+                .email(email)
+                .password(password)
                 .build();
+
+        user.addRole(RoleType.STUDENT);
+        return user;
+    }
+
+    public void addRole(RoleType roleType) {
+        Role role = Role.of(this.id, roleType);
         this.roles.add(role);
     }
 
@@ -79,20 +78,9 @@ public class User {
         this.status = status;
     }
 
+    // TODO : 암호화 필요
     public void changePassword(String password) {
-        // TODO : 암호화 필요
         this.password = password;
-    }
-
-    public static User createUser(String name, String email, String password) {
-        User user = User.builder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .build();
-
-        user.addRole(RoleType.STUDENT);
-        return user;
     }
 
     public void delete() {
