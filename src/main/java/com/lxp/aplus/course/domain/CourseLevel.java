@@ -10,5 +10,5 @@ public enum CourseLevel {
     INTERMEDIATE("중급"),
     ADVANCED("고급");
 
-    private final String description;
+    private final String displayName;
 }
