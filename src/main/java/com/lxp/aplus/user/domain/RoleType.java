@@ -1,4 +1,4 @@
-package com.lxp.aplus.user.domain.enums;
+package com.lxp.aplus.user.domain;
 
 public enum RoleType {
     STUDENT,

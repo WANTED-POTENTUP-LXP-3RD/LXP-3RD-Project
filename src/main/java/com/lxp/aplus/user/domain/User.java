@@ -1,8 +1,6 @@
-package com.lxp.aplus.user.domain.entity;
+package com.lxp.aplus.user.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
-import com.lxp.aplus.user.domain.enums.RoleType;
-import com.lxp.aplus.user.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
