@@ -14,16 +14,20 @@ import static org.assertj.core.api.Assertions.*;
 
 class EnrollmentTest {
 
+    private static final Long STUDENT_ID = 1L;
+    private static final Long COURSE_ID = 100L;
+    private static final int MAX_PROGRESS_RATE = 100;
+    private static final int VALID_PROGRESS_RATE = 50;
+
+
     @Test
     @DisplayName("수강 신청 시 초기 상태는 ENROLLED이며 진도율은 0이다.")
     void enroll() {
         // given
-        Long studentId = 1L;
-        Long courseId = 100L;
         LocalDateTime expiredAt = LocalDateTime.now().plusYears(1);
 
         // when
-        Enrollment enrollment = Enrollment.of(studentId, courseId, expiredAt);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, expiredAt);
 
         // then
         assertThat(enrollment.getStatus()).isEqualTo(EnrollmentStatus.ENROLLED);
@@ -35,20 +39,18 @@ class EnrollmentTest {
     @DisplayName("of 정적 팩토리 메서드는 인자가 null이면 BusinessException을 던진다.")
     void of_fail_if_argument_is_null() {
         // given
-        Long studentId = 1L;
-        Long courseId = 100L;
         LocalDateTime expiredAt = LocalDateTime.now().plusYears(1);
 
         // when & then
-        assertThatThrownBy(() -> Enrollment.of(null, courseId, expiredAt))
+        assertThatThrownBy(() -> Enrollment.of(null, COURSE_ID, expiredAt))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.INVALID_ARGUMENT);
 
-        assertThatThrownBy(() -> Enrollment.of(studentId, null, expiredAt))
+        assertThatThrownBy(() -> Enrollment.of(STUDENT_ID, null, expiredAt))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.INVALID_ARGUMENT);
 
-        assertThatThrownBy(() -> Enrollment.of(studentId, courseId, null))
+        assertThatThrownBy(() -> Enrollment.of(STUDENT_ID, COURSE_ID, null))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.INVALID_ARGUMENT);
     }
@@ -57,13 +59,13 @@ class EnrollmentTest {
     @DisplayName("진도율이 100%가 되면 자동으로 수료(COMPLETED) 상태로 변경된다.")
     void updateProgress_complete() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
 
         // when
-        enrollment.updateProgress(100);
+        enrollment.updateProgress(MAX_PROGRESS_RATE);
 
         // then
-        assertThat(enrollment.getProgressRate()).isEqualTo(100);
+        assertThat(enrollment.getProgressRate()).isEqualTo(MAX_PROGRESS_RATE);
         assertThat(enrollment.getStatus()).isEqualTo(EnrollmentStatus.COMPLETED);
     }
 
@@ -72,7 +74,7 @@ class EnrollmentTest {
     @ValueSource(ints = {-1, 101})
     void updateProgress_fail_if_invalid_rate(int invalidProgressRate) {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
 
         // when & then
         assertThatThrownBy(() -> enrollment.updateProgress(invalidProgressRate))
@@ -84,11 +86,11 @@ class EnrollmentTest {
     @DisplayName("수강 중이 아닌 강의의 진도율 업데이트 시 BusinessException을 던진다.")
     void updateProgress_fail_if_not_enrolled() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
         enrollment.cancel();
 
         // when & then
-        assertThatThrownBy(() -> enrollment.updateProgress(50))
+        assertThatThrownBy(() -> enrollment.updateProgress(VALID_PROGRESS_RATE))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.CANNOT_UPDATE_PROGRESS_FOR_NON_ENROLLED);
     }
@@ -97,10 +99,10 @@ class EnrollmentTest {
     @DisplayName("만료된 강의의 진도율 업데이트 시 BusinessException을 던진다.")
     void updateProgress_fail_if_expired() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().minusDays(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().minusDays(1));
 
         // when & then
-        assertThatThrownBy(() -> enrollment.updateProgress(50))
+        assertThatThrownBy(() -> enrollment.updateProgress(VALID_PROGRESS_RATE))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.ENROLLMENT_EXPIRED_PROGRESS_UPDATE_DENIED);
     }
@@ -109,7 +111,7 @@ class EnrollmentTest {
     @DisplayName("수강 신청을 취소하면 상태가 CANCELED로 변경된다.")
     void cancel() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
 
         // when
         enrollment.cancel();
@@ -122,8 +124,8 @@ class EnrollmentTest {
     @DisplayName("이미 수료한 강의는 취소할 수 없다.")
     void cancel_fail_if_completed() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusYears(1));
-        enrollment.updateProgress(100);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
+        enrollment.updateProgress(MAX_PROGRESS_RATE);
         // when & then
         assertThatThrownBy(enrollment::cancel)
                 .isInstanceOf(BusinessException.class)
@@ -134,7 +136,7 @@ class EnrollmentTest {
     @DisplayName("이미 취소된 강의는 다시 취소할 수 없다.")
     void cancel_fail_if_already_cancelled() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
         enrollment.cancel();
 
         // when & then
@@ -147,7 +149,7 @@ class EnrollmentTest {
     @DisplayName("만료된 강의는 취소할 수 없다.")
     void cancel_fail_if_expired() {
         // given
-        Enrollment enrollment = Enrollment.of(1L, 100L, LocalDateTime.now().minusDays(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().minusDays(1));
 
         // when & then
         assertThatThrownBy(enrollment::cancel)
@@ -161,7 +163,7 @@ class EnrollmentTest {
     void isExpired() {
         // given: 어제 날짜로 만료일 설정
         LocalDateTime pastDate = LocalDateTime.now().minusDays(1);
-        Enrollment enrollment = Enrollment.of(1L, 100L, pastDate);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, pastDate);
 
         // when
         boolean expired = enrollment.isExpired();
@@ -175,7 +177,7 @@ class EnrollmentTest {
     void isNotExpired() {
         // given: 내일 날짜로 만료일 설정
         LocalDateTime futureDate = LocalDateTime.now().plusDays(1);
-        Enrollment enrollment = Enrollment.of(1L, 100L, futureDate);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, futureDate);
 
         // when
         boolean expired = enrollment.isExpired();
