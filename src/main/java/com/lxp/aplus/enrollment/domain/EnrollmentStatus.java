@@ -3,7 +3,6 @@ package com.lxp.aplus.enrollment.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public enum EnrollmentStatus {
     ENROLLED("수강 중"),
@@ -11,6 +10,7 @@ public enum EnrollmentStatus {
     CANCELED("수강 취소"),
     EXPIRED("수강 기간 만료");
 
+    @Getter
     private final String description;
 
     public boolean isActive() {
