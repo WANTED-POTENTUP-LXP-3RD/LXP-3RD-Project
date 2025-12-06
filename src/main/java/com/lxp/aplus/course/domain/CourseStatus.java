@@ -11,4 +11,8 @@ public enum CourseStatus {
     DELETED("삭제됨");
 
     private final String description;
+
+    public String getDescription() {
+        return description;
+    }
 }
