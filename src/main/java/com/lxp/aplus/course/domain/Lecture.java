@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "lectures")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-class Lecture extends BaseTimeEntity {
+public class Lecture extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
