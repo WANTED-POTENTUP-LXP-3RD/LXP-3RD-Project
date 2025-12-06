@@ -12,16 +12,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Entity
 @Table(name = "courses")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Course extends BaseAggregateRoot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +43,7 @@ public class Course extends BaseAggregateRoot {
     @Column(nullable = false)
     private String summary;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @Column(nullable = false)
@@ -48,9 +52,10 @@ public class Course extends BaseAggregateRoot {
     @Column(nullable = false)
     private int price;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CourseStatus courseStatus;
+    private CourseStatus courseStatus = CourseStatus.DRAFT;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
