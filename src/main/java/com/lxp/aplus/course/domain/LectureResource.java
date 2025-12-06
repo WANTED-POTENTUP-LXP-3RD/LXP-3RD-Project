@@ -24,16 +24,13 @@ public class LectureResource extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private String description;
-
     @Column(name = "original_file_name", nullable = false)
     private String originalFileName;
 
     @Column(name = "duration_seconds")
     private Integer durationSeconds;
 
-    @Column(name = "file_key")
+    @Column(name = "file_key", nullable = false)
     private String fileKey;
 
     @Enumerated(EnumType.STRING)
