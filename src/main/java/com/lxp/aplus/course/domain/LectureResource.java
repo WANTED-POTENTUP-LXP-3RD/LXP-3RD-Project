@@ -2,11 +2,14 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "lecture_resources")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LectureResource extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +28,13 @@ public class LectureResource extends BaseTimeEntity {
     @Column(name = "original_file_name", nullable = false)
     private String originalFileName;
 
+    @Column(name = "duration_seconds")
+    private Integer durationSeconds;
+
     @Column(name = "file_key")
     private String fileKey;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "resource_type", nullable = false)
     private ResourceType resourceType;
 
