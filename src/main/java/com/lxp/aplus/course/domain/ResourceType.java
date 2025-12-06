@@ -1,10 +1,13 @@
 package com.lxp.aplus.course.domain;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Getter
+@RequiredArgsConstructor
 public enum ResourceType {
-    VIDEO,
-    PDF,
-    QUIZ
+    VIDEO("영상"),
+    PDF("PDF 자료");
+
+    @Getter
+    private final String displayName;
 }
