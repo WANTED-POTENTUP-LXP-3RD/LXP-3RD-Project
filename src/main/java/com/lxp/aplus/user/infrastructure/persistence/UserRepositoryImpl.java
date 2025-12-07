@@ -52,8 +52,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByIdWithRoles(Long id) {
-        return jpaRepository.findByIdWithRoles(id);
+    public Optional<User> findUserWithRolesById(Long id) {
+        return jpaRepository.getWithRolesById(id);
     }
 
     @Override

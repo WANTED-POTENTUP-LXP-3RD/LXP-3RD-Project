@@ -68,17 +68,17 @@ class UserQueryUseCaseTest {
 
     @Test
     @DisplayName("ID로 User와 Role을 함께 조회할 수 있다")
-    void findUserByIdWithRoles() {
+    void findUserWithRolesById() {
         // given
         Long userId = 1L;
         User user = User.of("홍길동", "hong", "hong@example.com", "password123", "010-1234-5678");
         user.addRole(RoleType.INSTRUCTOR);
         user.addRole(RoleType.ADMIN);
         
-        when(userRepository.findByIdWithRoles(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findUserWithRolesById(userId)).thenReturn(Optional.of(user));
 
         // when
-        Optional<UserResponse> response = userQueryUseCase.findUserByIdWithRoles(userId);
+        Optional<UserResponse> response = userQueryUseCase.findUserWithRolesById(userId);
 
         // then
         assertThat(response).isPresent();
@@ -88,14 +88,14 @@ class UserQueryUseCaseTest {
                 RoleType.INSTRUCTOR,
                 RoleType.ADMIN
         );
-        verify(userRepository, times(1)).findByIdWithRoles(userId);
+        verify(userRepository, times(1)).findUserWithRolesById(userId);
     }
 
     @Test
     @DisplayName("존재하지 않는 User와 Role 조회 시 Optional.empty()를 반환한다")
     void findUserByIdWithRoles_NotFound() {
         // when
-        Optional<UserResponse> response = userQueryUseCase.findUserByIdWithRoles(999L);
+        Optional<UserResponse> response = userQueryUseCase.findUserWithRolesById(999L);
 
         // then
         assertThat(response).isEmpty();
