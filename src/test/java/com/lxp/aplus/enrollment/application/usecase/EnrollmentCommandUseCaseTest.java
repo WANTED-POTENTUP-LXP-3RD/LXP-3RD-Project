@@ -2,9 +2,9 @@ package com.lxp.aplus.enrollment.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.course.domain.Course;
-import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
+import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
+import com.lxp.aplus.enrollment.application.port.out.CourseInfo;
 import com.lxp.aplus.enrollment.application.result.EnrollmentCreationResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
@@ -36,10 +36,7 @@ class EnrollmentCommandUseCaseTest {
     private EnrollmentRepository enrollmentRepository;
 
     @Mock
-    private CourseRepository courseRepository;
-
-    @Mock
-    private Course course;
+    private CourseFinder courseFinder;
 
     @Captor
     private ArgumentCaptor<Enrollment> enrollmentCaptor;
@@ -56,7 +53,7 @@ class EnrollmentCommandUseCaseTest {
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
         Enrollment createdEnrollment = Enrollment.of(STUDENT_ID, COURSE_ID_1, LocalDateTime.now().plusYears(2));
 
-        given(courseRepository.findById(COURSE_ID_1)).willReturn(Optional.of(course));
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1)));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(false);
         given(enrollmentRepository.save(any(Enrollment.class))).willReturn(createdEnrollment);
 
@@ -82,7 +79,7 @@ class EnrollmentCommandUseCaseTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
 
-        given(courseRepository.findById(COURSE_ID_1)).willReturn(Optional.empty());
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> enrollmentCommandUseCase.enroll(command))
@@ -97,7 +94,7 @@ class EnrollmentCommandUseCaseTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
 
-        given(courseRepository.findById(COURSE_ID_1)).willReturn(Optional.of(course));
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1)));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(true);
 
         // when & then
