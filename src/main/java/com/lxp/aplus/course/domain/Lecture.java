@@ -2,17 +2,15 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Entity
 @Table(name = "lectures")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Lecture extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +31,15 @@ public class Lecture extends BaseTimeEntity {
 
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
+
+    public Lecture(Section section, String title, String description, int orderIndex) {
+        this.section = section;
+        this.title = title;
+        this.description = description;
+        this.orderIndex = orderIndex;
+    }
+
+    public static Lecture create(Section section, String title, String description, int orderIndex) {
+        return new Lecture(section, title, description, orderIndex);
+    }
 }

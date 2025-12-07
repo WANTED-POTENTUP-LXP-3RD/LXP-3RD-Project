@@ -1,6 +1,8 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.SectionErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,6 +63,15 @@ public class Course extends BaseAggregateRoot {
     @Column(nullable = false)
     private CourseLevel courseLevel;
 
+    @Builder.Default
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
+
+    public Lecture addLectureToSection(Long sectionId, String title, String description) {
+        return sections.stream()
+                .filter(s -> s.getId().equals(sectionId))
+                .findFirst()
+                .map(s -> s.addLecture(title, description))
+                .orElseThrow(()-> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+    }
 }
