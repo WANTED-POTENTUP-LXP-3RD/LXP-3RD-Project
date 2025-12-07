@@ -1,6 +1,5 @@
-package com.lxp.aplus.user.domain.entity;
+package com.lxp.aplus.user.domain;
 
-import com.lxp.aplus.user.domain.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
