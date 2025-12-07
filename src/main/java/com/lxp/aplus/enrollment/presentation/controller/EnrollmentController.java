@@ -23,8 +23,9 @@ public class EnrollmentController {
 
     @PostMapping
     public ResponseEntity<ResultResponse<EnrollmentCreationResult>> enroll(
-            @AuthenticationPrincipal Long studentId,
+            //@AuthenticationPrincipal Long studentId,
             @Valid @RequestBody EnrollmentRequest request) {
+        Long studentId = 1L; // TODO: 인증 기능 구현 후 수정 예정
 
         EnrollmentCreationResult enrollmentCreationResult = enrollmentCommandUseCase.enroll(request.toCommand(studentId));
 
