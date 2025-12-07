@@ -1,6 +1,7 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.course.application.command.CourseUpdateCommand;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +26,7 @@ import java.util.List;
 @Table(name = "courses")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Course extends BaseAggregateRoot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,23 +35,23 @@ public class Course extends BaseAggregateRoot {
     @Column(nullable = false)
     private Long instructorId;
 
-    @Column(nullable = false)
+    @Column
     private Long categoryId;
 
-    @Column(nullable = false)
+    @Column
     private String title;
 
-    @Column(nullable = false)
+    @Column
     private String summary;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column
     private String thumbnailUrl;
 
-    @Column(nullable = false)
-    private int price;
+    @Column
+    private Integer price;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -58,9 +59,26 @@ public class Course extends BaseAggregateRoot {
     private CourseStatus courseStatus = CourseStatus.DRAFT;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private CourseLevel courseLevel;
 
+    @Builder.Default
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
+
+    public static Course from(Long instructorId) {
+        return Course.builder()
+                .instructorId(instructorId)
+                .build();
+    }
+
+    public void updateCourseInfo(CourseUpdateCommand request) {
+        this.title = request.title();
+        this.summary = request.summary();
+        this.description = request.description();
+        this.categoryId = request.categoryId();
+        this.courseLevel = request.courseLevel();
+        this.thumbnailUrl = request.thumbnailUrl();
+        this.price = request.price();
+    }
 }
