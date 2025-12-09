@@ -2,7 +2,10 @@ package com.lxp.aplus.user.infrastructure.persistence;
 
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.domain.UserRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 /**
  * Spring Data JPA Repository
@@ -30,5 +33,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @see UserRepositoryImpl
  */
 public interface UserJpaRepository extends JpaRepository<User, Long> {
+    
+    /**
+     * User와 Role을 함께 조회 (Fetch Join)
+     * 
+     * @EntityGraph를 사용하여 Fetch Join 수행
+     * - attributePaths = {"roles"}로 roles 연관관계를 즉시 로딩
+     * - Spring Data JPA가 자동으로 LEFT JOIN FETCH 쿼리 생성
+     * - 메서드 이름 구조에 따라 파싱 결과가 달라질 수 있음
+     * 
+     * @param id User ID
+     * @return Optional<User>
+     */
+    @EntityGraph(attributePaths = {"roles"})
+    Optional<User> getWithRolesById(Long id);
 }
 
