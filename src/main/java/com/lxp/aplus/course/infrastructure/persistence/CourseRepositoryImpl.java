@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class CourseRepositoryImpl implements CourseRepository {
-
     private final CourseJpaRepository jpaRepository;
 
     @Override
