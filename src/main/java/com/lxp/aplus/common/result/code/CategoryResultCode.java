@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum CategoryResultCode implements ResultCode {
-    CATEGORY_LIST_SUCCESS(HttpStatus.OK, "SC001", "카테고리 목록을 조회했습니다.");
+    CATEGORY_LIST_SUCCESS(HttpStatus.OK, "SCT001", "카테고리 목록을 조회했습니다.");
 
     private final HttpStatus status;
     private final String code;

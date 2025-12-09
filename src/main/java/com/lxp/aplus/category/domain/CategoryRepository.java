@@ -6,4 +6,5 @@ import java.util.Optional;
 public interface CategoryRepository {
     Optional<Category> findById(Long id);
     List<Category> findAllRootWithChildren();
+    Optional<Category> findByIdWithParent(Long id);
 }

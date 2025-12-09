@@ -19,11 +19,10 @@ public record CategoryResponse(
         return CategoryResponse.builder()
                 .categoryId(category.getId())
                 .name(category.getName())
-                .children(category.getChildren() != null ?
-                        category.getChildren().stream()
+                .children(category.getChildren().stream()
                                 .map(CategoryResponse::from)
-                                .collect(Collectors.toList()) :
-                        Collections.emptyList())
+                                .collect(Collectors.toList())
+                )
                 .build();
     }
 
