@@ -2,14 +2,20 @@ package com.lxp.aplus.course.presentation.controller;
 
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.CourseResultCode;
-import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
+import com.lxp.aplus.course.application.usecase.CourseQueryUseCase;
 import com.lxp.aplus.course.presentation.request.CourseCreateRequest;
 import com.lxp.aplus.course.presentation.request.CourseUpdateRequest;
 import com.lxp.aplus.course.presentation.response.CourseResponse;
+import com.lxp.aplus.course.presentation.response.CourseUpsertResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,31 +27,41 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CourseController {
     private final CourseCommandUseCase courseCommandUseCase;
+    private final CourseQueryUseCase courseQueryUseCase;
 
     @PostMapping("/api/instructor/courses")
-    public ResponseEntity<ResultResponse<CourseResponse>> createCourse(@RequestParam Long instructorId,
-                                                                       @Valid @RequestBody CourseCreateRequest request) {
-        CourseResult courseResult = courseCommandUseCase.createCourse(instructorId, request.toCommand());
+    public ResponseEntity<ResultResponse<CourseUpsertResponse>> createCourse(@RequestParam Long instructorId,
+                                                                             @Valid @RequestBody CourseCreateRequest request) {
+        CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.createCourse(instructorId, request.toCommand());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_REGISTER_SUCCESS.getStatus())
                 .body(ResultResponse.of(
                         CourseResultCode.COURSE_REGISTER_SUCCESS,
-                        CourseResponse.from(courseResult))
+                        courseUpsertResponse)
                 );
     }
 
     @PatchMapping("/api/instructor/courses/{courseId}")
-    public ResponseEntity<ResultResponse<CourseResponse>> updateCourse(@PathVariable Long courseId,
-                                                                       @RequestParam Long instructorId,
-                                                                       @RequestBody CourseUpdateRequest request) {
-        CourseResult courseResult = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());
+    public ResponseEntity<ResultResponse<CourseUpsertResponse>> updateCourse(@PathVariable Long courseId,
+                                                                             @RequestParam Long instructorId,
+                                                                             @RequestBody CourseUpdateRequest request) {
+        CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_UPDATE_SUCCESS.getStatus())
                 .body(ResultResponse.of(
                         CourseResultCode.COURSE_UPDATE_SUCCESS,
-                        CourseResponse.from(courseResult))
+                        courseUpsertResponse)
                 );
+    }
+
+    @GetMapping("/api/instructor/courses")
+    public ResponseEntity<ResultResponse<Page<CourseResponse>>> getInstructorCourses(
+            @RequestParam Long instructorId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<CourseResponse> result = courseQueryUseCase.getInstructorCourses(instructorId, pageable);
+        return ResponseEntity.ok(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, result));
     }
 }
