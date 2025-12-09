@@ -32,21 +32,21 @@ public class CourseQueryUseCase {
     }
 
     private Page<CourseResponse> convertToCourseResponse(Page<Course> courses, Pageable pageable) {
-        List<CourseResponse> dtoList = courses.getContent().stream()
+        List<CourseResponse> courseResponses = courses.getContent().stream()
                 .map(course -> {
                     List<String> categoryPath = getCategoryPath(course.getCategoryId());
                     return CourseResponse.of(course, categoryPath);
                 })
                 .toList();
 
-        return new PageImpl<>(dtoList, pageable, courses.getTotalElements());
+        return new PageImpl<>(courseResponses, pageable, courses.getTotalElements());
     }
 
     private List<String> getCategoryPath(Long categoryId) {
         if (categoryId == null) {
             return Collections.emptyList();
         }
-        return categoryQueryPort.findCategoryPathIds(categoryId);
+        return categoryQueryPort.findCategoryWithParentNames(categoryId);
     }
 
 }

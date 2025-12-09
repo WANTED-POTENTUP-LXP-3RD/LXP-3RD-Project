@@ -22,4 +22,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public List<Category> findAllRootWithChildren() {
         return jpaRepository.findAllRootWithChildren();
     }
+
+    @Override
+    public Optional<Category> findByIdWithParent(Long id) {
+        return jpaRepository.findByIdWithParent(id);
+    }
 }

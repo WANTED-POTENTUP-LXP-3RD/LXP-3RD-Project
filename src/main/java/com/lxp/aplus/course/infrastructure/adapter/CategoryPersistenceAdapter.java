@@ -17,16 +17,17 @@ public class CategoryPersistenceAdapter implements CategoryQueryPort {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<String> findCategoryPathIds(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
+    public List<String> findCategoryWithParentNames(Long categoryId) {
+        Category category = categoryRepository.findByIdWithParent(categoryId)
                 .orElseThrow(() -> new BusinessException(CategoryErrorCode.CATEGORY_NOT_FOUND));
 
-        List<String> path = new ArrayList<>();
-        while (category != null) {
-            path.add(0, String.valueOf(category.getName()));
-            category = category.getParent();
+        List<String> categoryNames = new ArrayList<>();
+        categoryNames.add(category.getName());
+
+        if (category.getParent() != null) {
+            categoryNames.add(0, category.getParent().getName());
         }
 
-        return path;
+        return categoryNames;
     }
 }
