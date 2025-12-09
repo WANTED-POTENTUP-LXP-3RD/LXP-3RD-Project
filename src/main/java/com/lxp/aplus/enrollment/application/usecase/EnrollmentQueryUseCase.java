@@ -1,5 +1,7 @@
 package com.lxp.aplus.enrollment.application.usecase;
 
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseInfo;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
@@ -30,7 +32,7 @@ public class EnrollmentQueryUseCase {
         List<EnrollmentListItemResult> content = enrollmentsPage.getContent().stream()
                 .map(enrollment -> {
                     CourseInfo courseInfo = courseFinder.findCourseById(enrollment.getCourseId())
-                            .orElse(new CourseInfo(enrollment.getCourseId(), "알 수 없는 강의"));
+                            .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
                     return EnrollmentListItemResult.of(enrollment, courseInfo);
                 })
