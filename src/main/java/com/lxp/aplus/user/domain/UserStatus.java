@@ -1,4 +1,4 @@
-package com.lxp.aplus.user.domain.enums;
+package com.lxp.aplus.user.domain;
 
 /**
  * ACTIVE	정상 회원
