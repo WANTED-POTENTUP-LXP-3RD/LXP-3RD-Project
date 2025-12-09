@@ -64,4 +64,12 @@ public class CourseController {
         Page<CourseResponse> result = courseQueryUseCase.getInstructorCourses(instructorId, pageable);
         return ResponseEntity.ok(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, result));
     }
+
+    @GetMapping("/api/courses")
+    public ResponseEntity<ResultResponse<Page<CourseResponse>>> getCourses(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<CourseResponse> result = courseQueryUseCase.getPublishedCourses(pageable);
+        return ResponseEntity.ok(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, result));
+    }
 }

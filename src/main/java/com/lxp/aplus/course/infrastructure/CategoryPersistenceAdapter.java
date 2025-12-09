@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -23,13 +22,11 @@ public class CategoryPersistenceAdapter implements CategoryQueryPort {
                 .orElseThrow(() -> new BusinessException(CategoryErrorCode.CATEGORY_NOT_FOUND));
 
         List<String> path = new ArrayList<>();
-
         while (category != null) {
-            path.add(String.valueOf(category.getName()));
+            path.add(0, String.valueOf(category.getName()));
             category = category.getParent();
         }
 
-        Collections.reverse(path);
         return path;
     }
 }
