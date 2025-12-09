@@ -21,6 +21,6 @@ public class CourseFinderAdapter implements CourseFinder {
     @Transactional(readOnly = true)
     public Optional<CourseInfo> findCourseById(Long courseId) {
         return courseRepository.findById(courseId)
-                .map(course -> new CourseInfo(course.getId()));
+                .map(course -> new CourseInfo(course.getId(), course.getTitle()));
     }
 }

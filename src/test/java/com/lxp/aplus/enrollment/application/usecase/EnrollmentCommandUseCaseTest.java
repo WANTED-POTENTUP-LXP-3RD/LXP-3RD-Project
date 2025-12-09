@@ -53,7 +53,7 @@ class EnrollmentCommandUseCaseTest {
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
         Enrollment createdEnrollment = Enrollment.of(STUDENT_ID, COURSE_ID_1, LocalDateTime.now().plusYears(2));
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1)));
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(false);
         given(enrollmentRepository.save(any(Enrollment.class))).willReturn(createdEnrollment);
 
@@ -94,7 +94,7 @@ class EnrollmentCommandUseCaseTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1)));
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(true);
 
         // when & then
