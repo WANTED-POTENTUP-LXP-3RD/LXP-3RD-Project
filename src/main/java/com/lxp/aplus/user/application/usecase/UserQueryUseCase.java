@@ -45,7 +45,7 @@ public class UserQueryUseCase {
      * @return Optional<User>
      */
     Optional<User> findByIdWithRoles(Long id) {
-        return userRepository.findByIdWithRoles(id);
+        return userRepository.findUserWithRolesById(id);
     }
 
     /**
@@ -67,8 +67,8 @@ public class UserQueryUseCase {
      * @param id User ID
      * @return Optional<UserResponse>
      */
-    public Optional<UserResponse> findUserByIdWithRoles(Long id) {
-        return userRepository.findByIdWithRoles(id)
+    public Optional<UserResponse> findUserWithRolesById(Long id) {
+        return userRepository.findUserWithRolesById(id)
                 .map(UserResponse::from);
     }
 
