@@ -7,6 +7,7 @@ import com.lxp.aplus.common.security.CustomPasswordEncoder;
 import com.lxp.aplus.common.security.RefreshTokenStorage;
 import com.lxp.aplus.common.security.AccessTokenBlacklist;
 import com.lxp.aplus.user.application.dto.AuthUser;
+import com.lxp.aplus.user.application.dto.CreateUserRequest;
 import com.lxp.aplus.user.application.dto.LoginRequest;
 import com.lxp.aplus.user.application.dto.LoginResponse;
 import com.lxp.aplus.user.domain.UserStatus;
@@ -26,10 +27,28 @@ import java.util.Date;
 public class AuthCommandUseCase {
 
     private final UserQueryUseCase userQueryUseCase;
+    private final UserCommandUseCase userCommandUseCase;
     private final CustomPasswordEncoder customPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenStorage refreshTokenStorage;
     private final AccessTokenBlacklist accessTokenBlacklist;
+
+    /**
+     * 회원가입 및 자동 로그인
+     * 
+     * 회원가입 후 자동으로 로그인하여 토큰을 발급합니다.
+     * 
+     * @param request 회원가입 요청
+     * @return 로그인 응답 (Access Token, Refresh Token, 닉네임, 역할 목록)
+     */
+    public LoginResponse signupAndLogin(CreateUserRequest request) {
+        // 1. 회원가입
+        userCommandUseCase.createUser(request);
+        
+        // 2. 자동 로그인 (회원가입한 사용자로 로그인)
+        LoginRequest loginRequest = new LoginRequest(request.email(), request.password());
+        return login(loginRequest);
+    }
 
     /**
      * 로그인
@@ -73,7 +92,19 @@ public class AuthCommandUseCase {
 
         log.info("로그인 성공: userId={}, email={}", user.id(), user.email());
 
-        return new LoginResponse(accessToken, refreshToken, user.nickName(), user.roles());
+        // Access Token 만료 시간 계산 (초 단위)
+        long expiresIn = jwtTokenProvider.getAccessTokenExpirationInSeconds();
+        
+        // UserInfo 객체 생성
+        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(user.nickName(), user.roles());
+        
+        return new LoginResponse(
+                accessToken,
+                refreshToken,
+                "Bearer",
+                expiresIn,
+                userInfo
+        );
     }
 
     /**
@@ -144,8 +175,20 @@ public class AuthCommandUseCase {
 
         log.info("토큰 재발급 성공: userId={}, roles={}", userId, user.roles());
 
+        // Access Token 만료 시간 계산 (초 단위)
+        long expiresIn = jwtTokenProvider.getAccessTokenExpirationInSeconds();
+        
+        // UserInfo 객체 생성
+        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(user.nickName(), user.roles());
+        
         // Refresh Token은 기존 것을 그대로 반환
-        return new LoginResponse(newAccessToken, refreshToken, user.nickName(), user.roles());
+        return new LoginResponse(
+                newAccessToken,
+                refreshToken,
+                "Bearer",
+                expiresIn,
+                userInfo
+        );
     }
 }
 

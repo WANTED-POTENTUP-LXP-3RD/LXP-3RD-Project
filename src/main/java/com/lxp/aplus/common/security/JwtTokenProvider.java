@@ -149,5 +149,14 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+    /**
+     * Access Token 만료 시간을 초 단위로 반환
+     * 
+     * @return 만료 시간 (초)
+     */
+    public long getAccessTokenExpirationInSeconds() {
+        return accessTokenExpiration / 1000; // 밀리초를 초로 변환
+    }
 }
 
