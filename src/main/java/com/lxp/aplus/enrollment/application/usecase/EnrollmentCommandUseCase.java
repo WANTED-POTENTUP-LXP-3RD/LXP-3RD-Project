@@ -24,13 +24,11 @@ public class EnrollmentCommandUseCase{
     private final CourseFinder courseFinder;
 
     /**
-     * 수강 신청 비즈니스 로직을 수행합니다. (Transaction Script & Domain Model Pattern)
+     * 수강 신청 비즈니스 로직을 수행합니다.
      * * <p> 처리 흐름:
-     * 1. [강의 조회] 신청하려는 강의가 존재하는지 확인
-     * 2. [결제 검증] 요청된 결제 정보(impUid)가 유효하고, 강의료와 일치하는지 검증 (PaymentValidator 위임)
-     * 3. [중복 검사] 이미 수강 중인 강의인지 확인 (중복 시 예외 발생)
-     * 4. [엔티티 생성] 수강 기간(2년) 정책을 적용하여 Enrollment 엔티티 생성
-     * 5. [저장] 생성된 수강 내역 저장 및 결과 반환
+     * 1. [중복 검사] 이미 수강 중인 강의인지 확인 (중복 시 예외 발생)
+     * 2. [엔티티 생성] 수강 기간(2년) 정책을 적용하여 Enrollment 엔티티 생성
+     * 3. [저장] 생성된 수강 내역 저장 및 결과 반환
      * </p>
      *
      * @param command 수강 신청 요청 데이터 (studentId, courseId, impUid 등)
