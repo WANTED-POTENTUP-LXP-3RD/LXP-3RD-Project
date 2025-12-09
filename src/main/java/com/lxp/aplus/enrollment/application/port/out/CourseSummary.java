@@ -1,6 +1,6 @@
 package com.lxp.aplus.enrollment.application.port.out;
 
-public record CourseInfo(
+public record CourseSummary(
         Long courseId,
         String courseName
 ) {

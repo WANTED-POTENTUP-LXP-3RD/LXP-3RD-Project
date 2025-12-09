@@ -1,7 +1,7 @@
 package com.lxp.aplus.enrollment.application.usecase;
 
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
-import com.lxp.aplus.enrollment.application.port.out.CourseInfo;
+import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListQueryResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
@@ -73,9 +73,9 @@ class EnrollmentQueryUseCaseTest {
         given(enrollmentRepository.findByStudentIdAndStatus(STUDENT_ID, status, pageable))
                 .willReturn(enrollmentsPage);
         given(courseFinder.findCourseById(COURSE_ID_1))
-                .willReturn(Optional.of(new CourseInfo(COURSE_ID_1, COURSE_NAME_1)));
+                .willReturn(Optional.of(new CourseSummary(COURSE_ID_1, COURSE_NAME_1)));
         given(courseFinder.findCourseById(COURSE_ID_2))
-                .willReturn(Optional.of(new CourseInfo(COURSE_ID_2, COURSE_NAME_2)));
+                .willReturn(Optional.of(new CourseSummary(COURSE_ID_2, COURSE_NAME_2)));
 
         // when
         EnrollmentListQueryResult result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);

@@ -1,7 +1,7 @@
 package com.lxp.aplus.enrollment.infrastructure.adapter;
 
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
-import com.lxp.aplus.enrollment.application.port.out.CourseInfo;
+import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 
 
 import com.lxp.aplus.course.domain.CourseRepository;
@@ -19,8 +19,8 @@ public class CourseFinderAdapter implements CourseFinder {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CourseInfo> findCourseById(Long courseId) {
+    public Optional<CourseSummary> findCourseById(Long courseId) {
         return courseRepository.findById(courseId)
-                .map(course -> new CourseInfo(course.getId(), course.getTitle()));
+                .map(course -> new CourseSummary(course.getId(), course.getTitle()));
     }
 }

@@ -3,7 +3,6 @@ package com.lxp.aplus.enrollment.presentation.controller;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.EnrollmentResultCode;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListQueryResult;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentCommandUseCase;
 import com.lxp.aplus.enrollment.application.usecase.EnrollmentQueryUseCase;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import lombok.RequiredArgsConstructor;
