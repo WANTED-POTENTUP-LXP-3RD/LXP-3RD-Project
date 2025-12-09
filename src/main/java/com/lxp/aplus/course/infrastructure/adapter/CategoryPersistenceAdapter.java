@@ -1,4 +1,4 @@
-package com.lxp.aplus.course.infrastructure;
+package com.lxp.aplus.course.infrastructure.adapter;
 
 import com.lxp.aplus.category.domain.Category;
 import com.lxp.aplus.category.domain.CategoryRepository;

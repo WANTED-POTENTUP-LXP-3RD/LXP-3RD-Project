@@ -6,7 +6,6 @@ import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
-import com.lxp.aplus.course.presentation.response.CourseResponse;
 import com.lxp.aplus.course.presentation.response.CourseUpsertResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
