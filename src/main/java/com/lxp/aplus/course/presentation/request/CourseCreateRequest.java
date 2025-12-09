@@ -5,9 +5,7 @@ import com.lxp.aplus.course.domain.CourseLevel;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 
-@Builder
 public record CourseCreateRequest(@NotBlank(message = "제목은 필수입니다.") String title,
                                   @NotNull(message = "카테고리는 필수입니다.") Long categoryId,
                                   @NotBlank(message = "한 줄 요약은 필수입니다.") String summary,
