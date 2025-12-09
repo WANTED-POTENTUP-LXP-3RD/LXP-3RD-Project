@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.presentation.controller;
 
+import com.lxp.aplus.common.result.PageResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.CourseResultCode;
 import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.lxp.aplus.common.result.code.CourseResultCode.COURSE_LIST_SUCCESS;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,19 +60,25 @@ public class CourseController {
     }
 
     @GetMapping("/api/instructor/courses")
-    public ResponseEntity<ResultResponse<Page<CourseResponse>>> getInstructorCourses(
+    public ResponseEntity<ResultResponse<PageResponse<CourseResponse>>> getInstructorCourses(
             @RequestParam Long instructorId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<CourseResponse> result = courseQueryUseCase.getInstructorCourses(instructorId, pageable);
-        return ResponseEntity.ok(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, result));
+        return ResponseEntity
+                .status(COURSE_LIST_SUCCESS.getStatus())
+                .body(ResultResponse.of(COURSE_LIST_SUCCESS, PageResponse.from(result))
+                );
     }
 
     @GetMapping("/api/courses")
-    public ResponseEntity<ResultResponse<Page<CourseResponse>>> getCourses(
+    public ResponseEntity<ResultResponse<PageResponse<CourseResponse>>> getPublishedCourses(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<CourseResponse> result = courseQueryUseCase.getPublishedCourses(pageable);
-        return ResponseEntity.ok(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, result));
+        return ResponseEntity
+                .status(COURSE_LIST_SUCCESS.getStatus())
+                .body(ResultResponse.of(COURSE_LIST_SUCCESS, PageResponse.from(result))
+                );
     }
 }
