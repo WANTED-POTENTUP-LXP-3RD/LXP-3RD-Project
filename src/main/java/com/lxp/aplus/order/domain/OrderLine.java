@@ -49,6 +49,7 @@ public class OrderLine {
         this.price = price;
     }
 
+    // FIXME: course 네이밍 바꾸기 (course 도메인과 헷갈릴 여지 있음)
     public static OrderLine course(Long courseId, BigDecimal price) {
         return new OrderLine(ItemType.COURSE, courseId, price);
     }
