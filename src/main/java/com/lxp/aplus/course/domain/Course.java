@@ -2,7 +2,8 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.common.error.code.CourseErrorCode;
+import com.lxp.aplus.common.error.code.GlobalErrorCode;
+import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
 import jakarta.persistence.CascadeType;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Builder
 @Entity
@@ -94,7 +96,37 @@ public class Course extends BaseAggregateRoot {
 
     public void validateOwner(Long userId) {
         if (!this.instructorId.equals(userId)) {
-            throw new BusinessException(CourseErrorCode.COURSE_ACCESS_DENIED);
+            throw new BusinessException(GlobalErrorCode.VALIDATION_ERROR);
+        }
+    }
+
+    public void addSection(String title, int orderIndex) {
+        validateSectionOrder(orderIndex);
+
+        Section newSection = Section.createSection(this, title, orderIndex);
+        this.sections.add(newSection);
+    }
+
+    public Section updateSection(Long sectionId, String title, Integer orderIndex) {
+        Section targetSection = this.sections.stream()
+                .filter(section -> Objects.equals(section.getId(), sectionId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+
+        if (orderIndex != null && targetSection.getOrderIndex() != orderIndex) {
+            validateSectionOrder(orderIndex);
+        }
+
+        targetSection.update(title, orderIndex);
+        return targetSection;
+    }
+
+    private void validateSectionOrder(int orderIndex) {
+        boolean isOrderIndexDuplicated = this.sections.stream()
+                .anyMatch(section -> section.getOrderIndex() == orderIndex);
+
+        if (isOrderIndexDuplicated) {
+            throw new BusinessException(SectionErrorCode.SECTION_ORDER_DUPLICATED);
         }
     }
 }

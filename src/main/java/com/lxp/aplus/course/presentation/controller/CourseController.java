@@ -3,12 +3,16 @@ package com.lxp.aplus.course.presentation.controller;
 import com.lxp.aplus.common.result.PageResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.CourseResultCode;
+import com.lxp.aplus.common.result.code.SectionResultCode;
 import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
 import com.lxp.aplus.course.application.usecase.CourseQueryUseCase;
 import com.lxp.aplus.course.presentation.request.CourseCreateRequest;
 import com.lxp.aplus.course.presentation.request.CourseUpdateRequest;
+import com.lxp.aplus.course.presentation.request.SectionCreateRequest;
+import com.lxp.aplus.course.presentation.request.SectionUpdateRequest;
 import com.lxp.aplus.course.presentation.response.CourseResponse;
 import com.lxp.aplus.course.presentation.response.CourseUpsertResponse;
+import com.lxp.aplus.course.presentation.response.SectionUpsertResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,8 +45,7 @@ public class CourseController {
                 .status(CourseResultCode.COURSE_REGISTER_SUCCESS.getStatus())
                 .body(ResultResponse.of(
                         CourseResultCode.COURSE_REGISTER_SUCCESS,
-                        courseUpsertResponse)
-                );
+                        courseUpsertResponse));
     }
 
     @PatchMapping("/api/instructor/courses/{courseId}")
@@ -55,8 +58,7 @@ public class CourseController {
                 .status(CourseResultCode.COURSE_UPDATE_SUCCESS.getStatus())
                 .body(ResultResponse.of(
                         CourseResultCode.COURSE_UPDATE_SUCCESS,
-                        courseUpsertResponse)
-                );
+                        courseUpsertResponse));
     }
 
     @GetMapping("/api/instructor/courses")
@@ -65,10 +67,10 @@ public class CourseController {
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<CourseResponse> result = courseQueryUseCase.getInstructorCourses(instructorId, pageable);
+
         return ResponseEntity
                 .status(COURSE_LIST_SUCCESS.getStatus())
-                .body(ResultResponse.of(COURSE_LIST_SUCCESS, PageResponse.from(result))
-                );
+                .body(ResultResponse.of(COURSE_LIST_SUCCESS, PageResponse.from(result)));
     }
 
     @GetMapping("/api/courses")
@@ -76,9 +78,36 @@ public class CourseController {
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<CourseResponse> result = courseQueryUseCase.getPublishedCourses(pageable);
+        
         return ResponseEntity
                 .status(COURSE_LIST_SUCCESS.getStatus())
-                .body(ResultResponse.of(COURSE_LIST_SUCCESS, PageResponse.from(result))
-                );
+                .body(ResultResponse.of(COURSE_LIST_SUCCESS, PageResponse.from(result)));
+    }
+
+    @PostMapping("/api/instructor/courses/{courseId}/sections")
+    public ResponseEntity<ResultResponse<SectionUpsertResponse>> createSection(
+            @PathVariable Long courseId,
+            @RequestParam Long instructorId,
+            @Valid @RequestBody SectionCreateRequest request
+    ) {
+        SectionUpsertResponse response = courseCommandUseCase.createSection(courseId, instructorId, request.toCommand());
+
+        return ResponseEntity
+                .status(SectionResultCode.SECTION_REGISTER_SUCCESS.getStatus())
+                .body(ResultResponse.of(SectionResultCode.SECTION_REGISTER_SUCCESS, response));
+    }
+
+    @PatchMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
+    public ResponseEntity<ResultResponse<SectionUpsertResponse>> updateSection(
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId,
+            @RequestParam Long instructorId,
+            @RequestBody SectionUpdateRequest request
+    ) {
+        SectionUpsertResponse response = courseCommandUseCase.updateSection(courseId, instructorId, sectionId, request.toCommand());
+
+        return ResponseEntity
+                .status(SectionResultCode.SECTION_UPDATE_SUCCESS.getStatus())
+                .body(ResultResponse.of(SectionResultCode.SECTION_UPDATE_SUCCESS, response));
     }
 }
