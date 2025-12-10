@@ -1,9 +1,9 @@
 package com.lxp.aplus.payment.application.usecase;
 
-import com.lxp.aplus.order.application.result.OrderCreationResult;
+import com.lxp.aplus.order.application.result.OrderCreateResult;
 import com.lxp.aplus.order.application.usecase.OrderCommandUseCase;
-import com.lxp.aplus.payment.application.command.PreparePaymentCommand;
-import com.lxp.aplus.payment.application.result.PaymentResult;
+import com.lxp.aplus.payment.application.command.PaymentPrepareCommand;
+import com.lxp.aplus.payment.application.result.PaymentPrepareResult;
 import com.lxp.aplus.payment.domain.Payment;
 import com.lxp.aplus.payment.domain.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,10 @@ public class PaymentCommandUseCase {
     private final PaymentRepository paymentRepository;
     private final OrderCommandUseCase orderCommandUseCase; // FIXME: Order BC 침범 (의도됨) ⚠️
 
-    public PaymentResult prepare(PreparePaymentCommand command) {
+    public PaymentPrepareResult prepare(PaymentPrepareCommand command) {
 
         // 1. Order 생성 (From Order BC)
-        OrderCreationResult orderResult = orderCommandUseCase.createOrderFromCourseIds(
+        OrderCreateResult orderResult = orderCommandUseCase.createOrderFromCourseIds(
                 command.userId(),
                 command.courseIds()
         );
@@ -35,6 +35,6 @@ public class PaymentCommandUseCase {
         paymentRepository.save(payment);
 
         // 3. 결과 반환
-        return PaymentResult.from(payment);
+        return PaymentPrepareResult.from(payment);
     }
 }
