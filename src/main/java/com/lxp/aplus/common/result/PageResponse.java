@@ -1,6 +1,7 @@
 package com.lxp.aplus.common.result;
 
 import org.springframework.data.domain.Page;
+
 import java.util.List;
 
 public record PageResponse<T>(
