@@ -9,7 +9,7 @@ public record CourseUpdateCommand(
         String summary,
         String description,
         Long categoryId,
-        CourseLevel courseLevel,
+        Integer price,
         String thumbnailUrl,
-        Integer price
+        CourseLevel courseLevel
 ) {}

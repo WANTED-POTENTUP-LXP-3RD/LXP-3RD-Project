@@ -2,7 +2,10 @@ package com.lxp.aplus.enrollment.infrastructure.persistence;
 
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,4 +42,8 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
         return jpaRepository.findByStudentIdAndCourseId(studentId, courseId);
     }
 
+    @Override
+    public Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable) {
+        return jpaRepository.findByStudentIdAndStatus(studentId, status, pageable);
+    }
 }

@@ -1,0 +1,192 @@
+### API HTTP Client
+### IntelliJ에서 직접 실행 가능 (▶ 버튼 클릭)
+### 변수 설정: baseUrl, accessToken, refreshToken 등
+
+### 변수 설정 (실행 전에 수정 가능)
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 테스트용 사용자 정보 (통일)
+@testEmail = test@example.com
+@testPassword = password123
+@testName = 테스트 사용자
+@testNickName = testuser
+@testPhoneNumber = 010-1234-5678
+
+##########################################
+### 인증 API (/api/auth)
+##########################################
+
+### 1. 회원가입 (테스트용 사용자 생성)
+# @name signup
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "name": "{{testName}}",
+  "nickName": "{{testNickName}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}",
+  "phoneNumber": "{{testPhoneNumber}}"
+}
+
+### 2. 로그인 (토큰 자동 저장)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+    client.log("Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 로그인 후 위의 스크립트가 자동으로 토큰을 변수에 저장합니다.
+### accessToken과 refreshToken 변수가 자동으로 설정됩니다.
+
+### 3. 토큰 재발급 (Refresh Token 사용, 새 토큰 자동 저장)
+# @name refreshToken
+POST {{baseUrl}}/api/auth/token/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("New Access Token: " + response.body.data.accessToken);
+    client.log("New Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 4. 로그아웃 (Access Token과 Refresh Token 모두 사용)
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+X-Refresh-Token: {{refreshToken}}
+
+##########################################
+### 사용자 API (/api/users)
+##########################################
+
+### 5. 내 정보 조회 (Access Token 사용)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+### 6. 내 정보 수정 (Access Token 사용)
+PATCH {{baseUrl}}/api/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nickName": "updatedNickname",
+  "email": "updated@example.com"
+}
+
+### 7. 비밀번호 변경 (Access Token 사용)
+PATCH {{baseUrl}}/api/users/me/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "newPassword": "newPassword123"
+}
+
+### 8. 회원탈퇴 (Access Token 사용)
+DELETE {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+### 9. 강사 권한 추가 (Access Token 사용)
+PATCH {{baseUrl}}/api/users/me/roles/instructor
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+##########################################
+### Access Token 자동 갱신 테스트
+##########################################
+
+### 10. Access Token 자동 갱신 테스트
+### Access Token이 만료되었을 때, X-Refresh-Token 헤더를 함께 보내면
+### 응답 헤더에 X-New-Access-Token으로 새로운 토큰이 반환됩니다.
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer expired-access-token
+X-Refresh-Token: {{refreshToken}}
+
+> {%
+    const newAccessToken = response.headers.valueOf("X-New-Access-Token");
+    if (newAccessToken) {
+        client.global.set("accessToken", newAccessToken);
+        client.log("New Access Token from header: " + newAccessToken);
+    }
+%}
+
+##########################################
+### 에러 케이스 테스트
+##########################################
+
+### 11. 잘못된 이메일로 로그인 시도
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "wrong@example.com",
+  "password": "{{testPassword}}"
+}
+
+### 12. 잘못된 비밀번호로 로그인 시도
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "password": "wrongPassword"
+}
+
+### 13. 유효하지 않은 Refresh Token으로 재발급 시도
+POST {{baseUrl}}/api/auth/token/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "invalid-refresh-token"
+}
+
+### 14. Access Token 없이 인증 필요한 API 호출
+GET {{baseUrl}}/api/users/me
+
+### 15. 만료된 Access Token으로 API 호출 (Refresh Token 없음)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer expired-access-token
+
+##########################################
+### 전체 플로우 테스트 시나리오
+##########################################
+
+### 시나리오 1: 정상적인 로그인 → API 사용 → 로그아웃
+### 1. 위의 "2. 로그인" 실행 (토큰이 자동으로 변수에 저장됨)
+### 2. "5. 내 정보 조회" 실행하여 인증 확인
+### 3. "4. 로그아웃" 실행
+
+### 시나리오 2: 토큰 재발급 테스트
+### 1. "2. 로그인" 실행하여 토큰 획득 (자동 저장됨)
+### 2. "3. 토큰 재발급" 실행하여 새 토큰 획득 (자동 저장됨)
+### 3. "5. 내 정보 조회" 실행하여 새 토큰으로 인증 확인
+
+### 시나리오 3: Access Token 자동 갱신 테스트
+### 1. "2. 로그인" 실행하여 토큰 획득 (자동 저장됨)
+### 2. Access Token 만료 시뮬레이션을 위해 "10. Access Token 자동 갱신 테스트" 실행
+### 3. 응답 헤더의 X-New-Access-Token이 자동으로 변수에 저장됨
+### 4. "5. 내 정보 조회" 실행하여 새 토큰으로 API 호출 테스트
+
+### 시나리오 4: 회원가입 → 로그인 → 정보 수정 → 비밀번호 변경 → 회원탈퇴
+### 1. "1. 회원가입" 실행
+### 2. "2. 로그인" 실행 (토큰 자동 저장)
+### 3. "6. 내 정보 수정" 실행
+### 4. "7. 비밀번호 변경" 실행
+### 5. "8. 회원탈퇴" 실행
+

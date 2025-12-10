@@ -2,7 +2,7 @@ package com.lxp.aplus.user.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.user.domain.exception.UserErrorCode;
+import com.lxp.aplus.common.error.code.UserErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,7 +13,12 @@ import java.util.List;
 
 @Builder
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_email", columnNames = {"email"})
+        }
+)
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -108,6 +113,17 @@ public class User extends BaseAggregateRoot {
      */
     void updateStatus(UserStatus status) {
         this.status = status;
+    }
+
+    /**
+     * PENDING 상태에서 ACTIVE로 활성화 (임시용)
+     *
+     * TODO: 프로덕션에서는 이메일 인증 등 추가 검증 후 활성화해야 함
+     */
+    public void activateFromPending() {
+        if (this.status == UserStatus.PENDING) {
+            this.status = UserStatus.ACTIVE;
+        }
     }
 
     // TODO : 암호화 필요
