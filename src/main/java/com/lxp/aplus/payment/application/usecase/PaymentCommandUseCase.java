@@ -3,9 +3,9 @@ package com.lxp.aplus.payment.application.usecase;
 import com.lxp.aplus.order.application.result.OrderCreateResult;
 import com.lxp.aplus.order.application.usecase.OrderCommandUseCase;
 import com.lxp.aplus.payment.application.command.PaymentPrepareCommand;
-import com.lxp.aplus.payment.application.result.PaymentPrepareResult;
 import com.lxp.aplus.payment.domain.Payment;
 import com.lxp.aplus.payment.domain.PaymentRepository;
+import com.lxp.aplus.payment.presentation.response.PaymentPrepareResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ public class PaymentCommandUseCase {
     private final PaymentRepository paymentRepository;
     private final OrderCommandUseCase orderCommandUseCase; // FIXME: Order BC 침범 (의도됨) ⚠️
 
-    public PaymentPrepareResult prepare(PaymentPrepareCommand command) {
+    public PaymentPrepareResponse prepare(PaymentPrepareCommand command) {
 
         // 1. Order 생성 (From Order BC)
         OrderCreateResult orderResult = orderCommandUseCase.createOrderFromCourseIds(
@@ -35,6 +35,6 @@ public class PaymentCommandUseCase {
         paymentRepository.save(payment);
 
         // 3. 결과 반환
-        return PaymentPrepareResult.from(payment);
+        return PaymentPrepareResponse.from(payment);
     }
 }
