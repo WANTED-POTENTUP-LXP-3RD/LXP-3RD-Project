@@ -4,7 +4,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
-import com.lxp.aplus.enrollment.application.port.out.CourseInfo;
+import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.result.EnrollmentCreationResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
@@ -53,7 +53,7 @@ class EnrollmentCommandUseCaseTest {
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
         Enrollment createdEnrollment = Enrollment.of(STUDENT_ID, COURSE_ID_1, LocalDateTime.now().plusYears(2));
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1)));
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(false);
         given(enrollmentRepository.save(any(Enrollment.class))).willReturn(createdEnrollment);
 
@@ -94,7 +94,7 @@ class EnrollmentCommandUseCaseTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseInfo(COURSE_ID_1)));
+        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(true);
 
         // when & then
