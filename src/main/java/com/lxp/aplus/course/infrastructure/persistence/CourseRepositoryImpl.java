@@ -21,6 +21,11 @@ public class CourseRepositoryImpl implements CourseRepository {
     }
 
     @Override
+    public void flush() {
+        jpaRepository.flush();
+    }
+
+    @Override
     public Optional<Course> findById(Long id) {
         return jpaRepository.findById(id);
     }

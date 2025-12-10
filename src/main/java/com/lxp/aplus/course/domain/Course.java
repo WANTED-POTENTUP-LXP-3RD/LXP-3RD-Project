@@ -100,11 +100,12 @@ public class Course extends BaseAggregateRoot {
         }
     }
 
-    public void addSection(String title, int orderIndex) {
+    public Section addSection(String title, int orderIndex) {
         validateSectionOrder(orderIndex);
 
         Section newSection = Section.createSection(this, title, orderIndex);
         this.sections.add(newSection);
+        return newSection;
     }
 
     public Section updateSection(Long sectionId, String title, Integer orderIndex) {
