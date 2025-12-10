@@ -63,19 +63,15 @@ public class Payment extends BaseAggregateRoot {
     private Payment(
             String paymentId,
             String orderId,
-            BigDecimal amount,
-            String currency,
-            PaymentMethod paymentMethod,
-            PgProvider pgProvider,
-            PaymentStatus paymentStatus
+            BigDecimal amount
     ) {
         this.paymentId = paymentId;
         this.orderId = orderId;
         this.amount = amount;
-        this.currency = currency;
-        this.paymentMethod = paymentMethod;
-        this.pgProvider = pgProvider;
-        this.paymentStatus = paymentStatus;
+        this.currency = "KRW";
+        this.paymentMethod = PaymentMethod.CARD;
+        this.pgProvider = PgProvider.TOSS;
+        this.paymentStatus = PaymentStatus.PENDING;
     }
 
     /* ========= 생성 ========= */
@@ -95,11 +91,7 @@ public class Payment extends BaseAggregateRoot {
         return new Payment(
                 paymentId,
                 orderId,
-                amount,
-                "KRW",                // 통화코드
-                PaymentMethod.CARD,   // 결제수단
-                PgProvider.TOSS,      // PG사
-                PaymentStatus.PENDING // 결제 상태
+                amount
         );
     }
 
