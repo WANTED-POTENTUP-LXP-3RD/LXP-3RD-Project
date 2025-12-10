@@ -6,7 +6,7 @@ import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.domain.UserRepository;
 import com.lxp.aplus.user.domain.UserStatus;
-import com.lxp.aplus.user.domain.exception.UserErrorCode;
+import com.lxp.aplus.common.error.code.UserErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,7 +108,7 @@ class UserCommandUseCaseTest {
     }
 
     @Test
-    @DisplayName("User에 Role을 추가할 수 있다")
+    @DisplayName("User에 강사 Role을 추가할 수 있다")
     void addRole() {
         // given
         Long userId = 1L;
@@ -119,7 +119,7 @@ class UserCommandUseCaseTest {
         when(userQueryUseCase.findByIdWithRoles(userId)).thenReturn(Optional.of(user));
 
         // when
-        UserResponse response = userCommandUseCase.addRole(request);
+        UserResponse response = userCommandUseCase.addInstructorRole(userId);
 
         // then
         assertThat(response.roles()).hasSize(2);
@@ -141,7 +141,7 @@ class UserCommandUseCaseTest {
                 .thenReturn(Optional.of(user));
 
         // when & then
-        assertThatThrownBy(() -> userCommandUseCase.addRole(request))
+        assertThatThrownBy(() -> userCommandUseCase.addInstructorRole(userId))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(UserErrorCode.ROLE_ALREADY_EXISTS);
