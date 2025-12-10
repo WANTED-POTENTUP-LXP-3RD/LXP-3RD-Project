@@ -2,6 +2,7 @@ package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
+import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
 import com.lxp.aplus.course.application.command.SectionCreateCommand;
@@ -44,9 +45,15 @@ public class CourseCommandUseCase {
 
         course.validateOwner(instructorId);
         course.addSection(command.title(), command.orderIndex());
-        courseRepository.save(course);
+        Course savedCourse = courseRepository.save(course);
+        courseRepository.flush();
 
-        Section newSection = course.getSections().get(course.getSections().size() - 1);
+        Section newSection = savedCourse.getSections().stream()
+                .filter(section -> section.getOrderIndex() == command.orderIndex() 
+                        && section.getTitle().equals(command.title()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+
         return SectionUpsertResponse.from(newSection);
     }
 
