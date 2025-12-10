@@ -6,11 +6,11 @@ import lombok.Builder;
 @Builder
 public record CourseCreateCommand(
         String title,
-        Long categoryId,
         String summary,
         String description,
-        String thumbnailUrl,
+        Long categoryId,
         int price,
+        String thumbnailUrl,
         CourseLevel courseLevel
 ) {
 }

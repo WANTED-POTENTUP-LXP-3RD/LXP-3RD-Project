@@ -27,7 +27,7 @@ class UserRepositoryTest {
     @DisplayName("User를 저장하고 조회할 수 있다")
     void saveAndFindById() {
         // given
-        User user = User.of("홍길동", "hong@example.com", "password123");
+        User user = User.of("홍길동", "hong", "hong@example.com", "password123", "010-1234-5678");
 
         // when - save
         User savedUser = userRepository.save(user);
@@ -59,7 +59,7 @@ class UserRepositoryTest {
     @DisplayName("User를 저장하면 Role도 함께 저장된다")
     void save_WithRole() {
         // given
-        User user = User.of("김영희", "kim@example.com", "password123");
+        User user = User.of("김영희", "kim", "kim@example.com", "password123", "010-9876-5432");
         user.addRole(RoleType.INSTRUCTOR); // 추가 역할
 
         // when
@@ -78,7 +78,7 @@ class UserRepositoryTest {
     @DisplayName("User의 닉네임과 이메일을 업데이트할 수 있다")
     void updateUserInfo() {
         // given
-        User user = User.of("이철수", "lee@example.com", "password123");
+        User user = User.of("이철수", "lee",  "lee@example.com", "password123", "010-1111-2222");
         User savedUser = userRepository.save(user);
         LocalDateTime beforeUpdate = savedUser.getUpdatedAt();
 
@@ -99,7 +99,7 @@ class UserRepositoryTest {
     @DisplayName("User의 비밀번호를 변경할 수 있다")
     void changePassword() {
         // given
-        User user = User.of("박민수", "park@example.com", "oldPassword123");
+        User user = User.of("박민수", "park", "park@example.com", "oldPassword123", "010-3333-4444");
         User savedUser = userRepository.save(user);
 
         // when
@@ -117,7 +117,7 @@ class UserRepositoryTest {
     @DisplayName("User를 삭제할 수 있다 (Soft Delete)")
     void delete() {
         // given
-        User user = User.of("최지영", "choi@example.com", "password123");
+        User user = User.of("최지영", "choi", "choi@example.com", "password123", "010-5555-6666");
         User savedUser = userRepository.save(user);
         assertThat(savedUser.getDeletedAt()).isNull();
 
@@ -136,7 +136,7 @@ class UserRepositoryTest {
     @DisplayName("User에 역할을 추가할 수 있다")
     void addRole() {
         // given
-        User user = User.of("강사1", "instructor1@example.com", "password123");
+        User user = User.of("강사1","gang",  "instructor1@example.com", "password123", "010-7777-8888");
         User savedUser = userRepository.save(user);
         assertThat(savedUser.getRoles()).hasSize(1); // 기본 STUDENT 역할
 
@@ -158,7 +158,7 @@ class UserRepositoryTest {
     @DisplayName("User 생성 시 기본적으로 STUDENT 역할이 설정된다")
     void createUser_WithDefaultRole() {
         // when
-        User user = User.of("테스트유저", "test@example.com", "password123");
+        User user = User.of("테스트유저", "test", "test@example.com", "password123", "010-9999-0000");
 
         // then
         assertThat(user.getRoles()).hasSize(1);

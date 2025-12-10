@@ -51,5 +51,15 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaRepository.findById(id);
     }
 
+    @Override
+    public Optional<User> findUserWithRolesById(Long id) {
+        return jpaRepository.getWithRolesById(id);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return jpaRepository.existsById(id);
+    }
+
 }
 

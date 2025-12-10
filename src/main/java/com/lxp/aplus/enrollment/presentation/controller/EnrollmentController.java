@@ -1,11 +1,13 @@
 package com.lxp.aplus.enrollment.presentation.controller;
 
+import com.lxp.aplus.common.result.PageResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.EnrollmentResultCode;
-import com.lxp.aplus.enrollment.application.result.EnrollmentListQueryResult;
+import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.application.usecase.EnrollmentQueryUseCase;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +25,14 @@ public class EnrollmentController {
 
 
     @GetMapping
-    public ResponseEntity<ResultResponse<EnrollmentListQueryResult>> getEnrollmentList(
+    public ResponseEntity<ResultResponse<PageResponse<EnrollmentListItemResult>>> getEnrollmentList(
             @RequestParam(required = false, defaultValue = "ENROLLED") EnrollmentStatus status,
             @PageableDefault(size = 10, page = 0) Pageable pageable
     ) {
         Long studentId = 1L;
-        EnrollmentListQueryResult result = enrollmentQueryUseCase.getEnrollmentList(studentId, status, pageable);
+        Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(studentId, status, pageable);
         return ResponseEntity.ok(
-                ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENTS_SUCCESS, result)
+                ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENTS_SUCCESS, PageResponse.from(result))
         );
     }
 }

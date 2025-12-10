@@ -2,7 +2,7 @@ package com.lxp.aplus.enrollment.application.usecase;
 
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-import com.lxp.aplus.enrollment.application.result.EnrollmentListQueryResult;
+import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
@@ -78,27 +78,27 @@ class EnrollmentQueryUseCaseTest {
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_2, COURSE_NAME_2)));
 
         // when
-        EnrollmentListQueryResult result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
+        Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.content()).hasSize(2);
-        assertThat(result.totalElements()).isEqualTo(2);
-        assertThat(result.totalPages()).isEqualTo(1);
-        assertThat(result.pageNumber()).isEqualTo(0);
-        assertThat(result.pageSize()).isEqualTo(10);
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getTotalPages()).isEqualTo(1);
+        assertThat(result.getNumber()).isEqualTo(0);
+        assertThat(result.getSize()).isEqualTo(10);
 
-        assertThat(result.content().get(0).enrollmentId()).isEqualTo(enrollment1.getId());
-        assertThat(result.content().get(0).courseId()).isEqualTo(enrollment1.getCourseId());
-        assertThat(result.content().get(0).courseName()).isEqualTo(COURSE_NAME_1);
-        assertThat(result.content().get(0).status()).isEqualTo(enrollment1.getStatus());
-        assertThat(result.content().get(0).progressRate()).isEqualTo(enrollment1.getProgressRate());
+        assertThat(result.getContent().get(0).enrollmentId()).isEqualTo(enrollment1.getId());
+        assertThat(result.getContent().get(0).courseId()).isEqualTo(enrollment1.getCourseId());
+        assertThat(result.getContent().get(0).courseName()).isEqualTo(COURSE_NAME_1);
+        assertThat(result.getContent().get(0).status()).isEqualTo(enrollment1.getStatus());
+        assertThat(result.getContent().get(0).progressRate()).isEqualTo(enrollment1.getProgressRate());
 
-        assertThat(result.content().get(1).enrollmentId()).isEqualTo(enrollment2.getId());
-        assertThat(result.content().get(1).courseId()).isEqualTo(enrollment2.getCourseId());
-        assertThat(result.content().get(1).courseName()).isEqualTo(COURSE_NAME_2);
-        assertThat(result.content().get(1).status()).isEqualTo(enrollment2.getStatus());
-        assertThat(result.content().get(1).progressRate()).isEqualTo(enrollment2.getProgressRate());
+        assertThat(result.getContent().get(1).enrollmentId()).isEqualTo(enrollment2.getId());
+        assertThat(result.getContent().get(1).courseId()).isEqualTo(enrollment2.getCourseId());
+        assertThat(result.getContent().get(1).courseName()).isEqualTo(COURSE_NAME_2);
+        assertThat(result.getContent().get(1).status()).isEqualTo(enrollment2.getStatus());
+        assertThat(result.getContent().get(1).progressRate()).isEqualTo(enrollment2.getProgressRate());
     }
 
     @Test
@@ -114,11 +114,11 @@ class EnrollmentQueryUseCaseTest {
                 .willReturn(emptyPage);
 
         // when
-        EnrollmentListQueryResult result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
+        Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.content()).isEmpty();
-        assertThat(result.totalElements()).isEqualTo(0);
+        assertThat(result.getContent()).isEmpty();
+        assertThat(result.getTotalElements()).isEqualTo(0);
     }
 }
