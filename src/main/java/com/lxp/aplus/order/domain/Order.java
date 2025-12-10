@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 // TODO: amount, currency 묶어서 VO(Money)로 만들기
+// TODO: 특정 상태에 종속적인 필드를 관리하는 구조적인 방법 고민(approvedPaymentId, cancelReason)
 @Entity
 @Table(name = "orders")
 @Getter
