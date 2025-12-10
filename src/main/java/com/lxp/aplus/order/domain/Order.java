@@ -74,14 +74,22 @@ public class Order extends BaseAggregateRoot {
     /*
      * 주문 생성
      * - Order는 항상 PENDING 상태로만 생성된다.
+     * - OrderLine의 price 합계와 금액이 일치해야 한다.
      */
     public static Order create(
             Long userId,
-            BigDecimal amount,
             List<OrderLine> orderLines
     ) {
-        String orderId = UUID.randomUUID().toString();  // TODO: 규칙 만들기
+        // 1. orderId 생성
+        // TODO: orderId 생성 규칙 만들기
+        String orderId = UUID.randomUUID().toString();
 
+        // 2. 총액 계산
+        BigDecimal amount = orderLines.stream()
+                .map(OrderLine::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 3. Order 생성 및 반환 (생성자를 통해 불변성 확보)
         return new Order(
                 orderId,
                 userId,
