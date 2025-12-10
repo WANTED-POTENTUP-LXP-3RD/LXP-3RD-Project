@@ -26,13 +26,13 @@ public class Order extends BaseAggregateRoot {
     @Column(name = "id")
     private String orderId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String currency;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private BigDecimal amount;
 
     @ElementCollection
