@@ -28,6 +28,9 @@ public class Payment extends BaseAggregateRoot {
 
     // NOTE: Aggregate 간 연관은 ID 참조 수준으로만 둡니다.
     @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
     private String orderId;
 
     @Column(unique = true)
@@ -62,10 +65,12 @@ public class Payment extends BaseAggregateRoot {
 
     private Payment(
             String paymentId,
+            Long userId,
             String orderId,
             BigDecimal amount
     ) {
         this.paymentId = paymentId;
+        this.userId = userId;
         this.orderId = orderId;
         this.amount = amount;
         this.currency = "KRW";
@@ -81,7 +86,7 @@ public class Payment extends BaseAggregateRoot {
      * - Payment는 항상 PENDING 상태로만 생성된다.
      * - 금액(amount) 변경 불가
      */
-    public static Payment create(String orderId, BigDecimal amount) {
+    public static Payment create(String orderId, Long userId, BigDecimal amount) {
         if (orderId == null) {
             throw new IllegalArgumentException("orderId is null");
         }
@@ -90,6 +95,7 @@ public class Payment extends BaseAggregateRoot {
 
         return new Payment(
                 paymentId,
+                userId,
                 orderId,
                 amount
         );
