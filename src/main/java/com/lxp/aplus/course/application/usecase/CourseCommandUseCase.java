@@ -2,6 +2,7 @@ package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
+import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
 import com.lxp.aplus.course.application.command.SectionCreateCommand;
@@ -45,14 +46,13 @@ public class CourseCommandUseCase {
         course.validateOwner(instructorId);
         course.addSection(command.title(), command.orderIndex());
         Course savedCourse = courseRepository.save(course);
-        courseRepository.flush(); // ID 생성을 위해 flush 수행
+        courseRepository.flush();
 
-        // flush 후 저장된 Course에서 새로 추가된 Section 찾기 (ID가 반영된 상태)
         Section newSection = savedCourse.getSections().stream()
                 .filter(section -> section.getOrderIndex() == command.orderIndex() 
                         && section.getTitle().equals(command.title()))
                 .findFirst()
-                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
 
         return SectionUpsertResponse.from(newSection);
     }
