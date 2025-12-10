@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,7 +41,8 @@ public class Order extends BaseAggregateRoot {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus orderStatus;
+    @ColumnDefault("'PENDING'")
+    private OrderStatus orderStatus = OrderStatus.PENDING;
 
     @Column
     private String approvedPaymentId; // orderStatus = COMPLETED일 때만 존재
@@ -62,7 +64,6 @@ public class Order extends BaseAggregateRoot {
         this.currency = "KRW";
         this.amount = amount;
         this.orderLines = orderLines;
-        this.orderStatus = OrderStatus.PENDING;
         this.approvedPaymentId = null;
         this.cancelReason = null;
         this.completedAt = null;
