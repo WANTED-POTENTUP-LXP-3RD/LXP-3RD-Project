@@ -2,6 +2,7 @@ package com.lxp.aplus.enrollment.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
+import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class EnrollmentQueryUseCase implements ProgressQueryPort { // Implement the new port
+public class EnrollmentQueryUseCase implements ProgressQueryPort {
 
     private final EnrollmentRepository enrollmentRepository;
     private final CourseFinder courseFinder;
@@ -39,7 +40,15 @@ public class EnrollmentQueryUseCase implements ProgressQueryPort { // Implement 
                     CourseSummary courseSummary = courseFinder.findCourseById(enrollment.getCourseId())
                             .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-                    return EnrollmentListItemResult.of(enrollment, courseSummary);
+                    int totalLectures = courseFinder.countLectures(enrollment.getCourseId());
+                    if (totalLectures == 0) {
+                        return EnrollmentListItemResult.of(enrollment, courseSummary, 0);
+                    }
+
+                    long completedLectures = progressRepository.countByEnrollmentIdAndIsCompleted(enrollment.getId(), true);
+                    int progressRate = (int) (((double) completedLectures / totalLectures) * 100);
+
+                    return EnrollmentListItemResult.of(enrollment, courseSummary, progressRate);
                 })
                 .collect(Collectors.toList());
 
@@ -48,14 +57,22 @@ public class EnrollmentQueryUseCase implements ProgressQueryPort { // Implement 
 
     @Override
     public Map<Long, Boolean> checkLectureCompletionStatus(Long enrollmentId, List<Long> lectureResourceIds) {
-        // Use the new efficient method to find progress records for the given enrollment and lecture resources
         List<Progress> progresses = progressRepository.findByEnrollmentIdAndLectureResourceIds(enrollmentId, lectureResourceIds);
 
-        // Map their completion status
         return progresses.stream()
                 .collect(Collectors.toMap(
                         progress -> progress.getLectureResource().getId(),
                         Progress::isCompleted
                 ));
+    }
+
+    public boolean isEnrollmentCompleted(Long enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
+        return enrollment.getStatus() == EnrollmentStatus.COMPLETED;
+    }
+
+    public long getStudentCountForCourse(Long courseId) {
+        return enrollmentRepository.countByCourseId(courseId);
     }
 }

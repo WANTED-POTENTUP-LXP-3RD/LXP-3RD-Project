@@ -13,7 +13,7 @@ public enum ProgressErrorCode implements ErrorCode {
     WATCHED_DURATION_EXCEEDS_TOTAL(HttpStatus.BAD_REQUEST, "EP003", "시청 시간이 전체 영상 길이를 초과할 수 없습니다."),
     CANNOT_UPDATE_EXPIRED_ENROLLMENT(HttpStatus.CONFLICT, "EP004", "수강 기간이 만료되어 진도율을 갱신할 수 없습니다.");
 
-    private final HttpStatus httpStatus;
+    private final HttpStatus status;
     private final String code;
     private final String message;
 }

@@ -4,4 +4,5 @@ import java.util.Optional;
 
 public interface CourseFinder {
     Optional<CourseSummary> findCourseById(Long courseId);
+    int countLectures(Long courseId);
 }

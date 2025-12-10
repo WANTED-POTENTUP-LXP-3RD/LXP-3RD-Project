@@ -3,20 +3,21 @@ package com.lxp.aplus.progress.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.common.error.code.ProgressErrorCode;
+import com.lxp.aplus.course.domain.CourseRepository;
+import com.lxp.aplus.course.domain.Lecture;
+import com.lxp.aplus.course.domain.LectureResource;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import com.lxp.aplus.progress.application.command.ProgressUpdateCommand;
-import com.lxp.aplus.progress.application.port.out.LectureResourceFinder;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
 import com.lxp.aplus.progress.presentation.response.ProgressUpdateResponse;
-import com.lxp.aplus.course.domain.LectureResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class ProgressCommandUseCaseImpl implements ProgressCommandUseCase {
 
     private final ProgressRepository progressRepository;
     private final EnrollmentRepository enrollmentRepository;
-    private final LectureResourceFinder lectureResourceFinder;
+    private final CourseRepository courseRepository; 
 
     @Override
     public ProgressUpdateResponse updateProgress(ProgressUpdateCommand command) {
@@ -36,7 +37,20 @@ public class ProgressCommandUseCaseImpl implements ProgressCommandUseCase {
             throw new BusinessException(ProgressErrorCode.CANNOT_UPDATE_EXPIRED_ENROLLMENT);
         }
 
-        LectureResource lectureResource = lectureResourceFinder.findLectureResourceById(command.resourceId())
+        AtomicReference<Lecture> parentLecture = new AtomicReference<>();
+        LectureResource lectureResource = courseRepository.findAllLecturesWithResourcesByCourseId(enrollment.getCourseId()).stream()
+                .filter(lecture -> {
+                    boolean found = lecture.getLectureResources().stream()
+                            .anyMatch(resource -> resource.getId().equals(command.resourceId()));
+                    if (found) {
+                        parentLecture.set(lecture);
+                    }
+                    return found;
+                })
+                .findFirst()
+                .flatMap(lecture -> lecture.getLectureResources().stream()
+                        .filter(resource -> resource.getId().equals(command.resourceId()))
+                        .findFirst())
                 .orElseThrow(() -> new BusinessException(ProgressErrorCode.LEARNING_HISTORY_NOT_FOUND));
 
         Optional<Progress> existingProgress = progressRepository.findByEnrollmentAndLectureResource(enrollment, lectureResource);
@@ -48,13 +62,10 @@ public class ProgressCommandUseCaseImpl implements ProgressCommandUseCase {
             progress = Progress.builder()
                     .enrollment(enrollment)
                     .lectureResource(lectureResource)
-                    .watchedDuration(0)
-                    .isCompleted(false)
-                    .lastWatchedAt(LocalDateTime.now())
                     .build();
         }
-
-        int totalDuration = lectureResource.getTotalDurationSeconds();
+        
+        int totalDuration = parentLecture.get().getTotalDurationSeconds();
         if (command.watchedDuration() > totalDuration) {
             throw new BusinessException(ProgressErrorCode.WATCHED_DURATION_EXCEEDS_TOTAL);
         }
@@ -64,7 +75,7 @@ public class ProgressCommandUseCaseImpl implements ProgressCommandUseCase {
 
         Progress savedProgress = progressRepository.save(progress);
 
-        int currentProgressRate = (int) ((double) savedProgress.getWatchedDuration() / totalDuration * 100);
+        int currentProgressRate = (int) (((double) savedProgress.getWatchedDuration() / totalDuration) * 100);
 
         return ProgressUpdateResponse.of(
                 savedProgress.getLectureResource().getId(),

@@ -23,4 +23,9 @@ public class CourseFinderAdapter implements CourseFinder {
         return courseRepository.findById(courseId)
                 .map(course -> new CourseSummary(course.getId(), course.getTitle()));
     }
+
+    @Override
+    public int countLectures(Long courseId) {
+        return courseRepository.countLecturesByCourseId(courseId);
+    }
 }
