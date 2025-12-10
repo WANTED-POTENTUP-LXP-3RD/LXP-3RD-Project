@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// TODO: amount, currency 묶어서 VO(Money)로 만들기
 @Entity
 @Table(name = "orders")
 @Getter
