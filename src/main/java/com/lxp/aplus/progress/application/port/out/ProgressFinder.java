@@ -1,9 +1,9 @@
-package com.lxp.aplus.progress.application.port.in;
+package com.lxp.aplus.progress.application.port.out;
 
 import java.util.List;
 import java.util.Map;
 
-public interface ProgressQueryPort {
+public interface ProgressFinder {
     /**
      * 특정 enrollment에 대한 여러 lectureResource들의 완료 상태를 조회합니다.
      *

@@ -51,4 +51,13 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
     public long countByCourseId(Long courseId) {
         return jpaRepository.countByCourseId(courseId);
     }
+
+    @Override
+    public boolean isEnrollmentCompleted(Long studentId, Long courseId) {
+        return jpaRepository.findByStudentIdAndCourseId(studentId, courseId)
+                .map(enrollment -> enrollment.getStatus() == EnrollmentStatus.COMPLETED)
+                .orElse(false);
+    }
+
+
 }

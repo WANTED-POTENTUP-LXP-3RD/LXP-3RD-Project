@@ -1,31 +1,30 @@
-package com.lxp.aplus.progress.application.usecase;
+package com.lxp.aplus.enrollment.infrastructure.adapter;
 
-import com.lxp.aplus.progress.application.port.out.ProgressFinder;
+import com.lxp.aplus.enrollment.application.port.out.ProgressFinder;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class ProgressQueryUseCase implements ProgressFinder {
+ @Component @RequiredArgsConstructor
+public class ProgressFinderAdapter implements ProgressFinder {
 
     private final ProgressRepository progressRepository;
 
-    @Override
-    public Map<Long, Boolean> checkLectureCompletionStatus(Long enrollmentId, List<Long> lectureResourceIds) {
+    @Override @Transactional(readOnly = true)
+    public Map<Long, Boolean> getCompletionStatusMap(Long enrollmentId, List<Long> lectureResourceIds) {
         List<Progress> progresses = progressRepository.findByEnrollmentIdAndLectureResourceIds(enrollmentId, lectureResourceIds);
 
         return progresses.stream()
                 .collect(Collectors.toMap(
                         progress -> progress.getLectureResource().getId(),
-                        Progress::isCompleted
+                        Progress::isCompleted,
+                        (existing, replacement) -> existing
                 ));
     }
 }
