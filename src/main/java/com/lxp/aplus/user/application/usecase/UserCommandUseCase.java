@@ -1,17 +1,18 @@
 package com.lxp.aplus.user.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.security.CustomPasswordEncoder;
 import com.lxp.aplus.user.application.dto.ActivateUserRequest;
-import com.lxp.aplus.user.application.dto.AddRoleRequest;
 import com.lxp.aplus.user.application.dto.ChangePasswordRequest;
 import com.lxp.aplus.user.application.dto.CreateUserRequest;
 import com.lxp.aplus.user.application.dto.DeleteUserRequest;
 import com.lxp.aplus.user.application.dto.UpdateUserInfoRequest;
 import com.lxp.aplus.user.application.dto.UserResponse;
 import com.lxp.aplus.user.application.dto.WithdrawUserRequest;
+import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.domain.UserRepository;
-import com.lxp.aplus.user.domain.exception.UserErrorCode;
+import com.lxp.aplus.common.error.code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +31,24 @@ public class UserCommandUseCase {
 
     private final UserRepository userRepository;
     private final UserQueryUseCase userQueryUseCase;
+    private final CustomPasswordEncoder customPasswordEncoder;
 
     public UserResponse createUser(CreateUserRequest request) {
+        // 비밀번호 암호화
+        String encodedPassword = customPasswordEncoder.encode(request.password());
+
         User user = User.of(
                 request.name(),
                 request.nickName(),
                 request.email(),
-                request.password(),
+                encodedPassword,
                 request.phoneNumber()
         );
+
+        // TODO: 임시로 회원가입 시 바로 ACTIVE 상태로 설정
+        // 프로덕션에서는 이메일 인증 등 추가 검증 후 활성화해야 함
+        user.activateFromPending();
+
         return UserResponse.from(userRepository.save(user));
     }
 
@@ -50,11 +60,15 @@ public class UserCommandUseCase {
         return UserResponse.from(user);
     }
 
-    public UserResponse addRole(AddRoleRequest request) {
-        User user = userQueryUseCase.findByIdWithRoles(request.userId())
+    public UserResponse addInstructorRole(Long userId) {
+        return addRole(userId, RoleType.INSTRUCTOR);
+    }
+
+    private UserResponse addRole(Long userId, RoleType roleType) {
+        User user = userQueryUseCase.findByIdWithRoles(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        user.addRole(request.roleType());
+        user.addRole(roleType);
         return UserResponse.from(user);
     }
 
@@ -83,7 +97,9 @@ public class UserCommandUseCase {
         User user = userQueryUseCase.findById(request.userId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        user.changePassword(request.newPassword());
+        // 비밀번호 암호화
+        String encodedPassword = customPasswordEncoder.encode(request.newPassword());
+        user.changePassword(encodedPassword);
     }
 
     public void deleteUser(DeleteUserRequest request) {
