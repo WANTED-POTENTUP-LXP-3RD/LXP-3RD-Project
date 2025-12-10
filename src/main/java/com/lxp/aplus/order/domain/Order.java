@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-//import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,14 +22,21 @@ public class Order extends BaseAggregateRoot {
     @Column(name = "id")
     private String orderId;
 
-    //@Column
-    //private Long userId;
+    @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
+    private String currency;
 
     @Column(nullable = false)
     private BigDecimal amount;
 
-    //@Column(nullable = false)
-    //private String currency;
+    @ElementCollection
+    @CollectionTable(
+            name = "order_lines",
+            joinColumns = @JoinColumn(name = "order_id")
+    )
+    private List<OrderLine> orderLines = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -36,25 +45,27 @@ public class Order extends BaseAggregateRoot {
     @Column
     private String approvedPaymentId; // orderStatus = COMPLETED일 때만 존재
 
-    //@Column
-    //private String cancelReason;
-    //
-    //@Column(nullable = false, updatable = false)
-    //private LocalDateTime orderedAt;
-    //
-    //@Column
-    //private LocalDateTime completedAt;
+    @Column
+    private String cancelReason;
 
-
+    @Column
+    private LocalDateTime completedAt;
 
     private Order(
             String orderId,
+            Long userId,
             BigDecimal amount,
-            OrderStatus orderStatus
+            List<OrderLine> orderLines
     ) {
         this.orderId = orderId;
+        this.userId = userId;
+        this.currency = "KRW";
         this.amount = amount;
-        this.orderStatus = orderStatus;
+        this.orderLines = orderLines;
+        this.orderStatus = OrderStatus.PENDING;
+        this.approvedPaymentId = null;
+        this.cancelReason = null;
+        this.completedAt = null;
     }
 
     /* ========= 생성 ========= */
@@ -63,13 +74,18 @@ public class Order extends BaseAggregateRoot {
      * 주문 생성
      * - Order는 항상 PENDING 상태로만 생성된다.
      */
-    public static Order create(BigDecimal amount) {
+    public static Order create(
+            Long userId,
+            BigDecimal amount,
+            List<OrderLine> orderLines
+    ) {
         String orderId = UUID.randomUUID().toString();  // TODO: 규칙 만들기
 
         return new Order(
                 orderId,
+                userId,
                 amount,
-                OrderStatus.PENDING
+                new ArrayList<>(orderLines)
         );
     }
 
@@ -93,6 +109,7 @@ public class Order extends BaseAggregateRoot {
 
         this.orderStatus = OrderStatus.COMPLETED;
         this.approvedPaymentId = paymentId;
+        this.completedAt = LocalDateTime.now();
     }
 
     /*
@@ -100,9 +117,10 @@ public class Order extends BaseAggregateRoot {
      * - PENDING 상태에서만 취소 가능
      * - COMPLETED → CANCELED로 직접 변경 불가 (= Payment BC의 책임)
      */
-    public void cancel() {
+    public void cancel(String reason) {
         validatePending();
         this.orderStatus = OrderStatus.CANCELED;
+        this.cancelReason = reason;
     }
 
     /* ========= 검증 ========= */
