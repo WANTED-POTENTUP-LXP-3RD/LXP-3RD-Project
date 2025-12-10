@@ -10,9 +10,18 @@ import java.util.List;
 public record LoginResponse(
         String accessToken,
         String refreshToken,
-        String nickName,
-        List<RoleType> roles
+        String tokenType,
+        Long expiresIn,
+        UserInfo user
 ) {
+    /**
+     * 사용자 정보 내부 클래스
+     */
+    public record UserInfo(
+            String nickname,
+            List<RoleType> roles
+    ) {
+    }
 }
 
 
