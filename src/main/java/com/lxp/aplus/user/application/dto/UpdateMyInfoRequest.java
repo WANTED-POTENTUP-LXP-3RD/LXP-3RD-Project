@@ -1,6 +1,5 @@
 package com.lxp.aplus.user.application.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 /**

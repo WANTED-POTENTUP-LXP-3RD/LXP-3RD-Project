@@ -48,7 +48,7 @@ public class UserController {
 
         UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(
                 userInfo.id(),
-                request.nickName(),
+                request.nickname(),
                 currentUser.email() // 기존 이메일 유지
         );
         UserResponse response = userCommandUseCase.updateUserInfo(updateRequest);
