@@ -3,11 +3,10 @@ package com.lxp.aplus.order.application.usecase;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.order.application.CoursePrice;
-import com.lxp.aplus.order.application.result.OrderCreationResult;
+import com.lxp.aplus.order.application.result.OrderCreateResult;
 import com.lxp.aplus.order.domain.Order;
 import com.lxp.aplus.order.domain.OrderLine;
 import com.lxp.aplus.order.domain.OrderRepository;
-import com.lxp.aplus.payment.application.usecase.PaymentCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,7 @@ public class OrderCommandUseCase {
     private final OrderRepository orderRepository;
     private final CourseRepository courseRepository; // FIXME: Course BC 침범 (의도됨) ⚠️
 
-    public OrderCreationResult createOrderFromCourseIds(Long userId, List<Long> courseIds) {
+    public OrderCreateResult createOrderFromCourseIds(Long userId, List<Long> courseIds) {
 
         // 1. Course 가격 조회 (From Course BC)
         // TODO: 이벤트로 수정
@@ -38,7 +37,7 @@ public class OrderCommandUseCase {
         Order order = Order.create(userId, orderLines);
         orderRepository.save(order);
 
-        return OrderCreationResult.of(order.getOrderId(), order.getAmount());
+        return OrderCreateResult.of(order.getOrderId(), order.getAmount());
     }
 
     // TODO: 이벤트 기반으로 분리 ----------
