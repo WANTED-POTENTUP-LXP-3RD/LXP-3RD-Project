@@ -65,9 +65,6 @@ public class Order extends BaseAggregateRoot {
         this.currency = "KRW";
         this.amount = amount;
         this.orderLines = orderLines;
-        this.approvedPaymentId = null;
-        this.cancelReason = null;
-        this.completedAt = null;
     }
 
     /* ========= 생성 ========= */
