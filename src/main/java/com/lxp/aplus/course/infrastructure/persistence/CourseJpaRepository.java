@@ -17,13 +17,13 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
     Page<Course> findAllByCourseStatus(CourseStatus courseStatus, Pageable pageable);
 
     @Query("SELECT COUNT(l) FROM Lecture l " +
-            "JOIN l.section s " +
+            "INNER JOIN l.section s " +
             "WHERE s.course.id = :courseId")
     int countLecturesByCourseId(@Param("courseId") Long courseId);
 
     @Query("SELECT DISTINCT l FROM Lecture l " +
             "LEFT JOIN FETCH l.lectureResources lr " +
-            "JOIN l.section s " +
+            "INNER JOIN l.section s " +
             "WHERE s.course.id = :courseId")
     List<Lecture> findAllLecturesWithResourcesByCourseId(@Param("courseId") Long courseId);
 }
