@@ -27,19 +27,19 @@ public class Payment extends BaseAggregateRoot {
     private String paymentId;  // 외부 시스템(운영/정산/CS)에 노출 가능
 
     // NOTE: Aggregate 간 연관은 ID 참조 수준으로만 둡니다.
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String orderId;
 
-    @Column(unique = true)
+    @Column(unique = true, updatable = false)
     private String paymentKey; // PG transactionId
 
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false, updatable = false, length = 3)
     private String currency;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -47,11 +47,11 @@ public class Payment extends BaseAggregateRoot {
     private PaymentStatus paymentStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, updatable = false, length = 20)
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, updatable = false, length = 20)
     private PgProvider pgProvider;
 
     @Column
