@@ -14,4 +14,5 @@ public interface CourseRepository {
     Page<Course> findAllByPublished(Pageable pageable);
     int countLecturesByCourseId(Long courseId);
     List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId);
+    List<Course> findByIdIn(List<Long> ids);
 }

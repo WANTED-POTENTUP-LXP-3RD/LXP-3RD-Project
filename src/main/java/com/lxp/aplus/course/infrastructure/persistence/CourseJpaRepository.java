@@ -26,4 +26,6 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
             "INNER JOIN l.section s " +
             "WHERE s.course.id = :courseId")
     List<Lecture> findAllLecturesWithResourcesByCourseId(@Param("courseId") Long courseId);
+
+    List<Course> findByIdIn(List<Long> ids);
 }
