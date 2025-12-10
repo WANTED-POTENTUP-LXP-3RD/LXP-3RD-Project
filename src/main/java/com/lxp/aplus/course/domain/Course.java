@@ -2,6 +2,7 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
@@ -94,21 +95,34 @@ public class Course extends BaseAggregateRoot {
         if (command.courseLevel() != null) this.courseLevel = command.courseLevel();
     }
 
+    public void delete() {
+        validateEditable();
+        this.courseStatus = CourseStatus.DELETED;
+    }
+
     public void validateOwner(Long userId) {
         if (!this.instructorId.equals(userId)) {
             throw new BusinessException(GlobalErrorCode.VALIDATION_ERROR);
         }
     }
 
-    public Section addSection(String title, int orderIndex) {
+    public void validateAccessible() {
+        if (this.courseStatus == CourseStatus.DELETED) {
+            throw new BusinessException(CourseErrorCode.COURSE_NOT_FOUND);
+        }
+    }
+
+    public void addSection(String title, int orderIndex) {
+        validateEditable();
         validateSectionOrder(orderIndex);
 
         Section newSection = Section.createSection(this, title, orderIndex);
         this.sections.add(newSection);
-        return newSection;
     }
 
     public Section updateSection(Long sectionId, String title, Integer orderIndex) {
+        validateEditable();
+
         Section targetSection = this.sections.stream()
                 .filter(section -> Objects.equals(section.getId(), sectionId))
                 .findFirst()
@@ -128,6 +142,23 @@ public class Course extends BaseAggregateRoot {
 
         if (isOrderIndexDuplicated) {
             throw new BusinessException(SectionErrorCode.SECTION_ORDER_DUPLICATED);
+        }
+    }
+
+    public void deleteSection(Long sectionId) {
+        validateEditable();
+
+        Section targetSection = this.sections.stream()
+                .filter(section -> Objects.equals(section.getId(), sectionId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+
+        this.sections.remove(targetSection);
+    }
+
+    private void validateEditable() {
+        if (this.courseStatus == CourseStatus.PUBLISHED) {
+            throw new BusinessException(CourseErrorCode.CANNOT_MODIFY_PUBLISHED_COURSE);
         }
     }
 }

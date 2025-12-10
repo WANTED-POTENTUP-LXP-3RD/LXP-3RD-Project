@@ -66,4 +66,20 @@ public class CourseCommandUseCase {
 
         return SectionUpsertResponse.from(updatedSection);
     }
+
+    public void deleteSection(Long courseId, Long instructorId, Long sectionId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+
+        course.validateOwner(instructorId);
+        course.deleteSection(sectionId);
+    }
+
+    public void deleteCourse(Long courseId, Long instructorId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+
+        course.validateOwner(instructorId);
+        course.delete();
+    }
 }

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -136,5 +137,30 @@ public class CourseController {
         return ResponseEntity
                 .status(SectionResultCode.SECTION_UPDATE_SUCCESS.getStatus())
                 .body(ResultResponse.of(SectionResultCode.SECTION_UPDATE_SUCCESS, response));
+    }
+
+    @DeleteMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
+    public ResponseEntity<ResultResponse<Void>> deleteSection(
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId,
+            @RequestParam Long instructorId
+    ) {
+        courseCommandUseCase.deleteSection(courseId, instructorId, sectionId);
+
+        return ResponseEntity
+                .status(SectionResultCode.SECTION_DELETE_SUCCESS.getStatus())
+                .body(ResultResponse.from(SectionResultCode.SECTION_DELETE_SUCCESS));
+    }
+
+    @DeleteMapping("/api/instructor/courses/{courseId}")
+    public ResponseEntity<ResultResponse<Void>> deleteCourse(
+            @PathVariable Long courseId,
+            @RequestParam Long instructorId
+    ) {
+        courseCommandUseCase.deleteCourse(courseId, instructorId);
+
+        return ResponseEntity
+                .status(CourseResultCode.COURSE_DELETE_SUCCESS.getStatus())
+                .body(ResultResponse.from(CourseResultCode.COURSE_DELETE_SUCCESS));
     }
 }
