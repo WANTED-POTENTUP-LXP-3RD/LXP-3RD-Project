@@ -1,35 +1,52 @@
 package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.common.error.code.CourseErrorCode;
+import com.lxp.aplus.common.error.code.LectureErrorCode;
 import com.lxp.aplus.course.application.command.CreateLectureCommand;
+import com.lxp.aplus.course.application.command.UpdateLectureCommand;
 import com.lxp.aplus.course.application.result.LectureResult;
-import com.lxp.aplus.course.domain.Course;
-import com.lxp.aplus.course.domain.CourseRepository;
-import com.lxp.aplus.course.domain.Lecture;
+import com.lxp.aplus.course.domain.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.lxp.aplus.common.error.code.CourseErrorCode.COURSE_NOT_FOUND;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class LectureCommandUseCase {
-    
+
     private final CourseRepository courseRepository;
-    
+
     public LectureResult createLecture(Long courseId, Long sectionId, CreateLectureCommand command) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
 
-        Lecture lecture = course.addLectureToSection(
-                sectionId,
-                command.title(),
-                command.description()
-        );
+        Lecture lecture = course.createLecture(CreateLectureSpec.from(sectionId, command));
+
+        if (lecture == null) {
+            throw new BusinessException(LectureErrorCode.LECTURE_CREATE_FAILED);
+        }
 
         courseRepository.save(course);
-
         return LectureResult.from(lecture);
+    }
+
+    public LectureResult updateLecture(Long courseId, Long lectureId, UpdateLectureCommand command) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
+
+        Lecture lecture = course.updateLecture(UpdateLectureSpec.from(lectureId, command));
+
+        courseRepository.save(course);
+        return LectureResult.from(lecture);
+    }
+
+    public void deleteLecture(Long courseId, Long lectureId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
+
+        course.deleteLecture(lectureId);
     }
 }

@@ -1,23 +1,19 @@
 package com.lxp.aplus.course.presentation.request;
 
-import com.lxp.aplus.course.application.command.CreateLectureCommand;
+import com.lxp.aplus.course.application.command.UpdateLectureCommand;
 
-public record LectureCreateRequest(
+public record LectureUpdateRequest(
         String title,
         Integer totalDurationSeconds,
-        boolean isPreview,
-        int orderIndex,
+        Boolean isPreview,
         LectureResourceRequest resource
 ) {
-    public CreateLectureCommand toCommand() {
-        return CreateLectureCommand.builder()
+    public UpdateLectureCommand toCommand() {
+        return UpdateLectureCommand.builder()
                 .title(this.title)
                 .totalDurationSeconds(this.totalDurationSeconds)
                 .isPreview(this.isPreview)
-                .orderIndex(this.orderIndex)
                 .resource(this.resource)
                 .build();
     }
 }
-
-

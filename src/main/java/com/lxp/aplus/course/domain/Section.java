@@ -1,7 +1,8 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
-import com.lxp.aplus.course.application.command.CreateLectureCommand;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.LectureErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,11 +33,38 @@ public class Section extends BaseTimeEntity {
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lecture> lectures = new ArrayList<>();
 
-    public Lecture addLecture(String title, String description) {
-        int newOrderIndex = lectures.size() + 1;
-
-        Lecture lecture = Lecture.create(this, title, description, newOrderIndex);
-        lectures.add(lecture);
+    public Lecture addLecture(CreateLectureSpec spec) {
+        Lecture lecture = Lecture.create(this, spec.title(), spec.totalDurationSeconds(), spec.isPreview(), spec.orderIndex(), spec.resource());
+        this.lectures.add(lecture);
         return lecture;
+    }
+
+    public Lecture updateLecture(UpdateLectureSpec spec) {
+        Lecture lecture = lectures.stream()
+                .filter(l -> l.getId().equals(spec.lectureId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+        lecture.update(spec.title(), spec.totalDurationSeconds(), spec.isPreview(), spec.orderIndex(), spec.resource());
+        return lecture;
+    }
+
+    public void deleteLecture(Long lectureId) {
+        Lecture target = lectures.stream()
+                .filter(l -> l.getId().equals(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+        lectures.remove(target);
+    }
+
+    public Lecture readLecture (Long lectureId) {
+        return lectures.stream()
+                .filter(l -> l.getId().equals(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+    }
+
+    public boolean hasLecture(Long lectureId) {
+        return lectures.stream()
+                .anyMatch(l -> l.getId().equals(lectureId));
     }
 }

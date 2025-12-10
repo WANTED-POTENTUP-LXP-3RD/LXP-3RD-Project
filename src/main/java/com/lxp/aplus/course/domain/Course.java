@@ -2,6 +2,7 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.LectureErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -67,11 +68,40 @@ public class Course extends BaseAggregateRoot {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    public Lecture addLectureToSection(Long sectionId, String title, String description) {
-        return sections.stream()
-                .filter(s -> s.getId().equals(sectionId))
+    public Lecture createLecture(CreateLectureSpec spec) {
+        Section section = sections.stream()
+                .filter(s -> s.getId().equals(spec.sectionId()))
                 .findFirst()
-                .map(s -> s.addLecture(title, description))
-                .orElseThrow(()-> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+
+        return section.addLecture(spec);
     }
+
+    public Lecture updateLecture(UpdateLectureSpec spec) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(spec.lectureId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        return section.updateLecture(spec);
+    }
+
+    public void deleteLecture(Long lectureId) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        section.deleteLecture(lectureId);
+    }
+
+    public Lecture readLecture(Long lectureId) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        return section.readLecture(lectureId);
+    }
+
 }

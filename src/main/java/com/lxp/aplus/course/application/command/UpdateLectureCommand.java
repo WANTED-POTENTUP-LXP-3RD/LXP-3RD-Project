@@ -4,7 +4,7 @@ import com.lxp.aplus.course.presentation.request.LectureResourceRequest;
 import lombok.Builder;
 
 @Builder
-public record CreateLectureCommand(
+public record UpdateLectureCommand(
         String title,
         Integer totalDurationSeconds,
         boolean isPreview,
