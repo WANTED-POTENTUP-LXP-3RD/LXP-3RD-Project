@@ -1,6 +1,12 @@
 package com.lxp.aplus.payment.domain;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum PgProvider {
-    // 토스페이먼츠
-    TOSS
+    TOSS("토스페이먼츠");
+
+    private final String description;
 }

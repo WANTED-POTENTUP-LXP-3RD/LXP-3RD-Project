@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// TODO: amount, currency 묶어서 VO(Money)로 만들기
+// TODO: 특정 상태에 종속적인 필드를 관리하는 구조적인 방법 고민(approvedPaymentId, cancelReason)
+// TODO: custom exception 적용하기
 @Entity
 @Table(name = "orders")
 @Getter
@@ -22,13 +26,13 @@ public class Order extends BaseAggregateRoot {
     @Column(name = "id")
     private String orderId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String currency;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private BigDecimal amount;
 
     @ElementCollection
@@ -40,7 +44,8 @@ public class Order extends BaseAggregateRoot {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus orderStatus;
+    @ColumnDefault("'PENDING'")
+    private OrderStatus orderStatus = OrderStatus.PENDING;
 
     @Column
     private String approvedPaymentId; // orderStatus = COMPLETED일 때만 존재
@@ -62,10 +67,6 @@ public class Order extends BaseAggregateRoot {
         this.currency = "KRW";
         this.amount = amount;
         this.orderLines = orderLines;
-        this.orderStatus = OrderStatus.PENDING;
-        this.approvedPaymentId = null;
-        this.cancelReason = null;
-        this.completedAt = null;
     }
 
     /* ========= 생성 ========= */
