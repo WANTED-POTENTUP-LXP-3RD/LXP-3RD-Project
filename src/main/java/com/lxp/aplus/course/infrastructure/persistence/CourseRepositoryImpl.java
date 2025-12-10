@@ -3,11 +3,13 @@ package com.lxp.aplus.course.infrastructure.persistence;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.course.domain.CourseStatus;
+import com.lxp.aplus.course.domain.Lecture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,5 +35,15 @@ public class CourseRepositoryImpl implements CourseRepository {
     @Override
     public Page<Course> findAllByPublished(Pageable pageable) {
         return jpaRepository.findAllByCourseStatus(CourseStatus.PUBLISHED, pageable);
+    }
+
+    @Override
+    public int countLecturesByCourseId(Long courseId) {
+        return jpaRepository.countLecturesByCourseId(courseId);
+    }
+
+    @Override
+    public List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId) {
+        return jpaRepository.findAllLecturesWithResourcesByCourseId(courseId);
     }
 }
