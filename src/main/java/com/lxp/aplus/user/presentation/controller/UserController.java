@@ -1,0 +1,91 @@
+package com.lxp.aplus.user.presentation.controller;
+
+import com.lxp.aplus.common.result.ResultResponse;
+import com.lxp.aplus.common.result.code.UserResultCode;
+import com.lxp.aplus.common.security.Authenticated;
+import com.lxp.aplus.common.security.UserInfo;
+import com.lxp.aplus.user.application.dto.*;
+import com.lxp.aplus.user.application.usecase.UserCommandUseCase;
+import com.lxp.aplus.user.application.usecase.UserQueryUseCase;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserCommandUseCase userCommandUseCase;
+    private final UserQueryUseCase userQueryUseCase;
+
+    /**
+     * 회원정보 조회 API
+     * GET /api/users/me
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ResultResponse<UserResponse>> getMyInfo(@Authenticated Long userId) {
+        return userQueryUseCase.findUserWithRolesById(userId)
+                .map(userResponse -> ResponseEntity.ok(
+                        ResultResponse.of(UserResultCode.USER_GET_SUCCESS, userResponse)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * 회원정보 수정 API
+     * PATCH /api/users/me
+     */
+    @PatchMapping("/me")
+    public ResponseEntity<ResultResponse<UserResponse>> updateMyInfo(
+            @Authenticated UserInfo userInfo,
+            @Valid @RequestBody UpdateMyInfoRequest request) {
+        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(userInfo.id(), request.nickName(), request.email());
+        UserResponse response = userCommandUseCase.updateUserInfo(updateRequest);
+        return ResponseEntity.ok(ResultResponse.of(UserResultCode.USER_UPDATE_SUCCESS, response));
+    }
+
+    /**
+     * 회원탈퇴 API
+     * DELETE /api/users/me
+     */
+    @DeleteMapping("/me")
+    public ResponseEntity<ResultResponse<Void>> deleteMyAccount(@Authenticated Long userId) {
+        DeleteUserRequest request = new DeleteUserRequest(userId);
+        userCommandUseCase.deleteUser(request);
+        return ResponseEntity.ok(ResultResponse.from(UserResultCode.USER_WITHDRAW_SUCCESS));
+    }
+
+    /**
+     * 비밀번호 변경 API
+     * PATCH /api/users/me/password
+     */
+    @PatchMapping("/me/password")
+    public ResponseEntity<ResultResponse<Void>> changeMyPassword(
+            @Authenticated Long userId,
+            @Valid @RequestBody ChangeMyPasswordRequest request) {
+        ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest(userId, request.newPassword());
+        userCommandUseCase.changePassword(changePasswordRequest);
+        return ResponseEntity.ok(ResultResponse.from(UserResultCode.USER_PASSWORD_CHANGE_SUCCESS));
+    }
+
+    /**
+     * 강사 권한 추가 API
+     * POST /api/users/me/roles/instructor
+     * 
+     * 현재 로그인한 사용자에게 강사(INSTRUCTOR) 권한을 추가합니다.
+     */
+    @PatchMapping("/me/roles/instructor")
+    public ResponseEntity<ResultResponse<UserResponse>> addInstructorRole(@Authenticated UserInfo userInfo) {
+        // UserInfo에서 id와 roles 정보를 자동으로 받아옴
+        // userInfo.id() - 사용자 ID
+        // userInfo.roles() - 역할 목록
+        // userInfo.hasRole(RoleType.INSTRUCTOR) - 역할 확인 가능
+        
+        UserResponse response = userCommandUseCase.addInstructorRole(userInfo.id());
+        return ResponseEntity.ok(ResultResponse.of(UserResultCode.USER_ROLE_ADD_SUCCESS, response));
+    }
+
+    
+}
+

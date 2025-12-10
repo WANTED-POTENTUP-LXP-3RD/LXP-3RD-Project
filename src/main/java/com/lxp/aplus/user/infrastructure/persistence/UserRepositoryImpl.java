@@ -53,12 +53,48 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findUserWithRolesById(Long id) {
-        return jpaRepository.getWithRolesById(id);
+        // @EntityGraph만 사용: List로 받아서 첫 번째 요소만 반환 (중복 제거)
+        // 쿼리를 직접 작성하지 않고 Spring Data JPA의 메서드 네이밍 컨벤션만 사용
+        java.util.List<User> users = jpaRepository.findAllById(id);
+        if (users.isEmpty()) {
+            return Optional.empty();
+        }
+        // 첫 번째 User만 반환 (같은 User이므로 중복 제거)
+        User user = users.get(0);
+        // @EntityGraph로 조회했지만 Lazy Loading 프록시가 초기화되지 않을 수 있으므로
+        // roles 컬렉션에 접근하여 프록시 초기화 강제
+        if (user.getRoles() != null) {
+            user.getRoles().size(); // 컬렉션 초기화
+        }
+        return Optional.of(user);
     }
 
     @Override
     public boolean existsById(Long id) {
         return jpaRepository.existsById(id);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return jpaRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findUserWithRolesByEmail(String email) {
+        // @EntityGraph만 사용: List로 받아서 첫 번째 요소만 반환 (중복 제거)
+        // 쿼리를 직접 작성하지 않고 Spring Data JPA의 메서드 네이밍 컨벤션만 사용
+        java.util.List<User> users = jpaRepository.findAllByEmail(email);
+        if (users.isEmpty()) {
+            return Optional.empty();
+        }
+        // 첫 번째 User만 반환 (같은 User이므로 중복 제거)
+        User user = users.get(0);
+        // @EntityGraph로 조회했지만 Lazy Loading 프록시가 초기화되지 않을 수 있으므로
+        // roles 컬렉션에 접근하여 프록시 초기화 강제
+        if (user.getRoles() != null) {
+            user.getRoles().size(); // 컬렉션 초기화
+        }
+        return Optional.of(user);
     }
 
 }

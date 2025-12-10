@@ -1,5 +1,6 @@
 package com.lxp.aplus.user.application.usecase;
 
+import com.lxp.aplus.user.application.dto.AuthUser;
 import com.lxp.aplus.user.application.dto.UserResponse;
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.domain.UserRepository;
@@ -46,6 +47,34 @@ public class UserQueryUseCase {
      */
     Optional<User> findByIdWithRoles(Long id) {
         return userRepository.findUserWithRolesById(id);
+    }
+
+    /**
+     * ID로 User와 Role을 함께 조회 (인증용 VO 반환)
+     * 
+     * 토큰 재발급 등 인증 과정에서 사용합니다.
+     * 엔티티 대신 VO를 반환하여 조회 전용임을 명확히 합니다.
+     * 
+     * @param id User ID
+     * @return Optional<AuthUser>
+     */
+    public Optional<AuthUser> findUserForAuthById(Long id) {
+        return userRepository.findUserWithRolesById(id)
+                .map(AuthUser::from);
+    }
+
+    /**
+     * 이메일로 User와 Role을 함께 조회 (인증용 VO 반환)
+     * 
+     * 로그인 등 인증 과정에서 사용합니다.
+     * 엔티티 대신 VO를 반환하여 조회 전용임을 명확히 합니다.
+     * 
+     * @param email 이메일
+     * @return Optional<AuthUser>
+     */
+    public Optional<AuthUser> findUserForAuthByEmail(String email) {
+        return userRepository.findUserWithRolesByEmail(email)
+                .map(AuthUser::from);
     }
 
     /**

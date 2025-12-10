@@ -19,7 +19,7 @@ public record CreateUserRequest(
         String password,
 
         @NotBlank(message = "전화번호는 필수입니다")
-        @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다 (예: 010-1234-5678)")
+        @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다")
         String phoneNumber
 ) {
 }
