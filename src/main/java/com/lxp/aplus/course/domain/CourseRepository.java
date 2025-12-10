@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface CourseRepository {
     Course save(Course course);
+    void flush();
     Optional<Course> findById(Long id);
     Page<Course> findAllByInstructorId(Long instructorId, Pageable pageable);
     Page<Course> findAllByPublished(Pageable pageable);
