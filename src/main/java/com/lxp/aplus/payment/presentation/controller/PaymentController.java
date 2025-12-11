@@ -22,7 +22,7 @@ public class PaymentController {
     @PostMapping("/prepare")
     public ResponseEntity<ResultResponse<PaymentPrepareResponse>> preparePayment(
             @Authenticated Long userId,
-            @Valid @RequestBody PaymentPrepareRequest request
+            @RequestBody @Valid PaymentPrepareRequest request
     ) {
 
         PaymentPrepareResponse response = paymentCommandUseCase.prepare(request.toCommand(userId));
