@@ -38,6 +38,20 @@ public class AuthController {
     }
 
     /**
+     * 회원가입 및 자동 로그인 API
+     * POST /api/auth/signup-and-login
+     *
+     * 회원가입 후 자동으로 로그인하여 토큰을 발급합니다.
+     */
+    @PostMapping("/signup-and-login")
+    public ResponseEntity<ResultResponse<LoginResponse>> signupAndLogin(@Valid @RequestBody CreateUserRequest request) {
+        LoginResponse response = authCommandUseCase.signupAndLogin(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ResultResponse.of(UserResultCode.LOGIN_SUCCESS, response));
+    }
+
+    /**
      * 로그인 API
      * POST /api/auth/login
      * 
