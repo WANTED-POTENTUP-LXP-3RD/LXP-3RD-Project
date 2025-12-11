@@ -1,6 +1,8 @@
 package com.lxp.aplus.order.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.OrderErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +17,7 @@ import java.util.UUID;
 
 // TODO: amount, currency 묶어서 VO(Money)로 만들기
 // TODO: 특정 상태에 종속적인 필드를 관리하는 구조적인 방법 고민(approvedPaymentId, cancelReason)
-// TODO: custom exception 적용하기
+// TODO: 중복 결제 준비 API 요청 방지 (멱등키 or paymentId)
 @Entity
 @Table(name = "orders")
 @Getter
@@ -74,14 +76,22 @@ public class Order extends BaseAggregateRoot {
     /*
      * 주문 생성
      * - Order는 항상 PENDING 상태로만 생성된다.
+     * - OrderLine의 price 합계와 금액이 일치해야 한다.
      */
     public static Order create(
             Long userId,
-            BigDecimal amount,
             List<OrderLine> orderLines
     ) {
-        String orderId = UUID.randomUUID().toString();  // TODO: 규칙 만들기
+        // 1. orderId 생성
+        // TODO: orderId 생성 규칙 만들기
+        String orderId = UUID.randomUUID().toString();
 
+        // 2. 총액 계산
+        BigDecimal amount = orderLines.stream()
+                .map(OrderLine::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 3. Order 생성 및 반환 (생성자를 통해 불변성 확보)
         return new Order(
                 orderId,
                 userId,
@@ -98,7 +108,7 @@ public class Order extends BaseAggregateRoot {
      * - 하나의 Order에는 승인된 Payment가 하나만 존재
      * - 승인된 결제 금액 = 주문 금액
      *
-     * TODO: Payment Approved 이벤트릐 결과를 반영하도록 수정
+     * TODO: Payment Approved 이벤트의 결과를 반영하도록 수정
      */
     public void completeWithApprovedPayment(
             String paymentId,
@@ -131,7 +141,7 @@ public class Order extends BaseAggregateRoot {
      */
     private void validatePending() {
         if (this.orderStatus != OrderStatus.PENDING) {
-            throw new IllegalStateException("Pending 상태에서만 수행 가능합니다.");
+            throw new BusinessException(OrderErrorCode.ORDER_INVALID_STATUS);
         }
     }
 
@@ -140,7 +150,7 @@ public class Order extends BaseAggregateRoot {
      */
     private void validateNoApprovedPayment() {
         if (this.approvedPaymentId != null) {
-            throw new IllegalStateException("이미 승인된 결제가 존재합니다.");
+            throw new BusinessException(OrderErrorCode.ORDER_ALREADY_PAID);
         }
     }
 
@@ -149,7 +159,7 @@ public class Order extends BaseAggregateRoot {
      */
     private void validateAmount(BigDecimal approvedAmount) {
         if (!this.amount.equals(approvedAmount)) {
-            throw new IllegalArgumentException("Order 금액과 승인 금액이 일치하지 않습니다.");
+            throw new BusinessException(OrderErrorCode.ORDER_AMOUNT_MISMATCH);
         }
     }
 }
