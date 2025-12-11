@@ -28,7 +28,6 @@ public class EnrollmentController {
 
     private final EnrollmentQueryUseCase enrollmentQueryUseCase;
 
-
     @GetMapping
     public ResponseEntity<ResultResponse<PageResponse<EnrollmentListItemResult>>> getEnrollmentList(
             @Authenticated UserInfo currentUser,
