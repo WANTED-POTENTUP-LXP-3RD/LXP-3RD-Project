@@ -2,6 +2,8 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.LectureErrorCode;
+import jakarta.persistence.*;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,6 +50,41 @@ public class Section extends BaseTimeEntity {
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lecture> lectures = new ArrayList<>();
+
+    public Lecture addLecture(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+        Lecture lecture = Lecture.create(this, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+        this.lectures.add(lecture);
+        return lecture;
+    }
+
+    public Lecture updateLecture(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+        Lecture lecture = lectures.stream()
+                .filter(l -> l.getId().equals(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+        lecture.update(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+        return lecture;
+    }
+
+    public void deleteLecture(Long lectureId) {
+        Lecture target = lectures.stream()
+                .filter(l -> l.getId().equals(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+        lectures.remove(target);
+    }
+
+    public Lecture readLecture (Long lectureId) {
+        return lectures.stream()
+                .filter(l -> l.getId().equals(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+    }
+
+    public boolean hasLecture(Long lectureId) {
+        return lectures.stream()
+                .anyMatch(l -> l.getId().equals(lectureId));
+    }
 
     public static Section createSection(Course course, String title, int orderIndex) {
         return Section.builder()

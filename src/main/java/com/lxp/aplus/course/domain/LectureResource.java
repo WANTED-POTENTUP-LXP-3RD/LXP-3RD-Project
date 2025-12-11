@@ -36,4 +36,13 @@ public class LectureResource extends BaseTimeEntity {
 
     @Column(name = "is_downloadable")
     private boolean isDownloadable;
+
+    public static LectureResource create(Lecture lecture, boolean isDownloadable) {
+        return LectureResource.builder()
+                .lecture(lecture)
+                .isDownloadable(isDownloadable)
+                .build();
+    }
 }
+
+

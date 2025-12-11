@@ -6,6 +6,7 @@ import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.port.out.ProgressFinder;
+import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
@@ -48,7 +49,10 @@ public class EnrollmentQueryUseCase {
                     }
 
                     Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-                    long completedResources = resourceIdToIsCompletedMap.values().stream().filter(Boolean::booleanValue).count();
+                    long completedResources = resourceIdToIsCompletedMap.values()
+                                                                        .stream()
+                                                                        .filter(Boolean::booleanValue)
+                                                                        .count();
                     int progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
 
                     return EnrollmentListItemResult.of(
@@ -62,13 +66,27 @@ public class EnrollmentQueryUseCase {
         return new PageImpl<>(content, pageable, enrollmentsPage.getTotalElements());
     }
 
-
-
-    public boolean isEnrollmentCompleted(Long enrollmentId) {
+    public EnrollmentDetailResult getEnrollmentDetail(Long studentId, Long enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
-        return enrollment.getStatus() == EnrollmentStatus.COMPLETED;
+
+        enrollment.validateOwner(studentId);
+
+        List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
+        int progressRate = 0;
+        if (!lectureResourceIds.isEmpty()) {
+            Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
+            long completedResources = resourceIdToIsCompletedMap.values()
+                                                                .stream()
+                                                                .filter(Boolean::booleanValue)
+                                                                .count();
+            progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
+        }
+
+        return EnrollmentDetailResult.of(enrollment, progressRate);
     }
+
+
 
     public long getStudentCountForCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);

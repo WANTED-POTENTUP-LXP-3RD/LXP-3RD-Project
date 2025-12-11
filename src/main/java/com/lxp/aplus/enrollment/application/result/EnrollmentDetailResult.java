@@ -10,15 +10,17 @@ public record EnrollmentDetailResult(
         Long studentId,
         Long courseId,
         EnrollmentStatus status,
+        int progressRate,
         LocalDateTime createdAt,
         LocalDateTime expiredAt
 ) {
-    public static EnrollmentDetailResult from(Enrollment enrollment) {
+    public static EnrollmentDetailResult of(Enrollment enrollment, int progressRate) {
         return new EnrollmentDetailResult(
                 enrollment.getId(),
                 enrollment.getStudentId(),
                 enrollment.getCourseId(),
                 enrollment.getStatus(),
+                progressRate,
                 enrollment.getCreatedAt(),
                 enrollment.getExpiredAt()
         );

@@ -4,6 +4,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.UserErrorCode;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;
+import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
 import com.lxp.aplus.course.application.port.out.UserQueryPort;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
@@ -27,6 +28,7 @@ public class CourseQueryUseCase {
     private final CourseRepository courseRepository;
     private final UserQueryPort userQueryPort;
     private final CategoryQueryPort categoryQueryPort;
+    private final EnrollmentQueryPort enrollmentQueryPort;
 
     public Page<CourseResponse> getInstructorCourses(Long instructorId, Pageable pageable) {
         Page<Course> courses = courseRepository.findAllByInstructorIdExcludingDeleted(instructorId, pageable);
@@ -67,9 +69,8 @@ public class CourseQueryUseCase {
 
         int totalDuration = calculateTotalDuration(course);
 
-        // TODO: enrollmentQueryPort를 통해 수강 완료 여부 조회 & 수강생 수 조회
-        boolean isPurchased = false;
-        int studentCount = 0;
+        boolean isPurchased = enrollmentQueryPort.isEnrolled(userId, courseId);
+        int studentCount = enrollmentQueryPort.getStudentCount(courseId);
 
         return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
     }
@@ -87,9 +88,8 @@ public class CourseQueryUseCase {
 
         int totalDuration = calculateTotalDuration(course);
 
-        // TODO: enrollmentQueryPort를 통해 수강 완료 여부 조회 & 수강생 수 조회
-        boolean isPurchased = false;
-        int studentCount = 0;
+        boolean isPurchased = enrollmentQueryPort.isEnrolled(instructorId, courseId);
+        int studentCount = enrollmentQueryPort.getStudentCount(courseId);
 
         return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
     }
