@@ -33,12 +33,22 @@ public class CourseRepositoryImpl implements CourseRepository {
     }
 
     @Override
-    public Page<Course> findAllByInstructorId(Long instructorId, Pageable pageable) {
-        return jpaRepository.findAllByInstructorId(instructorId, pageable);
+    public Optional<Course> findWithCurriculumById(Long courseId) {
+        return jpaRepository.findWithCurriculumById(courseId);
     }
 
     @Override
-    public Page<Course> findAllByPublished(Pageable pageable) {
+    public Optional<Course> findPublishedWithCurriculumById(Long courseId) {
+        return jpaRepository.findPublishedWithCurriculumById(courseId);
+    }
+
+    @Override
+    public Page<Course> findAllByInstructorIdExcludingDeleted(Long instructorId, Pageable pageable) {
+        return jpaRepository.findAllByInstructorIdAndCourseStatusNot(instructorId, CourseStatus.DELETED, pageable);
+    }
+
+    @Override
+    public Page<Course> findAllPublished(Pageable pageable) {
         return jpaRepository.findAllByCourseStatus(CourseStatus.PUBLISHED, pageable);
     }
 
@@ -50,5 +60,10 @@ public class CourseRepositoryImpl implements CourseRepository {
     @Override
     public List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId) {
         return jpaRepository.findAllLecturesWithResourcesByCourseId(courseId);
+    }
+
+    @Override
+    public List<Course> findByIdIn(List<Long> ids) {
+        return jpaRepository.findByIdIn(ids);
     }
 }

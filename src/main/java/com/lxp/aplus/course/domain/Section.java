@@ -4,6 +4,7 @@ import com.lxp.aplus.common.domain.BaseTimeEntity;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.LectureErrorCode;
 import jakarta.persistence.*;
+import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class Section extends BaseTimeEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lecture> lectures = new ArrayList<>();
 
@@ -91,8 +94,16 @@ public class Section extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(String title, Integer orderIndex) {
-        if (title != null) this.title = title;
-        if (orderIndex != null) this.orderIndex = orderIndex;
+    public void updateSection(String title, Integer orderIndex) {
+        if (title == null || title.isBlank()) {
+            throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+        }
+
+        if (orderIndex == null) {
+            throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+        }
+
+        this.title = title;
+        this.orderIndex = orderIndex;
     }
 }

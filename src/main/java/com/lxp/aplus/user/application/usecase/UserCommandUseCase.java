@@ -39,7 +39,7 @@ public class UserCommandUseCase {
 
         User user = User.of(
                 request.name(),
-                request.nickName(),
+                request.nickname(),
                 request.email(),
                 encodedPassword,
                 request.phoneNumber()
@@ -103,7 +103,7 @@ public class UserCommandUseCase {
     }
 
     public void deleteUser(DeleteUserRequest request) {
-        // delete() 메서드에서 roles에 접근하므로 roles를 함께 로드해야 함
+        // deleteCourse() 메서드에서 roles에 접근하므로 roles를 함께 로드해야 함
         User user = userQueryUseCase.findByIdWithRoles(request.userId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 

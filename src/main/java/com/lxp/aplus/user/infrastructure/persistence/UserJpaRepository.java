@@ -18,7 +18,7 @@ import java.util.Optional;
  * - 도메인 로직과 인프라스트럭처 관심사 분리
  * 
  * 역할:
- * - JpaRepository를 상속받아 JPA 기본 메서드 제공 (save, findById, findAll, delete 등)
+ * - JpaRepository를 상속받아 JPA 기본 메서드 제공 (save, findById, findAll, deleteCourse 등)
  * - Spring Data JPA가 자동으로 구현체를 생성
  * - UserRepositoryImpl에서 이 인터페이스를 사용하여 도메인 인터페이스 구현
  * 

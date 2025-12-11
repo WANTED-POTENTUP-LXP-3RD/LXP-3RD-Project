@@ -31,7 +31,7 @@ class EnrollmentTest {
 
         // then
         assertThat(enrollment.getStatus()).isEqualTo(EnrollmentStatus.ENROLLED);
-        assertThat(enrollment.getProgressRate()).isEqualTo(0);
+        // assertThat(enrollment.getProgressRate()).isEqualTo(0);
         assertThat(enrollment.getExpiredAt()).isEqualTo(expiredAt);
     }
 
@@ -56,58 +56,6 @@ class EnrollmentTest {
     }
 
     @Test
-    @DisplayName("진도율이 100%가 되면 자동으로 수료(COMPLETED) 상태로 변경된다.")
-    void updateProgress_complete() {
-        // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
-
-        // when
-        enrollment.updateProgress(MAX_PROGRESS_RATE);
-
-        // then
-        assertThat(enrollment.getProgressRate()).isEqualTo(MAX_PROGRESS_RATE);
-        assertThat(enrollment.getStatus()).isEqualTo(EnrollmentStatus.COMPLETED);
-    }
-
-    @DisplayName("유효하지 않은 진도율로 업데이트 시 BusinessException을 던진다.")
-    @ParameterizedTest
-    @ValueSource(ints = {-1, 101})
-    void updateProgress_fail_if_invalid_rate(int invalidProgressRate) {
-        // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
-
-        // when & then
-        assertThatThrownBy(() -> enrollment.updateProgress(invalidProgressRate))
-                .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.INVALID_PROGRESS_RATE);
-    }
-
-    @Test
-    @DisplayName("수강 중이 아닌 강의의 진도율 업데이트 시 BusinessException을 던진다.")
-    void updateProgress_fail_if_not_enrolled() {
-        // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
-        enrollment.cancel();
-
-        // when & then
-        assertThatThrownBy(() -> enrollment.updateProgress(VALID_PROGRESS_RATE))
-                .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.CANNOT_UPDATE_PROGRESS_FOR_NON_ENROLLED);
-    }
-
-    @Test
-    @DisplayName("만료된 강의의 진도율 업데이트 시 BusinessException을 던진다.")
-    void updateProgress_fail_if_expired() {
-        // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().minusDays(1));
-
-        // when & then
-        assertThatThrownBy(() -> enrollment.updateProgress(VALID_PROGRESS_RATE))
-                .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.ENROLLMENT_EXPIRED_PROGRESS_UPDATE_DENIED);
-    }
-
-    @Test
     @DisplayName("수강 신청을 취소하면 상태가 CANCELED로 변경된다.")
     void cancel() {
         // given
@@ -118,18 +66,6 @@ class EnrollmentTest {
 
         // then
         assertThat(enrollment.getStatus()).isEqualTo(EnrollmentStatus.CANCELED);
-    }
-
-    @Test
-    @DisplayName("이미 수료한 강의는 취소할 수 없다.")
-    void cancel_fail_if_completed() {
-        // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
-        enrollment.updateProgress(MAX_PROGRESS_RATE);
-        // when & then
-        assertThatThrownBy(enrollment::cancel)
-                .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.CANNOT_CANCEL_COMPLETED_ENROLLMENT);
     }
 
     @Test

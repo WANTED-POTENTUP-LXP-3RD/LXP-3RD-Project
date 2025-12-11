@@ -133,7 +133,7 @@ public class User extends BaseAggregateRoot {
 
     public void delete() {
         this.deletedAt = LocalDateTime.now();
-        // 연관된 Role들도 모두 soft delete
+        // 연관된 Role들도 모두 soft deleteCourse
         this.roles.stream()
                 .filter(role -> role.getDeletedAt() == null) // 아직 삭제되지 않은 Role만
                 .forEach(Role::delete);

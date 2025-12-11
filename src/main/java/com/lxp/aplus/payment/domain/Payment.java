@@ -1,6 +1,8 @@
 package com.lxp.aplus.payment.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.PaymentErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -88,7 +90,7 @@ public class Payment extends BaseAggregateRoot {
      */
     public static Payment create(String orderId, Long userId, BigDecimal amount) {
         if (orderId == null) {
-            throw new IllegalArgumentException("orderId is null");
+            throw new BusinessException(PaymentErrorCode.PAYMENT_INVALID_ORDER_ID);
         }
 
         String paymentId = UUID.randomUUID().toString();  // TODO: 규칙 만들기
@@ -163,7 +165,7 @@ public class Payment extends BaseAggregateRoot {
      */
     private void validatePending() {
         if (this.paymentStatus != PaymentStatus.PENDING) {
-            throw new IllegalStateException("Pending 상태에서만 수행할 수 있습니다.");
+            throw new BusinessException(PaymentErrorCode.PAYMENT_NOT_PENDING);
         }
     }
 
@@ -172,7 +174,7 @@ public class Payment extends BaseAggregateRoot {
      */
     private void validateApproved() {
         if (this.paymentStatus != PaymentStatus.APPROVED) {
-            throw new IllegalStateException("Approved 상태에서만 수행할 수 있습니다.");
+            throw new BusinessException(PaymentErrorCode.PAYMENT_NOT_APPROVED);
         }
     }
 
@@ -181,7 +183,7 @@ public class Payment extends BaseAggregateRoot {
      */
     private void validateAmount(BigDecimal approvedAmount) {
         if (!this.amount.equals(approvedAmount)) {
-            throw new IllegalArgumentException("결제 금액이 일치하지 않습니다.");
+            throw new BusinessException(PaymentErrorCode.PAYMENT_AMOUNT_MISMATCH);
         }
     }
 
@@ -190,7 +192,7 @@ public class Payment extends BaseAggregateRoot {
      */
     private void validatePaymentKeyNotAssigned() {
         if (this.paymentKey != null) {
-            throw new IllegalStateException("이미 승인 처리된 결제입니다.");
+            throw new BusinessException(PaymentErrorCode.PAYMENT_ALREADY_APPROVED);
         }
     }
 }

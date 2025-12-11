@@ -2,6 +2,7 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
@@ -85,31 +86,67 @@ public class Course extends BaseAggregateRoot {
                 .build();
     }
 
-    public void updateCourseInfo(CourseUpdateCommand command) {
-        if (command.title() != null) this.title = command.title();
-        if (command.summary() != null) this.summary = command.summary();
-        if (command.description() != null) this.description = command.description();
-        if (command.categoryId() != null) this.categoryId = command.categoryId();
-        if (command.thumbnailUrl() != null) this.thumbnailUrl = command.thumbnailUrl();
-        if (command.price() != null) this.price = command.price();
-        if (command.courseLevel() != null) this.courseLevel = command.courseLevel();
-    }
+    public void updateCourse(CourseUpdateCommand command) {
+        if (command.title() != null) {
+            if (command.title().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT); // 또는 적절한 CourseErrorCode
+            }
+            this.title = command.title();
+        }
 
-    public void validateOwner(Long userId) {
-        if (!this.instructorId.equals(userId)) {
-            throw new BusinessException(GlobalErrorCode.VALIDATION_ERROR);
+        if (command.summary() != null) {
+            if (command.summary().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.summary = command.summary();
+        }
+
+        if (command.description() != null) {
+            if (command.description().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.description = command.description();
+        }
+
+        if (command.categoryId() != null) {
+            this.categoryId = command.categoryId();
+        }
+
+        if (command.thumbnailUrl() != null) {
+            if (command.thumbnailUrl().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.thumbnailUrl = command.thumbnailUrl();
+        }
+
+        if (command.price() != null) {
+            if (command.price() < 0) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.price = command.price();
+        }
+
+        if (command.courseLevel() != null) {
+            this.courseLevel = command.courseLevel();
         }
     }
 
-    public Section addSection(String title, int orderIndex) {
+    public void deleteCourse() {
+        validateEditable();
+        this.courseStatus = CourseStatus.DELETED;
+    }
+
+    public void addSection(String title, int orderIndex) {
+        validateEditable();
         validateSectionOrder(orderIndex);
 
         Section newSection = Section.createSection(this, title, orderIndex);
         this.sections.add(newSection);
-        return newSection;
     }
 
     public Section updateSection(Long sectionId, String title, Integer orderIndex) {
+        validateEditable();
+
         Section targetSection = this.sections.stream()
                 .filter(section -> Objects.equals(section.getId(), sectionId))
                 .findFirst()
@@ -119,8 +156,25 @@ public class Course extends BaseAggregateRoot {
             validateSectionOrder(orderIndex);
         }
 
-        targetSection.update(title, orderIndex);
+        targetSection.updateSection(title, orderIndex);
         return targetSection;
+    }
+
+    public void deleteSection(Long sectionId) {
+        validateEditable();
+
+        Section targetSection = this.sections.stream()
+                .filter(section -> Objects.equals(section.getId(), sectionId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+
+        this.sections.remove(targetSection);
+    }
+
+    public void validateOwner(Long userId) {
+        if (!this.instructorId.equals(userId)) {
+            throw new BusinessException(GlobalErrorCode.VALIDATION_ERROR);
+        }
     }
 
     private void validateSectionOrder(int orderIndex) {
@@ -129,6 +183,12 @@ public class Course extends BaseAggregateRoot {
 
         if (isOrderIndexDuplicated) {
             throw new BusinessException(SectionErrorCode.SECTION_ORDER_DUPLICATED);
+        }
+    }
+
+    private void validateEditable() {
+        if (this.courseStatus == CourseStatus.PUBLISHED) {
+            throw new BusinessException(CourseErrorCode.CANNOT_MODIFY_PUBLISHED_COURSE);
         }
     }
 
