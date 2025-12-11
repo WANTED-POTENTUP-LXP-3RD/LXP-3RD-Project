@@ -56,17 +56,19 @@ public class CourseQueryUseCase {
         return categoryQueryPort.findCategoryWithParentNames(categoryId);
     }
 
-    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
-        Course course = courseRepository.findWithCurriculumById(courseId)
+    public CourseDetailResponse getPublishedCourseDetail(Long courseId, Long userId) {
+        Course course = courseRepository.findPublishedWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
-        course.validateOwner(instructorId);
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
         InstructorResponse instructorResponse = userQueryPort.findInstructorById(course.getInstructorId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        int totalDuration = calculateTotalDuration(course);
+        int totalDuration = course.getSections().stream()
+                .flatMap(section -> section.getLectures().stream())
+                .mapToInt(lecture -> lecture.getTotalDurationSeconds() != null ? lecture.getTotalDurationSeconds() : 0)
+                .sum();
 
         // TODO: enrollmentQueryPort를 통해 수강 완료 여부 조회 & 수강생 수 조회
         boolean isPurchased = false;
@@ -75,10 +77,10 @@ public class CourseQueryUseCase {
         return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
     }
 
-    public CourseDetailResponse getPublishedCourseDetail(Long courseId, Long userId) {
-        Course course = courseRepository.findPublishedWithCurriculumById(courseId)
+    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
+        Course course = courseRepository.findWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
-        course.validateAccessible();
+        course.validateOwner(instructorId);
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
