@@ -61,4 +61,9 @@ public class CourseRepositoryImpl implements CourseRepository {
     public List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId) {
         return jpaRepository.findAllLecturesWithResourcesByCourseId(courseId);
     }
+
+    @Override
+    public List<Course> findByIdIn(List<Long> ids) {
+        return jpaRepository.findByIdIn(ids);
+    }
 }

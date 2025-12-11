@@ -1,5 +1,7 @@
 package com.lxp.aplus.order.domain;
 
+import com.lxp.aplus.order.application.CoursePrice;
+import com.lxp.aplus.order.application.usecase.OrderCommandUseCase;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,5 +54,13 @@ public class OrderLine {
     // FIXME: course 네이밍 바꾸기 (course 도메인과 헷갈릴 여지 있음)
     public static OrderLine course(Long courseId, BigDecimal price) {
         return new OrderLine(ItemType.COURSE, courseId, price);
+    }
+
+    public static OrderLine from(CoursePrice coursePrice) {
+        return new OrderLine(
+                ItemType.COURSE,
+                coursePrice.courseId(),
+                BigDecimal.valueOf(coursePrice.price()) // int -> BigDecimal
+        );
     }
 }

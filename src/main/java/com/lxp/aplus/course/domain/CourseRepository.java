@@ -16,4 +16,5 @@ public interface CourseRepository {
     Optional<Course> findPublishedWithCurriculumById(Long courseId);
     int countLecturesByCourseId(Long courseId);
     List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId);
+    List<Course> findByIdIn(List<Long> ids);
 }
