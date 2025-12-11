@@ -6,6 +6,7 @@ import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.port.out.ProgressFinder;
+import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
@@ -60,6 +61,25 @@ public class EnrollmentQueryUseCase {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, enrollmentsPage.getTotalElements());
+    }
+
+    public EnrollmentDetailResult getEnrollmentDetail(Long studentId, Long enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
+
+        if (!enrollment.getStudentId().equals(studentId)) {
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
+        }
+
+        List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
+        int progressRate = 0;
+        if (!lectureResourceIds.isEmpty()) {
+            Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
+            long completedResources = resourceIdToIsCompletedMap.values().stream().filter(Boolean::booleanValue).count();
+            progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
+        }
+
+        return EnrollmentDetailResult.of(enrollment, progressRate);
     }
 
 

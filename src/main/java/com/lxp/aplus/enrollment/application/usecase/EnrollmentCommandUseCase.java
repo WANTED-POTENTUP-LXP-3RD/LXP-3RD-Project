@@ -51,8 +51,8 @@ public class EnrollmentCommandUseCase{
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollmentToSave);
 
-        EnrollmentDetailResult createdEnrollment = EnrollmentDetailResult.from(savedEnrollment);
+        EnrollmentDetailResult createdEnrollment = EnrollmentDetailResult.of(savedEnrollment, 0);
 
-        return EnrollmentCreationResult.from(List.of(createdEnrollment));
+        return EnrollmentCreationResult.of(List.of(createdEnrollment));
     }
 }
