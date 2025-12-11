@@ -35,13 +35,13 @@ public class Payment extends BaseAggregateRoot {
     @Column(nullable = false, updatable = false)
     private String orderId;
 
-    @Column(unique = true, updatable = false)
+    @Column(unique = true)
     private String paymentKey; // PG transactionId
 
     @Column(nullable = false, updatable = false, length = 3)
     private String currency;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, precision = 10, scale = 0)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -182,7 +182,7 @@ public class Payment extends BaseAggregateRoot {
      * 승인된 금액과 Payment.amount가 동일한지 확인
      */
     private void validateAmount(BigDecimal approvedAmount) {
-        if (!this.amount.equals(approvedAmount)) {
+        if (this.amount.compareTo(approvedAmount) != 0) {
             throw new BusinessException(PaymentErrorCode.PAYMENT_AMOUNT_MISMATCH);
         }
     }

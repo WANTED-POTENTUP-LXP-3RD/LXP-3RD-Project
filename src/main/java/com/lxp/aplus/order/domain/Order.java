@@ -158,7 +158,8 @@ public class Order extends BaseAggregateRoot {
      * 금액 정합성 검증
      */
     private void validateAmount(BigDecimal approvedAmount) {
-        if (!this.amount.equals(approvedAmount)) {
+
+        if (this.amount.compareTo(approvedAmount) != 0) {
             throw new BusinessException(OrderErrorCode.ORDER_AMOUNT_MISMATCH);
         }
     }

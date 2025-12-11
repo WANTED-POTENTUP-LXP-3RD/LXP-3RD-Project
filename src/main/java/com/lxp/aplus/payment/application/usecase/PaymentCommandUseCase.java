@@ -1,7 +1,10 @@
 package com.lxp.aplus.payment.application.usecase;
 
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.PaymentErrorCode;
 import com.lxp.aplus.order.application.result.OrderCreateResult;
 import com.lxp.aplus.order.application.usecase.OrderCommandUseCase;
+import com.lxp.aplus.payment.application.command.PaymentConfirmCommand;
 import com.lxp.aplus.payment.application.command.PaymentPrepareCommand;
 import com.lxp.aplus.payment.domain.Payment;
 import com.lxp.aplus.payment.domain.PaymentRepository;
@@ -36,5 +39,23 @@ public class PaymentCommandUseCase {
 
         // 3. 결과 반환
         return PaymentPrepareResponse.from(payment);
+    }
+
+    public void confirm(PaymentConfirmCommand command) {
+        // 1. Payment 조회
+        Payment payment = paymentRepository.findByOrderId(command.orderId())
+                .orElseThrow(() -> new BusinessException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+
+        // 2. PG사에 최종 승인 요청
+        // TODO: 추후 구현. 성공했다고 가정함
+
+        // 3. 도메인 불변성 검증 -> 상태 변경
+        payment.approve(command.paymentKey(), command.amount());
+
+        // 4. Order BC에 완료 통보 (결제 성공 후 Order 상태를 COMPLETED로 변경 요청)
+        orderCommandUseCase.completeOrder(command.orderId(), payment.getPaymentId(), command.amount());
+
+        // 5. Payment 저장
+        paymentRepository.save(payment);
     }
 }

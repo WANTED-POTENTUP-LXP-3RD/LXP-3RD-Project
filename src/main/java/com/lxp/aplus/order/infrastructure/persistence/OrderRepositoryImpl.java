@@ -5,6 +5,8 @@ import com.lxp.aplus.order.domain.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class OrderRepositoryImpl implements OrderRepository {
@@ -14,5 +16,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order save(Order order) {
         return jpaRepository.save(order);
+    }
+
+    @Override
+    public Optional<Order> findById(String id) {
+        return jpaRepository.findById(id);
     }
 }

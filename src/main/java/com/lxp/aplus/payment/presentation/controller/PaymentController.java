@@ -3,6 +3,7 @@ package com.lxp.aplus.payment.presentation.controller;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.payment.application.usecase.PaymentCommandUseCase;
+import com.lxp.aplus.payment.presentation.request.PaymentConfirmRequest;
 import com.lxp.aplus.payment.presentation.request.PaymentPrepareRequest;
 import com.lxp.aplus.payment.presentation.response.PaymentPrepareResponse;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.lxp.aplus.common.result.code.PaymentResultCode.PAYMENT_CONFIRM_SUCCESS;
 import static com.lxp.aplus.common.result.code.PaymentResultCode.PAYMENT_PREPARE_SUCCESS;
 
 @RestController
@@ -30,5 +32,18 @@ public class PaymentController {
         return ResponseEntity
                 .status(PAYMENT_PREPARE_SUCCESS.getStatus())
                 .body(ResultResponse.of(PAYMENT_PREPARE_SUCCESS, response));
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<ResultResponse<Void>> confirmPayment(
+            @Authenticated Long userId,
+            @RequestBody @Valid PaymentConfirmRequest request
+    ) {
+
+        paymentCommandUseCase.confirm(request.toCommand(userId));
+
+        return ResponseEntity
+                .status(PAYMENT_CONFIRM_SUCCESS.getStatus())
+                .body(ResultResponse.from(PAYMENT_CONFIRM_SUCCESS));
     }
 }
