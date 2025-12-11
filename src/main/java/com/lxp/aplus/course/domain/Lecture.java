@@ -1,7 +1,11 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.LectureErrorCode;
+import com.lxp.aplus.course.presentation.response.LectureResourceResponse;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -25,7 +29,7 @@ public class Lecture extends BaseTimeEntity {
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LectureResource> lectureResources = new ArrayList<>();
 
-    @Column(name = "total_duration_seconds", nullable = false)
+    @Column(name = "total_duration_seconds")
     private Integer totalDurationSeconds;
 
     @Column (nullable = false)
@@ -35,6 +39,7 @@ public class Lecture extends BaseTimeEntity {
     private boolean isPreview;
 
     @Column(name = "order_index", nullable = false)
+    @Min(1)
     private int orderIndex;
 
     private Lecture(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
@@ -47,24 +52,29 @@ public class Lecture extends BaseTimeEntity {
     }
 
     public static Lecture create(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, CreateLectureResourceSpec resourceSpec) {
-        Lecture lecture = new Lecture(section, title, totalDurationSeconds, isPreview, orderIndex);
-        if (resourceSpec != null) {
-            LectureResource resource = LectureResource.create(lecture, resourceSpec.isDownloadable());
-            lecture.lectureResources.add(resource);
+        if (resourceSpec == null) {
+            throw new BusinessException(LectureErrorCode.LECTURE_RESOURCE_REQUIRED);
         }
+
+        Lecture lecture = new Lecture(section, title, totalDurationSeconds, isPreview, orderIndex);
+        LectureResource resource = LectureResource.create(lecture, resourceSpec.isDownloadable());
+        lecture.lectureResources.add(resource);
+
         return lecture;
     }
 
     public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, UpdateLectureResourceSpec resourceSpec) {
+        if (resourceSpec == null) {
+            throw new BusinessException(LectureErrorCode.LECTURE_RESOURCE_REQUIRED);
+        }
+
         this.title = title;
         this.totalDurationSeconds = totalDurationSeconds;
         this.isPreview = isPreview;
         this.orderIndex = orderIndex;
 
-        if (resourceSpec != null) {
-            this.lectureResources.clear();
-            LectureResource resource = LectureResource.create(this, resourceSpec.isDownloadable());
-            this.lectureResources.add(resource);
-        }
+        this.lectureResources.clear();
+        LectureResource resource = LectureResource.create(this, resourceSpec.isDownloadable());
+        this.lectureResources.add(resource);
     }
 }
