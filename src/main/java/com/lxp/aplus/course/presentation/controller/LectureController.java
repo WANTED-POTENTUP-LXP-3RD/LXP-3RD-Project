@@ -8,6 +8,7 @@ import com.lxp.aplus.course.application.usecase.LectureQueryUseCase;
 import com.lxp.aplus.course.presentation.request.LectureCreateRequest;
 import com.lxp.aplus.course.presentation.request.LectureUpdateRequest;
 import com.lxp.aplus.course.presentation.response.LectureResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class LectureController {
 
     /** 강의 생성 **/
     @PostMapping("/instructor/courses/{courseId}/sections/{sectionId}/lectures")
-    public ResponseEntity<ResultResponse<LectureResponse>> createLecture (@PathVariable Long courseId, @PathVariable Long sectionId, @RequestBody LectureCreateRequest request) {
+    public ResponseEntity<ResultResponse<LectureResponse>> createLecture (@Valid @PathVariable Long courseId, @PathVariable Long sectionId, @RequestBody LectureCreateRequest request) {
         LectureResult result = lectureCommandUseCase.createLecture(courseId, sectionId, request.toCommand());
 
         return ResponseEntity
@@ -47,7 +48,7 @@ public class LectureController {
 
     /** 강의 수정 **/
     @PutMapping("/instructor/courses/{courseId}/lectures/{lectureId}")
-    public ResponseEntity<ResultResponse<LectureResponse>> updateLecture(@PathVariable Long courseId, @PathVariable Long lectureId, @RequestBody LectureUpdateRequest request) {
+    public ResponseEntity<ResultResponse<LectureResponse>> updateLecture(@Valid @PathVariable Long courseId, @PathVariable Long lectureId, @RequestBody LectureUpdateRequest request) {
         LectureResult result = lectureCommandUseCase.updateLecture(courseId, lectureId, request.toCommand());
 
         return ResponseEntity
