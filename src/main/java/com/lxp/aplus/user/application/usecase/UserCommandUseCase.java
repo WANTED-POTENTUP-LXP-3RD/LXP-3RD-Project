@@ -39,7 +39,7 @@ public class UserCommandUseCase {
 
         User user = User.of(
                 request.name(),
-                request.nickName(),
+                request.nickname(),
                 request.email(),
                 encodedPassword,
                 request.phoneNumber()
