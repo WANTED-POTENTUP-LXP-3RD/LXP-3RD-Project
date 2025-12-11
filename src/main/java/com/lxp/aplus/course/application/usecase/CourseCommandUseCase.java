@@ -3,6 +3,7 @@ package com.lxp.aplus.course.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
+import com.lxp.aplus.common.file.FileUploader;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
 import com.lxp.aplus.course.application.command.SectionCreateCommand;
@@ -21,9 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CourseCommandUseCase {
     private final CourseRepository courseRepository;
+    private final FileUploader fileUploader;
 
     public CourseUpsertResponse createCourse(Long instructorId, CourseCreateCommand command) {
-        Course course = Course.createDraftCourse(instructorId, command);
+        String thumbnailUrl = fileUploader.upload(command.thumbnailFile());
+        Course course = Course.createDraftCourse(instructorId, thumbnailUrl, command);
         Course savedCourse = courseRepository.save(course);
 
         return CourseUpsertResponse.from(savedCourse);
