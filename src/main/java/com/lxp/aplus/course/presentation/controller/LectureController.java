@@ -52,7 +52,8 @@ public class LectureController {
         LectureResult result = lectureCommandUseCase.updateLecture(courseId, lectureId, request.toCommand());
 
         return ResponseEntity
-                .ok(ResultResponse.of(
+                .status(LectureResultCode.LECTURE_UPDATE_SUCCESS.getStatus())
+                .body(ResultResponse.of(
                         LectureResultCode.LECTURE_UPDATE_SUCCESS,
                         LectureResponse.from(result)));
     }
@@ -63,8 +64,7 @@ public class LectureController {
         lectureCommandUseCase.deleteLecture(courseId, lectureId);
 
         return ResponseEntity
-                .ok(ResultResponse.of(
-                        LectureResultCode.LECTURE_DELETE_SUCCESS,
-                        null));
+                .status(LectureResultCode.LECTURE_DELETE_SUCCESS.getStatus())
+                .body(ResultResponse.from(LectureResultCode.LECTURE_DELETE_SUCCESS));
     }
 }
