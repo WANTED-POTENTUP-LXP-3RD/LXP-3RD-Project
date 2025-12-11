@@ -11,7 +11,6 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class UserQueryAdapter implements UserQueryPort {
-
     private final UserRepository userRepository;
 
     @Override
