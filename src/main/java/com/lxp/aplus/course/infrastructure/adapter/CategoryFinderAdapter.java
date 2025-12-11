@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class CategoryPersistenceAdapter implements CategoryQueryPort {
+public class CategoryFinderAdapter implements CategoryQueryPort {
     private final CategoryRepository categoryRepository;
 
     @Override

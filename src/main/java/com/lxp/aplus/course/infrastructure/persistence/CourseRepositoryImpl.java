@@ -43,6 +43,16 @@ public class CourseRepositoryImpl implements CourseRepository {
     }
 
     @Override
+    public Optional<Course> findWithCurriculumById(Long courseId) {
+        return jpaRepository.findWithCurriculumById(courseId);
+    }
+
+    @Override
+    public Optional<Course> findPublishedWithCurriculumById(Long courseId) {
+        return jpaRepository.findPublishedWithCurriculumById(courseId);
+    }
+
+    @Override
     public int countLecturesByCourseId(Long courseId) {
         return jpaRepository.countLecturesByCourseId(courseId);
     }
