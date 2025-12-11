@@ -85,31 +85,54 @@ public class Course extends BaseAggregateRoot {
                 .build();
     }
 
-    public void updateCourseInfo(CourseUpdateCommand command) {
-        if (command.title() != null) this.title = command.title();
-        if (command.summary() != null) this.summary = command.summary();
-        if (command.description() != null) this.description = command.description();
-        if (command.categoryId() != null) this.categoryId = command.categoryId();
-        if (command.thumbnailUrl() != null) this.thumbnailUrl = command.thumbnailUrl();
-        if (command.price() != null) this.price = command.price();
-        if (command.courseLevel() != null) this.courseLevel = command.courseLevel();
+    public void updateCourse(CourseUpdateCommand command) {
+        if (command.title() != null) {
+            if (command.title().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT); // 또는 적절한 CourseErrorCode
+            }
+            this.title = command.title();
+        }
+
+        if (command.summary() != null) {
+            if (command.summary().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.summary = command.summary();
+        }
+
+        if (command.description() != null) {
+            if (command.description().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.description = command.description();
+        }
+
+        if (command.categoryId() != null) {
+            this.categoryId = command.categoryId();
+        }
+
+        if (command.thumbnailUrl() != null) {
+            if (command.thumbnailUrl().isBlank()) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.thumbnailUrl = command.thumbnailUrl();
+        }
+
+        if (command.price() != null) {
+            if (command.price() < 0) {
+                throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+            }
+            this.price = command.price();
+        }
+
+        if (command.courseLevel() != null) {
+            this.courseLevel = command.courseLevel();
+        }
     }
 
-    public void delete() {
+    public void deleteCourse() {
         validateEditable();
         this.courseStatus = CourseStatus.DELETED;
-    }
-
-    public void validateOwner(Long userId) {
-        if (!this.instructorId.equals(userId)) {
-            throw new BusinessException(GlobalErrorCode.VALIDATION_ERROR);
-        }
-    }
-
-    public void validateAccessible() {
-        if (this.courseStatus == CourseStatus.DELETED) {
-            throw new BusinessException(CourseErrorCode.COURSE_NOT_FOUND);
-        }
     }
 
     public void addSection(String title, int orderIndex) {
@@ -132,17 +155,8 @@ public class Course extends BaseAggregateRoot {
             validateSectionOrder(orderIndex);
         }
 
-        targetSection.update(title, orderIndex);
+        targetSection.updateSection(title, orderIndex);
         return targetSection;
-    }
-
-    private void validateSectionOrder(int orderIndex) {
-        boolean isOrderIndexDuplicated = this.sections.stream()
-                .anyMatch(section -> section.getOrderIndex() == orderIndex);
-
-        if (isOrderIndexDuplicated) {
-            throw new BusinessException(SectionErrorCode.SECTION_ORDER_DUPLICATED);
-        }
     }
 
     public void deleteSection(Long sectionId) {
@@ -154,6 +168,21 @@ public class Course extends BaseAggregateRoot {
                 .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
 
         this.sections.remove(targetSection);
+    }
+
+    public void validateOwner(Long userId) {
+        if (!this.instructorId.equals(userId)) {
+            throw new BusinessException(GlobalErrorCode.VALIDATION_ERROR);
+        }
+    }
+
+    private void validateSectionOrder(int orderIndex) {
+        boolean isOrderIndexDuplicated = this.sections.stream()
+                .anyMatch(section -> section.getOrderIndex() == orderIndex);
+
+        if (isOrderIndexDuplicated) {
+            throw new BusinessException(SectionErrorCode.SECTION_ORDER_DUPLICATED);
+        }
     }
 
     private void validateEditable() {

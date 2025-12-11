@@ -34,9 +34,17 @@ public class CourseCommandUseCase {
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         course.validateOwner(instructorId);
-        course.updateCourseInfo(command);
+        course.updateCourse(command);
 
         return CourseUpsertResponse.from(course);
+    }
+
+    public void deleteCourse(Long courseId, Long instructorId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+
+        course.validateOwner(instructorId);
+        course.deleteCourse();
     }
 
     public SectionUpsertResponse createSection(Long courseId, Long instructorId, SectionCreateCommand command) {
@@ -49,7 +57,7 @@ public class CourseCommandUseCase {
         courseRepository.flush();
 
         Section newSection = savedCourse.getSections().stream()
-                .filter(section -> section.getOrderIndex() == command.orderIndex() 
+                .filter(section -> section.getOrderIndex() == command.orderIndex()
                         && section.getTitle().equals(command.title()))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
@@ -73,13 +81,5 @@ public class CourseCommandUseCase {
 
         course.validateOwner(instructorId);
         course.deleteSection(sectionId);
-    }
-
-    public void deleteCourse(Long courseId, Long instructorId) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
-
-        course.validateOwner(instructorId);
-        course.delete();
     }
 }

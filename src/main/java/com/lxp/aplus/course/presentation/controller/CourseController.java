@@ -112,6 +112,18 @@ public class CourseController {
                 .body(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, PageResponse.from(result)));
     }
 
+    @DeleteMapping("/api/instructor/courses/{courseId}")
+    public ResponseEntity<ResultResponse<Void>> deleteCourse(
+            @PathVariable Long courseId,
+            @RequestParam Long instructorId
+    ) {
+        courseCommandUseCase.deleteCourse(courseId, instructorId);
+
+        return ResponseEntity
+                .status(CourseResultCode.COURSE_DELETE_SUCCESS.getStatus())
+                .body(ResultResponse.from(CourseResultCode.COURSE_DELETE_SUCCESS));
+    }
+
     @PostMapping("/api/instructor/courses/{courseId}/sections")
     public ResponseEntity<ResultResponse<SectionUpsertResponse>> createSection(
             @PathVariable Long courseId,
@@ -137,18 +149,6 @@ public class CourseController {
         return ResponseEntity
                 .status(SectionResultCode.SECTION_UPDATE_SUCCESS.getStatus())
                 .body(ResultResponse.of(SectionResultCode.SECTION_UPDATE_SUCCESS, response));
-    }
-
-    @DeleteMapping("/api/instructor/courses/{courseId}")
-    public ResponseEntity<ResultResponse<Void>> deleteCourse(
-            @PathVariable Long courseId,
-            @RequestParam Long instructorId
-    ) {
-        courseCommandUseCase.deleteCourse(courseId, instructorId);
-
-        return ResponseEntity
-                .status(CourseResultCode.COURSE_DELETE_SUCCESS.getStatus())
-                .body(ResultResponse.from(CourseResultCode.COURSE_DELETE_SUCCESS));
     }
 
     @DeleteMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
