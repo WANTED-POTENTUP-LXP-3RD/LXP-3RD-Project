@@ -13,7 +13,6 @@ import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
 import com.lxp.aplus.progress.presentation.request.ProgressUpdateRequest;
-import com.lxp.aplus.progress.presentation.response.ProgressUpdateResponse; // Corrected import
 import com.lxp.aplus.progress.presentation.response.ProgressUpdateResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -155,14 +154,27 @@ class ProgressCommandUseCaseTest {
         // given
         Enrollment expiredEnrollment = Enrollment.builder()
                 .id(1L)
+                .courseId(100L) 
                 .expiredAt(LocalDateTime.now().minusDays(1))
                 .build();
         Long testEnrollmentId = expiredEnrollment.getId();
-        Long testResourceId = lectureResource.getId();
+        Long testResourceId = 1L; 
         Integer testWatchedDuration = 150;
 
+        Progress realProgress = Progress.builder()
+                .enrollment(expiredEnrollment)
+                .lectureResource(lectureResource)
+                .build();
+
         given(enrollmentRepository.findById(testEnrollmentId)).willReturn(Optional.of(expiredEnrollment));
+        given(courseRepository.findAllLecturesWithResourcesByCourseId(expiredEnrollment.getCourseId())).willReturn(List.of(lecture));
+        when(lecture.getLectureResources()).thenReturn(List.of(lectureResource));
+        when(lectureResource.getId()).thenReturn(testResourceId);
+
+        when(lecture.getTotalDurationSeconds()).thenReturn(300);
         
+        given(progressRepository.findByEnrollmentAndLectureResource(expiredEnrollment, lectureResource)).willReturn(Optional.of(realProgress));
+
         // when & then
         ProgressUpdateRequest request = new ProgressUpdateRequest(testResourceId, testWatchedDuration);
         BusinessException exception = assertThrows(BusinessException.class, () -> progressCommandUseCase.updateProgress(testEnrollmentId, request));

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -32,25 +31,16 @@ public class ProgressCommandUseCase {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
-        if (enrollment.isExpired()) {
-            throw new BusinessException(ProgressErrorCode.CANNOT_UPDATE_EXPIRED_ENROLLMENT);
-        }
-
-        AtomicReference<Lecture> parentLecture = new AtomicReference<>();
-        LectureResource lectureResource = courseRepository.findAllLecturesWithResourcesByCourseId(enrollment.getCourseId()).stream()
-                .filter(lecture -> {
-                    boolean found = lecture.getLectureResources().stream()
-                            .anyMatch(resource -> resource.getId().equals(request.resourceId()));
-                    if (found) {
-                        parentLecture.set(lecture);
-                    }
-                    return found;
-                })
+        Lecture parentLecture = courseRepository.findAllLecturesWithResourcesByCourseId(enrollment.getCourseId()).stream()
+                .filter(lecture -> lecture.getLectureResources().stream()
+                        .anyMatch(resource -> resource.getId().equals(request.resourceId())))
                 .findFirst()
-                .flatMap(lecture -> lecture.getLectureResources().stream()
-                        .filter(resource -> resource.getId().equals(request.resourceId()))
-                        .findFirst())
                 .orElseThrow(() -> new BusinessException(ProgressErrorCode.LEARNING_HISTORY_NOT_FOUND));
+
+        LectureResource lectureResource = parentLecture.getLectureResources().stream()
+                .filter(resource -> resource.getId().equals(request.resourceId()))
+                .findFirst()
+                .get();
 
         Optional<Progress> existingProgress = progressRepository.findByEnrollmentAndLectureResource(enrollment, lectureResource);
         Progress progress;
@@ -64,7 +54,7 @@ public class ProgressCommandUseCase {
                     .build();
         }
         
-        int totalDuration = parentLecture.get().getTotalDurationSeconds();
+        int totalDuration = parentLecture.getTotalDurationSeconds();
         if (request.watchedDuration() > totalDuration) {
             throw new BusinessException(ProgressErrorCode.WATCHED_DURATION_EXCEEDS_TOTAL);
         }

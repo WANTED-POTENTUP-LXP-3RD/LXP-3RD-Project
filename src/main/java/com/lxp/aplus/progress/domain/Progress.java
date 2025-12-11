@@ -1,6 +1,8 @@
 package com.lxp.aplus.progress.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.ProgressErrorCode;
 import com.lxp.aplus.course.domain.LectureResource;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import jakarta.persistence.*;
@@ -48,6 +50,9 @@ public class Progress extends BaseTimeEntity {
     }
 
     public void updateProgress(Integer watchedDuration, boolean isCompleted) {
+        if (this.enrollment.isExpired()) {
+            throw new BusinessException(ProgressErrorCode.CANNOT_UPDATE_EXPIRED_ENROLLMENT);
+        }
         this.watchedDuration = watchedDuration;
         this.isCompleted = isCompleted;
         this.lastWatchedAt = LocalDateTime.now();
