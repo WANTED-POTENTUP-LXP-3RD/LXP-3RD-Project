@@ -3,6 +3,7 @@ package com.lxp.aplus.course.domain;
 import com.lxp.aplus.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Lecture extends BaseTimeEntity {
     @JoinColumn(name = "section_id", nullable = false)
     private Section section;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LectureResource> lectureResources = new ArrayList<>();
 

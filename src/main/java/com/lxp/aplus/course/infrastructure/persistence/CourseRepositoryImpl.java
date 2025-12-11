@@ -23,6 +23,11 @@ public class CourseRepositoryImpl implements CourseRepository {
     }
 
     @Override
+    public void flush() {
+        jpaRepository.flush();
+    }
+
+    @Override
     public Optional<Course> findById(Long id) {
         return jpaRepository.findById(id);
     }
@@ -35,6 +40,16 @@ public class CourseRepositoryImpl implements CourseRepository {
     @Override
     public Page<Course> findAllByPublished(Pageable pageable) {
         return jpaRepository.findAllByCourseStatus(CourseStatus.PUBLISHED, pageable);
+    }
+
+    @Override
+    public Optional<Course> findWithCurriculumById(Long courseId) {
+        return jpaRepository.findWithCurriculumById(courseId);
+    }
+
+    @Override
+    public Optional<Course> findPublishedWithCurriculumById(Long courseId) {
+        return jpaRepository.findPublishedWithCurriculumById(courseId);
     }
 
     @Override
