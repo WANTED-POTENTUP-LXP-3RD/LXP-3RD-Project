@@ -1,7 +1,6 @@
 package com.lxp.aplus.progress.application.result;
 
 import com.lxp.aplus.enrollment.application.port.out.LectureResourceSummary;
-import com.lxp.aplus.progress.domain.Progress;
 import java.time.LocalDateTime;
 
 public record LectureProgressResult(
@@ -13,32 +12,27 @@ public record LectureProgressResult(
         boolean isCompleted,
         LocalDateTime lastWatchedAt
 ) {
-    public static LectureProgressResult from(LectureResourceSummary resourceSummary, Progress progress) {
-        int watched = progress != null ? progress.getWatchedDuration() : 0;
-        boolean completed = progress != null && progress.isCompleted();
-        LocalDateTime lastWatched = progress != null ? progress.getLastWatchedAt() : null;
-
+    public static LectureProgressResult of(
+            LectureResourceSummary resourceSummary,
+            int watchedDuration,
+            boolean isCompleted,
+            LocalDateTime lastWatchedAt,
+            int currentProgressRate
+    ) {
         int totalDuration = resourceSummary.totalDurationSeconds() != null ? resourceSummary.totalDurationSeconds() : 0;
-
-        int progressRate = 0;
-        if (totalDuration > 0) {
-            progressRate = (int) ((double) watched / totalDuration * 100);
-        } else if (completed) {
-            progressRate = 100;
-        }
 
         return new LectureProgressResult(
                 resourceSummary.resourceId(),
                 resourceSummary.title(),
-                progressRate,
-                watched,
+                currentProgressRate,
+                watchedDuration,
                 totalDuration,
-                completed,
-                lastWatched
+                isCompleted,
+                lastWatchedAt
         );
     }
 
     public static LectureProgressResult from(LectureResourceSummary resourceSummary) {
-        return from(resourceSummary, null);
+        return of(resourceSummary, 0, false, null, 0); 
     }
 }

@@ -44,6 +44,7 @@ public class ProgressController {
             @PathVariable Long enrollmentId
     ) {
         LearningHistoryResult result = progressQueryUseCase.getLearningHistory(currentUser.id(), enrollmentId);
-        return ResponseEntity.ok(ResultResponse.of(ProgressResultCode.GET_PROGRESS_SUCCESS, LearningHistoryResponse.from(result)));
+        return ResponseEntity.ok(ResultResponse
+                .of(ProgressResultCode.GET_PROGRESS_SUCCESS, LearningHistoryResponse.from(result)));
     }
 }

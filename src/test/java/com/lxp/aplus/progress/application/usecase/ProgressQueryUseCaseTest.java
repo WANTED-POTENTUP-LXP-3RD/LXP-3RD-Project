@@ -74,30 +74,26 @@ class ProgressQueryUseCaseTest {
         List<LectureResourceSummary> lectureResourceSummaries = List.of(
                 new LectureResourceSummary(RESOURCE_ID_1, "Spring Boot 개념 설명", 240),
                 new LectureResourceSummary(RESOURCE_ID_2, "Spring Data JPA 활용", 300),
-                new LectureResourceSummary(RESOURCE_ID_3, "RESTful API 설계", 180)
+                new LectureResourceSummary(RESOURCE_ID_3, "RESTFul API 설계", 180)
         );
-        
-        LectureResource lr1 = mock(LectureResource.class);
-        given(lr1.getId()).willReturn(RESOURCE_ID_1);
 
-        LectureResource lr2 = mock(LectureResource.class);
-        given(lr2.getId()).willReturn(RESOURCE_ID_2);
-        
-        Progress progress1 = Progress.builder()
-                .enrollment(enrollment)
-                .lectureResource(lr1)
-                .watchedDuration(180)
-                .isCompleted(true)
-                .lastWatchedAt(LocalDateTime.now().minusHours(1))
-                .build();
-        
-        Progress progress2 = Progress.builder()
-                .enrollment(enrollment)
-                .lectureResource(lr2)
-                .watchedDuration(90)
-                .isCompleted(false)
-                .lastWatchedAt(LocalDateTime.now().minusHours(2))
-                .build();
+        Progress progress1 = mock(Progress.class);
+        LectureResource lr1_mock = mock(LectureResource.class);
+        given(lr1_mock.getId()).willReturn(RESOURCE_ID_1);
+        given(progress1.getLectureResource()).willReturn(lr1_mock);
+        given(progress1.getWatchedDuration()).willReturn(180);
+        given(progress1.isCompleted()).willReturn(true);
+        given(progress1.getLastWatchedAt()).willReturn(LocalDateTime.now().minusHours(1));
+        given(progress1.calculateProgressRate()).willReturn(75);
+
+        Progress progress2 = mock(Progress.class);
+        LectureResource lr2_mock = mock(LectureResource.class);
+        given(lr2_mock.getId()).willReturn(RESOURCE_ID_2);
+        given(progress2.getLectureResource()).willReturn(lr2_mock);
+        given(progress2.getWatchedDuration()).willReturn(90);
+        given(progress2.isCompleted()).willReturn(false);
+        given(progress2.getLastWatchedAt()).willReturn(LocalDateTime.now().minusHours(2));
+        given(progress2.calculateProgressRate()).willReturn(30);
 
         List<Progress> progresses = List.of(progress1, progress2);
 
@@ -181,8 +177,8 @@ class ProgressQueryUseCaseTest {
     }
 
     @Test
-    @DisplayName("실패 - 학습할 리소스가 없을 때 예외를 발생시켜야 한다.")
-    void getLearningHistory_fail_noResources() {
+    @DisplayName("성공 - 학습할 리소스가 없을 경우, 0% 진도로 빈 학습 이력을 반환해야 한다.")
+    void getLearningHistory_success_noResources() {
         // given
         Enrollment enrollment = Enrollment.builder()
                 .id(ENROLLMENT_ID)
@@ -193,15 +189,20 @@ class ProgressQueryUseCaseTest {
         given(enrollmentRepository.findById(ENROLLMENT_ID)).willReturn(Optional.of(enrollment));
         given(courseFinder.findAllLectureResourcesByCourseId(COURSE_ID)).willReturn(Collections.emptyList());
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID));
-        assertThat(exception.getErrorCode()).isEqualTo(ProgressErrorCode.LEARNING_HISTORY_NOT_FOUND);
+        // when
+        LearningHistoryResult result = progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.enrollmentId()).isEqualTo(ENROLLMENT_ID);
+        assertThat(result.overallProgressRate()).isEqualTo(0);
+        assertThat(result.lectureProgresses()).isEmpty();
+        assertThat(result.lastWatchedVideoId()).isNull();
     }
 
     @Test
-    @DisplayName("실패 - 학습 이력이 없을 때 예외를 발생시켜야 한다. (아직 학습을 시작하지 않음)")
-    void getLearningHistory_fail_noProgressYet() {
+    @DisplayName("성공 - 학습 이력이 없을 경우, 0% 진도로 학습 이력을 반환해야 한다. (아직 학습을 시작하지 않음)")
+    void getLearningHistory_success_noProgressYet() {
         // given
         Enrollment enrollment = Enrollment.builder()
                 .id(ENROLLMENT_ID)
@@ -215,10 +216,20 @@ class ProgressQueryUseCaseTest {
         
         given(enrollmentRepository.findById(ENROLLMENT_ID)).willReturn(Optional.of(enrollment));
         given(courseFinder.findAllLectureResourcesByCourseId(COURSE_ID)).willReturn(lectureResourceSummaries);
+        given(progressRepository.findByEnrollmentIdAndLectureResourceIds(any(Long.class), any(List.class)))
+                .willReturn(Collections.emptyList()); // 진도 기록이 없음을 명시
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID));
-        assertThat(exception.getErrorCode()).isEqualTo(ProgressErrorCode.LEARNING_HISTORY_NOT_FOUND);
+        // when
+        LearningHistoryResult result = progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.enrollmentId()).isEqualTo(ENROLLMENT_ID);
+        assertThat(result.overallProgressRate()).isEqualTo(0);
+        assertThat(result.lectureProgresses()).hasSize(1);
+        assertThat(result.lectureProgresses().get(0).resourceId()).isEqualTo(RESOURCE_ID_1);
+        assertThat(result.lectureProgresses().get(0).currentProgressRate()).isEqualTo(0);
+        assertThat(result.lectureProgresses().get(0).watchedDuration()).isEqualTo(0);
+        assertThat(result.lastWatchedVideoId()).isNull(); // 진도가 없으므로 마지막 시청 정보도 없음
     }
 }
