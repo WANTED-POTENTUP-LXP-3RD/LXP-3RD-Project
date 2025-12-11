@@ -49,7 +49,10 @@ public class EnrollmentQueryUseCase {
                     }
 
                     Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-                    long completedResources = resourceIdToIsCompletedMap.values().stream().filter(Boolean::booleanValue).count();
+                    long completedResources = resourceIdToIsCompletedMap.values()
+                                                                        .stream()
+                                                                        .filter(Boolean::booleanValue)
+                                                                        .count();
                     int progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
 
                     return EnrollmentListItemResult.of(
@@ -67,15 +70,16 @@ public class EnrollmentQueryUseCase {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
-        if (!enrollment.getStudentId().equals(studentId)) {
-            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
-        }
+        enrollment.validateOwner(studentId);
 
         List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
         int progressRate = 0;
         if (!lectureResourceIds.isEmpty()) {
             Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-            long completedResources = resourceIdToIsCompletedMap.values().stream().filter(Boolean::booleanValue).count();
+            long completedResources = resourceIdToIsCompletedMap.values()
+                                                                .stream()
+                                                                .filter(Boolean::booleanValue)
+                                                                .count();
             progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
         }
 

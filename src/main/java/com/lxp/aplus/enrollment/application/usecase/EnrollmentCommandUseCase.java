@@ -53,6 +53,6 @@ public class EnrollmentCommandUseCase{
 
         EnrollmentDetailResult createdEnrollment = EnrollmentDetailResult.of(savedEnrollment, 0);
 
-        return EnrollmentCreationResult.of(List.of(createdEnrollment));
+        return EnrollmentCreationResult.from(List.of(createdEnrollment));
     }
 }
