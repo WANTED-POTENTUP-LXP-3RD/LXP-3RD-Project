@@ -12,7 +12,7 @@ import java.util.UUID;
 @Component
 public class LocalFileUploader implements FileUploader {
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
 
     @Override
     public String upload(MultipartFile file) {
