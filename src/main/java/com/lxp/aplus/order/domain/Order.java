@@ -17,7 +17,7 @@ import java.util.UUID;
 
 // TODO: amount, currency 묶어서 VO(Money)로 만들기
 // TODO: 특정 상태에 종속적인 필드를 관리하는 구조적인 방법 고민(approvedPaymentId, cancelReason)
-// TODO: custom exception 적용하기
+// TODO: 중복 결제 준비 API 요청 방지 (멱등키 or paymentId)
 @Entity
 @Table(name = "orders")
 @Getter
@@ -108,7 +108,7 @@ public class Order extends BaseAggregateRoot {
      * - 하나의 Order에는 승인된 Payment가 하나만 존재
      * - 승인된 결제 금액 = 주문 금액
      *
-     * TODO: Payment Approved 이벤트릐 결과를 반영하도록 수정
+     * TODO: Payment Approved 이벤트의 결과를 반영하도록 수정
      */
     public void completeWithApprovedPayment(
             String paymentId,
