@@ -13,7 +13,6 @@ import com.lxp.aplus.progress.domain.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -42,14 +41,13 @@ public class ProgressQueryUseCase {
 
         List<LectureResourceSummary> allLectureResources = courseFinder.
                 findAllLectureResourcesByCourseId(enrollment.getCourseId());
-        
-        // 강의 자료가 없을 경우, 빈 목록과 0% 진도로 처리
+
         if (allLectureResources.isEmpty()) {
             return new LearningHistoryResult(
                     enrollmentId,
                     0, // overallProgressRate
-                    null, // lastWatchedVideoId
-                    null, // lastWatchedDurationOfLastVideo
+                    0L, // lastWatchedVideoId (null 대신 0L)
+                    0, // lastWatchedDurationOfLastVideo (null 대신 0)
                     null, // lastWatchedAt
                     Collections.emptyList() // lectureProgresses
             );
@@ -76,8 +74,8 @@ public class ProgressQueryUseCase {
                 .filter(p -> p.getLastWatchedAt() != null)
                 .max(Comparator.comparing(Progress::getLastWatchedAt));
         
-        Long lastWatchedVideoId = lastWatchedProgress.map(p -> p.getLectureResource().getId()).orElse(null);
-        Integer lastWatchedDuration = lastWatchedProgress.map(Progress::getWatchedDuration).orElse(null);
+        Long lastWatchedVideoId = lastWatchedProgress.map(p -> p.getLectureResource().getId()).orElse(0L);
+        Integer lastWatchedDuration = lastWatchedProgress.map(Progress::getWatchedDuration).orElse(0);
         java.time.LocalDateTime lastWatchedAt = lastWatchedProgress.map(Progress::getLastWatchedAt).orElse(null);
 
         return new LearningHistoryResult(

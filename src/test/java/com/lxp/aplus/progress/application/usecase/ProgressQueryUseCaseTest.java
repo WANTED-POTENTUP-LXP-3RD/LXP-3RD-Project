@@ -2,7 +2,6 @@ package com.lxp.aplus.progress.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.common.error.code.ProgressErrorCode;
 import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.LectureResourceSummary;
@@ -24,11 +23,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import com.lxp.aplus.course.domain.LectureResource;
 import static org.mockito.Mockito.mock;
 
@@ -187,17 +188,22 @@ class ProgressQueryUseCaseTest {
                 .expiredAt(LocalDateTime.now().plusDays(1))
                 .build();
         given(enrollmentRepository.findById(ENROLLMENT_ID)).willReturn(Optional.of(enrollment));
-        given(courseFinder.findAllLectureResourcesByCourseId(COURSE_ID)).willReturn(Collections.emptyList());
+        
+        List<LectureResourceSummary> emptyLectureResources = new ArrayList<>();
+        given(courseFinder.findAllLectureResourcesByCourseId(enrollment.getCourseId())).willReturn(emptyLectureResources); // enrollment.getCourseId()를 직접 사용
 
         // when
         LearningHistoryResult result = progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID);
 
         // then
+        verify(courseFinder).findAllLectureResourcesByCourseId(enrollment.getCourseId());
         assertThat(result).isNotNull();
         assertThat(result.enrollmentId()).isEqualTo(ENROLLMENT_ID);
         assertThat(result.overallProgressRate()).isEqualTo(0);
         assertThat(result.lectureProgresses()).isEmpty();
-        assertThat(result.lastWatchedVideoId()).isNull();
+        assertThat(result.lastWatchedVideoId()).isEqualTo(0L);
+        assertThat(result.lastWatchedDurationOfLastVideo()).isEqualTo(0);
+        assertThat(result.lastWatchedAt()).isNull();
     }
 
     @Test
@@ -217,7 +223,7 @@ class ProgressQueryUseCaseTest {
         given(enrollmentRepository.findById(ENROLLMENT_ID)).willReturn(Optional.of(enrollment));
         given(courseFinder.findAllLectureResourcesByCourseId(COURSE_ID)).willReturn(lectureResourceSummaries);
         given(progressRepository.findByEnrollmentIdAndLectureResourceIds(any(Long.class), any(List.class)))
-                .willReturn(Collections.emptyList()); // 진도 기록이 없음을 명시
+                .willReturn(Collections.emptyList());
 
         // when
         LearningHistoryResult result = progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID);
@@ -230,6 +236,8 @@ class ProgressQueryUseCaseTest {
         assertThat(result.lectureProgresses().get(0).resourceId()).isEqualTo(RESOURCE_ID_1);
         assertThat(result.lectureProgresses().get(0).currentProgressRate()).isEqualTo(0);
         assertThat(result.lectureProgresses().get(0).watchedDuration()).isEqualTo(0);
-        assertThat(result.lastWatchedVideoId()).isNull(); // 진도가 없으므로 마지막 시청 정보도 없음
+        assertThat(result.lastWatchedVideoId()).isEqualTo(0L);
+        assertThat(result.lastWatchedDurationOfLastVideo()).isEqualTo(0);
+        assertThat(result.lastWatchedAt()).isNull();
     }
 }

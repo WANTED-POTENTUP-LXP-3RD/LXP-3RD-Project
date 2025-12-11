@@ -65,7 +65,7 @@ class ProgressCommandUseCaseTest {
         Long courseId = 100L;
 
         Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(currentUser.id()).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
-        Progress existingProgress = Progress.of(enrollment, lectureResource); // isCompleted = false
+        Progress existingProgress = Progress.of(enrollment, lectureResource);
 
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
         given(courseRepository.findAllLecturesWithResourcesByCourseId(courseId)).willReturn(List.of(lecture));
