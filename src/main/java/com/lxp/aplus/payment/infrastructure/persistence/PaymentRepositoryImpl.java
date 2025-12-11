@@ -1,4 +1,4 @@
-package com.lxp.aplus.payment.infrastucture.persistence;
+package com.lxp.aplus.payment.infrastructure.persistence;
 
 import com.lxp.aplus.payment.domain.Payment;
 import com.lxp.aplus.payment.domain.PaymentRepository;
