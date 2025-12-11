@@ -13,7 +13,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseJpaRepository extends JpaRepository<Course, Long> {
-    Page<Course> findAllByInstructorId(Long instructorId, Pageable pageable);
+    @Query("SELECT DISTINCT c FROM Course c " +
+            "LEFT JOIN FETCH c.sections s " +
+            "WHERE c.id = :courseId AND c.courseStatus <> 'DELETED'")
+    Optional<Course> findWithCurriculumById(@Param("courseId") Long courseId);
+
+    @Query("SELECT DISTINCT c FROM Course c " +
+            "LEFT JOIN FETCH c.sections s " +
+            "WHERE c.id = :courseId AND c.courseStatus = 'PUBLISHED' AND c.courseStatus <> 'DELETED'")
+    Optional<Course> findPublishedWithCurriculumById(@Param("courseId") Long courseId);
+
+    Page<Course> findAllByInstructorIdAndCourseStatusNot(Long instructorId, CourseStatus courseStatus, Pageable pageable);
 
     Page<Course> findAllByCourseStatus(CourseStatus courseStatus, Pageable pageable);
 
@@ -37,4 +47,6 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
             "INNER JOIN l.section s " +
             "WHERE s.course.id = :courseId")
     List<Lecture> findAllLecturesWithResourcesByCourseId(@Param("courseId") Long courseId);
+
+    List<Course> findByIdIn(List<Long> ids);
 }

@@ -29,12 +29,12 @@ public class CourseQueryUseCase {
     private final CategoryQueryPort categoryQueryPort;
 
     public Page<CourseResponse> getInstructorCourses(Long instructorId, Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllByInstructorId(instructorId, pageable);
+        Page<Course> courses = courseRepository.findAllByInstructorIdExcludingDeleted(instructorId, pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
     public Page<CourseResponse> getPublishedCourses(Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllByPublished(pageable);
+        Page<Course> courses = courseRepository.findAllPublished(pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
@@ -56,10 +56,9 @@ public class CourseQueryUseCase {
         return categoryQueryPort.findCategoryWithParentNames(categoryId);
     }
 
-    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
-        Course course = courseRepository.findWithCurriculumById(courseId)
+    public CourseDetailResponse getPublishedCourseDetail(Long courseId, Long userId) {
+        Course course = courseRepository.findPublishedWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
-        course.validateOwner(instructorId);
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
@@ -75,10 +74,11 @@ public class CourseQueryUseCase {
         return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
     }
 
-    public CourseDetailResponse getPublishedCourseDetail(Long courseId, Long userId) {
-        Course course = courseRepository.findPublishedWithCurriculumById(courseId)
+    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
+        Course course = courseRepository.findWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
-        course.validateAccessible();
+
+        course.validateOwner(instructorId);
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
