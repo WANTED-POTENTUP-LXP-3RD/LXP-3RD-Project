@@ -1,5 +1,7 @@
 package com.lxp.aplus.order.application.usecase;
 
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.order.application.CoursePrice;
@@ -41,11 +43,12 @@ public class OrderCommandUseCase {
     }
 
     // TODO: 이벤트 기반으로 분리 ----------
+    // NOTE: Course의 코드를 최대한 덜 건드리기 위해서 이곳에 임시로 작성한 코드입니다.
     private List<CoursePrice> getCoursePriceByIds(List<Long> ids) {
         List<Course> courses = courseRepository.findByIdIn(ids);
 
         if (courses.size() != ids.size()) {
-            throw new IllegalArgumentException("일부 강의를 찾을 수 없습니다.");
+            throw new BusinessException(CourseErrorCode.COURSE_NOT_FOUND);
         }
 
         return courses.stream()
