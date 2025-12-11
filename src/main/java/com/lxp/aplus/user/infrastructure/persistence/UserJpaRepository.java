@@ -2,7 +2,10 @@ package com.lxp.aplus.user.infrastructure.persistence;
 
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.domain.UserRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 /**
  * Spring Data JPA Repository
@@ -30,5 +33,41 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @see UserRepositoryImpl
  */
 public interface UserJpaRepository extends JpaRepository<User, Long> {
+    
+    /**
+     * User와 Role을 함께 조회 (Fetch Join)
+     * 
+     * @EntityGraph를 사용하여 Fetch Join 수행
+     * - attributePaths = {"roles"}로 roles 연관관계를 즉시 로딩
+     * - Spring Data JPA가 자동으로 LEFT JOIN FETCH 쿼리 생성
+     * - 여러 Role이 있을 경우 중복 결과가 발생할 수 있으므로 List로 반환
+     * 
+     * @param id User ID
+     * @return List<User> (중복 제거는 RepositoryImpl에서 처리)
+     */
+    @EntityGraph(attributePaths = {"roles"})
+    java.util.List<User> findAllById(Long id);
+
+    /**
+     * 이메일로 User 조회
+     *
+     * @param email 이메일
+     * @return Optional<User>
+     */
+    Optional<User> findByEmail(String email);
+
+    /**
+     * 이메일로 User와 Role을 함께 조회
+     *
+     * @EntityGraph를 사용하면 SQL에서 JOIN을 사용해 연관 엔티티까지 한번에 조회
+     * - attributePaths = {"roles"}로 roles 연관관계를 한번에 조회
+     * - Spring Data JPA가 자동으로 LEFT JOIN FETCH 쿼리 생성
+     * - 여러 Role이 있을 경우 중복 결과가 발생할 수 있으므로 List로 반환
+     *
+     * @param email 이메일
+     * @return List<User> (중복 제거는 RepositoryImpl에서 처리)
+     */
+    @EntityGraph(attributePaths = {"roles"})
+    java.util.List<User> findAllByEmail(String email);
 }
 
