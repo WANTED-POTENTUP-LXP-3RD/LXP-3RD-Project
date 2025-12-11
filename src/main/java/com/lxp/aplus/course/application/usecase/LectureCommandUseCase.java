@@ -2,7 +2,6 @@ package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
-import com.lxp.aplus.common.error.code.LectureErrorCode;
 import com.lxp.aplus.course.application.command.CreateLectureCommand;
 import com.lxp.aplus.course.application.command.UpdateLectureCommand;
 import com.lxp.aplus.course.application.result.LectureResult;
@@ -23,10 +22,6 @@ public class LectureCommandUseCase {
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         Lecture lecture = course.createLecture(CreateLectureSpec.from(sectionId, command));
-
-        if (lecture == null) {
-            throw new BusinessException(LectureErrorCode.LECTURE_CREATE_FAILED);
-        }
 
         courseRepository.save(course);
         return LectureResult.from(lecture);
