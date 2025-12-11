@@ -75,4 +75,10 @@ public class Enrollment extends BaseAggregateRoot {
             this.status = EnrollmentStatus.COMPLETED;
         }
     }
+
+    public void validateOwner(Long studentId) {
+        if (!this.studentId.equals(studentId)) {
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
+        }
+    }
 }
