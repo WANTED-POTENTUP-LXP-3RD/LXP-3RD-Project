@@ -1,6 +1,7 @@
 package com.lxp.aplus.course.application.result;
 
 import com.lxp.aplus.course.domain.Lecture;
+import com.lxp.aplus.course.domain.LectureResource;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,8 @@ public record LectureResult (
         LectureResourceResult resource
 ) {
     public static LectureResult from (Lecture lecture) {
+        LectureResource lectureResource = lecture.getLectureResources().get(0);
+
         return LectureResult.builder()
                 .id(lecture.getId())
                 .title(lecture.getTitle())
@@ -23,6 +26,13 @@ public record LectureResult (
                 .updatedAt(lecture.getUpdatedAt())
                 .resource(new LectureResourceResult(lecture.getLectureResources().get(0).getResourceType(), lecture.getLectureResources().get(0).isDownloadable(), lecture.getLectureResources().get(0).getFileUrl()
                 ))
+                .resource(
+                        LectureResourceResult.builder()
+                                .resourceType(lectureResource.getResourceType())
+                                .isDownloadable(lectureResource.isDownloadable())
+                                .fileUrl(lectureResource.getFileUrl())
+                                .build()
+                )
                 .build();
     }
 }
