@@ -24,8 +24,6 @@ public record LectureResult (
                 .orderIndex(lecture.getOrderIndex())
                 .createdAt(lecture.getCreatedAt())
                 .updatedAt(lecture.getUpdatedAt())
-                .resource(new LectureResourceResult(lecture.getLectureResources().get(0).getResourceType(), lecture.getLectureResources().get(0).isDownloadable(), lecture.getLectureResources().get(0).getFileUrl()
-                ))
                 .resource(
                         LectureResourceResult.builder()
                                 .resourceType(lectureResource.getResourceType())

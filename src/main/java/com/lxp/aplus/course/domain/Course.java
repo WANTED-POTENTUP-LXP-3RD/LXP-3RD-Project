@@ -192,22 +192,31 @@ public class Course extends BaseAggregateRoot {
         }
     }
 
-    public Lecture createLecture(Long sectionId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+    public Lecture createLecture(Long sectionId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
             Section section = sections.stream()
                 .filter(s -> s.getId().equals(sectionId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
 
-        return section.addLecture(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+        return section.addLecture(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
     }
 
-    public Lecture updateLecture(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+    public Lecture updateLectureMeta(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
         Section section = sections.stream()
                 .filter(s -> s.hasLecture(lectureId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
 
-        return section.updateLecture(lectureId, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+        return section.updateLectureMeta(lectureId, title, totalDurationSeconds, isPreview, orderIndex);
+    }
+
+    public Lecture updateLectureWithResource(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        return section.updateLectureWithResource(lectureId, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
     }
 
     public void deleteLecture(Long lectureId) {

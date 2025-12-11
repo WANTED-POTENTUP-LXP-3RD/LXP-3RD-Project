@@ -51,18 +51,27 @@ public class Section extends BaseTimeEntity {
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lecture> lectures = new ArrayList<>();
 
-    public Lecture addLecture(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
-        Lecture lecture = Lecture.create(this, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+    public Lecture addLecture(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
+        Lecture lecture = Lecture.create(this, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
         this.lectures.add(lecture);
         return lecture;
     }
 
-    public Lecture updateLecture(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+    public Lecture updateLectureMeta(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
         Lecture lecture = lectures.stream()
                 .filter(l -> l.getId().equals(lectureId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
-        lecture.update(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+        lecture.update(title, totalDurationSeconds, isPreview, orderIndex);
+        return lecture;
+    }
+
+    public Lecture updateLectureWithResource(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
+        Lecture lecture = lectures.stream()
+                .filter(l -> l.getId().equals(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+        lecture.update(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
         return lecture;
     }
 

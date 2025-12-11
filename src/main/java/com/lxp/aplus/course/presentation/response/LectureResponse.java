@@ -43,7 +43,13 @@ public record LectureResponse(
                 .orderIndex(result.orderIndex())
                 .createdAt(result.createdAt())
                 .updatedAt(result.updatedAt())
-                .resource(new LectureResourceResponse(result.resource().resourceType(), result.resource().isDownloadable(), result.resource().fileUrl()))
+                .resource(
+                        LectureResourceResponse.builder()
+                                .resourceType(result.resource().resourceType())
+                                .isDownloadable(result.resource().isDownloadable())
+                                .fileUrl(result.resource().fileUrl())
+                                .build()
+                )
                 .build();
     }
 }
