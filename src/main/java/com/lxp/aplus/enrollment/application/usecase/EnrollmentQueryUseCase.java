@@ -84,12 +84,6 @@ public class EnrollmentQueryUseCase {
 
 
 
-    public boolean isEnrollmentCompleted(Long enrollmentId) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
-        return enrollment.getStatus() == EnrollmentStatus.COMPLETED;
-    }
-
     public long getStudentCountForCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
     }

@@ -123,52 +123,6 @@ class EnrollmentQueryUseCaseTest {
     }
 
     @Test
-    @DisplayName("성공 - 수강 완료 여부를 true로 반환한다")
-    void isEnrollmentCompleted_success_true() {
-        // given
-        Long enrollmentId = 1L;
-        Enrollment completedEnrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusDays(1));
-        ReflectionTestUtils.setField(completedEnrollment, "status", EnrollmentStatus.COMPLETED);
-        
-        given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(completedEnrollment));
-
-        // when
-        boolean result = enrollmentQueryUseCase.isEnrollmentCompleted(enrollmentId);
-
-        // then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("성공 - 수강 완료 여부를 false로 반환한다")
-    void isEnrollmentCompleted_success_false() {
-        // given
-        Long enrollmentId = 1L;
-        Enrollment enrolledEnrollment = Enrollment.of(1L, 100L, LocalDateTime.now().plusDays(1));
-        
-        given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrolledEnrollment));
-
-        // when
-        boolean result = enrollmentQueryUseCase.isEnrollmentCompleted(enrollmentId);
-
-        // then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    @DisplayName("실패 - 수강 내역이 없을 때 예외를 던진다")
-    void isEnrollmentCompleted_fail_notFound() {
-        // given
-        Long enrollmentId = 999L;
-        given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.empty());
-
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> enrollmentQueryUseCase.isEnrollmentCompleted(enrollmentId));
-        assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
-    }
-
-    @Test
     @DisplayName("성공 - 강좌의 수강생 수를 반환한다")
     void getStudentCountForCourse_success() {
         // given
