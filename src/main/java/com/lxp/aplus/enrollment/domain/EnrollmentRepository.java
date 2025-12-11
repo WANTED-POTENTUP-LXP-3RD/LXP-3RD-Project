@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface EnrollmentRepository {
 
     Enrollment save(Enrollment enrollment);
-    
+
     List<Enrollment> saveAll(List<Enrollment> enrollments);
 
     Optional<Enrollment> findById(Long id);
@@ -19,4 +19,9 @@ public interface EnrollmentRepository {
     Optional<Enrollment> findByStudentIdAndCourseId(Long studentId, Long courseId);
 
     Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable);
+
+    long countByCourseId(Long courseId);
+
+    boolean isEnrollmentCompleted(Long studentId, Long courseId);
+
 }

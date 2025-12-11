@@ -14,13 +14,13 @@ public record EnrollmentListItemResult(
         int progressRate,
         LocalDateTime expiredAt
 ) {
-    public static EnrollmentListItemResult of(Enrollment enrollment, CourseSummary courseSummary) {
+    public static EnrollmentListItemResult of(Enrollment enrollment, CourseSummary courseSummary, int progressRate) {
         return new EnrollmentListItemResult(
                 enrollment.getId(),
                 enrollment.getCourseId(),
                 courseSummary.courseName(),
                 enrollment.getStatus(),
-                enrollment.getProgressRate(),
+                progressRate,
                 enrollment.getExpiredAt()
         );
     }

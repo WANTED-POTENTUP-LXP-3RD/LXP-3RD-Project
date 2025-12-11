@@ -46,4 +46,18 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
     public Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable) {
         return jpaRepository.findByStudentIdAndStatus(studentId, status, pageable);
     }
+
+    @Override
+    public long countByCourseId(Long courseId) {
+        return jpaRepository.countByCourseId(courseId);
+    }
+
+    @Override
+    public boolean isEnrollmentCompleted(Long studentId, Long courseId) {
+        return jpaRepository.findByStudentIdAndCourseId(studentId, courseId)
+                .map(enrollment -> enrollment.getStatus() == EnrollmentStatus.COMPLETED)
+                .orElse(false);
+    }
+
+
 }
