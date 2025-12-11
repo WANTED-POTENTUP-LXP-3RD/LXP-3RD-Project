@@ -37,7 +37,7 @@ public class Lecture extends BaseTimeEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
-    public Lecture(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
+    private Lecture(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
         this.section = section;
         this.title = title;
         this.totalDurationSeconds = totalDurationSeconds;
@@ -67,6 +67,4 @@ public class Lecture extends BaseTimeEntity {
             this.lectureResources.add(resource);
         }
     }
-
-
 }
