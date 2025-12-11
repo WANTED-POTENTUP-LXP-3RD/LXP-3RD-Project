@@ -3,6 +3,7 @@ package com.lxp.aplus.progress.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.common.error.code.ProgressErrorCode;
+import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.course.domain.Lecture;
 import com.lxp.aplus.course.domain.LectureResource;
@@ -27,9 +28,13 @@ public class ProgressCommandUseCase {
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
 
-    public ProgressUpdateResponse updateProgress(Long enrollmentId, ProgressUpdateRequest request) {
+    public ProgressUpdateResponse updateProgress(UserInfo currentUser, Long enrollmentId, ProgressUpdateRequest request) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
+
+        if (!enrollment.getStudentId().equals(currentUser.id())) {
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
+        }
 
         Lecture parentLecture = courseRepository.findAllLecturesWithResourcesByCourseId(enrollment.getCourseId()).stream()
                 .filter(lecture -> lecture.getLectureResources().stream()
@@ -48,31 +53,21 @@ public class ProgressCommandUseCase {
         if (existingProgress.isPresent()) {
             progress = existingProgress.get();
         } else {
-            progress = Progress.builder()
-                    .enrollment(enrollment)
-                    .lectureResource(lectureResource)
-                    .build();
+            progress = Progress.of(enrollment, lectureResource);
         }
         
         int totalDuration = parentLecture.getTotalDurationSeconds();
-        if (request.watchedDuration() > totalDuration) {
-            throw new BusinessException(ProgressErrorCode.WATCHED_DURATION_EXCEEDS_TOTAL);
-        }
 
-        boolean isCompleted = request.watchedDuration() >= totalDuration;
-        progress.updateProgress(request.watchedDuration(), isCompleted);
+        boolean wasAlreadyCompleted = progress.isCompleted();
+        boolean isNowCompleted = request.watchedDuration() >= totalDuration;
+        boolean finalCompletionStatus = wasAlreadyCompleted || isNowCompleted;
+
+        progress.updateProgress(request.watchedDuration(), finalCompletionStatus);
 
         Progress savedProgress = progressRepository.save(progress);
 
-        int currentProgressRate = (int) (((double) savedProgress.getWatchedDuration() / totalDuration) * 100);
+        int currentProgressRate = savedProgress.calculateProgressRate();
 
-        return new ProgressUpdateResponse(
-                savedProgress.getLectureResource().getId(),
-                savedProgress.getEnrollment().getId(),
-                currentProgressRate,
-                savedProgress.getLectureResource().getId(),
-                savedProgress.getWatchedDuration(),
-                savedProgress.getLastWatchedAt()
-        );
+        return ProgressUpdateResponse.of(savedProgress, currentProgressRate);
     }
 }

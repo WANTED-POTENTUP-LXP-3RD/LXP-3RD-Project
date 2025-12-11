@@ -1,6 +1,5 @@
 package com.lxp.aplus.progress.application.usecase;
 
-import com.lxp.aplus.progress.application.port.out.ProgressFinder;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +13,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ProgressQueryUseCase implements ProgressFinder {
+public class ProgressQueryUseCase {
 
     private final ProgressRepository progressRepository;
 
-    @Override
     public Map<Long, Boolean> checkLectureCompletionStatus(Long enrollmentId, List<Long> lectureResourceIds) {
         List<Progress> progresses = progressRepository.findByEnrollmentIdAndLectureResourceIds(enrollmentId, lectureResourceIds);
 

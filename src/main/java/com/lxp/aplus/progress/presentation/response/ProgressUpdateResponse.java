@@ -1,5 +1,6 @@
 package com.lxp.aplus.progress.presentation.response;
 
+import com.lxp.aplus.progress.domain.Progress;
 import java.time.LocalDateTime;
 
 public record ProgressUpdateResponse(
@@ -10,4 +11,14 @@ public record ProgressUpdateResponse(
         Integer lastWatchedDuration,
         LocalDateTime updatedAt
 ) {
+    public static ProgressUpdateResponse of(Progress progress, int currentProgressRate) {
+        return new ProgressUpdateResponse(
+                progress.getLectureResource().getId(),
+                progress.getEnrollment().getId(),
+                currentProgressRate,
+                progress.getLectureResource().getId(),
+                progress.getWatchedDuration(),
+                progress.getLastWatchedAt()
+        );
+    }
 }

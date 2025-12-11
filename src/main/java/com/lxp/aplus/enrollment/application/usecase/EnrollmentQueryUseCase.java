@@ -47,8 +47,8 @@ public class EnrollmentQueryUseCase {
                         );
                     }
 
-                    Map<Long, Boolean> completionStatusMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-                    long completedResources = completionStatusMap.values().stream().filter(Boolean::booleanValue).count();
+                    Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
+                    long completedResources = resourceIdToIsCompletedMap.values().stream().filter(Boolean::booleanValue).count();
                     int progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
 
                     return EnrollmentListItemResult.of(
