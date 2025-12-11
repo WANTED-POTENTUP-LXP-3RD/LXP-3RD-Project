@@ -48,18 +48,18 @@ public class Section extends BaseTimeEntity {
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lecture> lectures = new ArrayList<>();
 
-    public Lecture addLecture(CreateLectureSpec spec) {
-        Lecture lecture = Lecture.create(this, spec.title(), spec.totalDurationSeconds(), spec.isPreview(), spec.orderIndex(), spec.resource());
+    public Lecture addLecture(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+        Lecture lecture = Lecture.create(this, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
         this.lectures.add(lecture);
         return lecture;
     }
 
-    public Lecture updateLecture(UpdateLectureSpec spec) {
+    public Lecture updateLecture(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
         Lecture lecture = lectures.stream()
-                .filter(l -> l.getId().equals(spec.lectureId()))
+                .filter(l -> l.getId().equals(lectureId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
-        lecture.update(spec.title(), spec.totalDurationSeconds(), spec.isPreview(), spec.orderIndex(), spec.resource());
+        lecture.update(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
         return lecture;
     }
 

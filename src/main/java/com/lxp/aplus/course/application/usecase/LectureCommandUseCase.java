@@ -21,7 +21,14 @@ public class LectureCommandUseCase {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        Lecture lecture = course.createLecture(CreateLectureSpec.from(sectionId, command));
+        Lecture lecture = course.createLecture(
+                sectionId,
+                command.title(),
+                command.totalDurationSeconds(),
+                command.isPreview(),
+                command.orderIndex(),
+                command.resource().isDownloadable()
+        );
 
         courseRepository.save(course);
         return LectureResult.from(lecture);
@@ -31,7 +38,14 @@ public class LectureCommandUseCase {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        Lecture lecture = course.updateLecture(UpdateLectureSpec.from(lectureId, command));
+        Lecture lecture = course.updateLecture(
+                lectureId,
+                command.title(),
+                command.totalDurationSeconds(),
+                command.isPreview(),
+                command.orderIndex(),
+                command.resource().isDownloadable()
+        );
 
         courseRepository.save(course);
         return LectureResult.from(lecture);

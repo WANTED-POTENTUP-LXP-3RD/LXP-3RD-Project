@@ -1,9 +1,6 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
-import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.common.error.code.LectureErrorCode;
-import com.lxp.aplus.course.presentation.response.LectureResourceResponse;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -51,30 +48,22 @@ public class Lecture extends BaseTimeEntity {
         this.lectureResources = new ArrayList<>();
     }
 
-    public static Lecture create(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, CreateLectureResourceSpec resourceSpec) {
-        if (resourceSpec == null) {
-            throw new BusinessException(LectureErrorCode.LECTURE_RESOURCE_REQUIRED);
-        }
-
+    public static Lecture create(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
         Lecture lecture = new Lecture(section, title, totalDurationSeconds, isPreview, orderIndex);
-        LectureResource resource = LectureResource.create(lecture, resourceSpec.isDownloadable());
+        LectureResource resource = LectureResource.create(lecture, isDownloadable);
         lecture.lectureResources.add(resource);
 
         return lecture;
     }
 
-    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, UpdateLectureResourceSpec resourceSpec) {
-        if (resourceSpec == null) {
-            throw new BusinessException(LectureErrorCode.LECTURE_RESOURCE_REQUIRED);
-        }
-
+    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
         this.title = title;
         this.totalDurationSeconds = totalDurationSeconds;
         this.isPreview = isPreview;
         this.orderIndex = orderIndex;
 
         this.lectureResources.clear();
-        LectureResource resource = LectureResource.create(this, resourceSpec.isDownloadable());
+        LectureResource resource = LectureResource.create(this, isDownloadable);
         this.lectureResources.add(resource);
     }
 }

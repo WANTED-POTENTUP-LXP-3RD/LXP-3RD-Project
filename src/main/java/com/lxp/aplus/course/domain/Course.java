@@ -6,9 +6,7 @@ import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
-import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.LectureErrorCode;
-import com.lxp.aplus.common.error.code.SectionErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -134,22 +132,22 @@ public class Course extends BaseAggregateRoot {
         }
     }
 
-    public Lecture createLecture(CreateLectureSpec spec) {
-        Section section = sections.stream()
-                .filter(s -> s.getId().equals(spec.sectionId()))
+    public Lecture createLecture(Long sectionId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+            Section section = sections.stream()
+                .filter(s -> s.getId().equals(sectionId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
 
-        return section.addLecture(spec);
+        return section.addLecture(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
     }
 
-    public Lecture updateLecture(UpdateLectureSpec spec) {
+    public Lecture updateLecture(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
         Section section = sections.stream()
-                .filter(s -> s.hasLecture(spec.lectureId()))
+                .filter(s -> s.hasLecture(lectureId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
 
-        return section.updateLecture(spec);
+        return section.updateLecture(lectureId, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
     }
 
     public void deleteLecture(Long lectureId) {
