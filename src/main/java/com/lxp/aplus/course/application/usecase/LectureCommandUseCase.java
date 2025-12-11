@@ -1,6 +1,7 @@
 package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.LectureErrorCode;
 import com.lxp.aplus.course.application.command.CreateLectureCommand;
 import com.lxp.aplus.course.application.command.UpdateLectureCommand;
@@ -9,8 +10,6 @@ import com.lxp.aplus.course.domain.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import static com.lxp.aplus.common.error.code.CourseErrorCode.COURSE_NOT_FOUND;
 
 @Service
 @Transactional
@@ -21,7 +20,7 @@ public class LectureCommandUseCase {
 
     public LectureResult createLecture(Long courseId, Long sectionId, CreateLectureCommand command) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         Lecture lecture = course.createLecture(CreateLectureSpec.from(sectionId, command));
 
@@ -35,7 +34,7 @@ public class LectureCommandUseCase {
 
     public LectureResult updateLecture(Long courseId, Long lectureId, UpdateLectureCommand command) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         Lecture lecture = course.updateLecture(UpdateLectureSpec.from(lectureId, command));
 
@@ -45,7 +44,7 @@ public class LectureCommandUseCase {
 
     public void deleteLecture(Long courseId, Long lectureId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         course.deleteLecture(lectureId);
     }
