@@ -1,6 +1,8 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,8 +57,16 @@ public class Section extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(String title, Integer orderIndex) {
-        if (title != null) this.title = title;
-        if (orderIndex != null) this.orderIndex = orderIndex;
+    public void updateSection(String title, Integer orderIndex) {
+        if (title == null || title.isBlank()) {
+            throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+        }
+
+        if (orderIndex == null) {
+            throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
+        }
+
+        this.title = title;
+        this.orderIndex = orderIndex;
     }
 }

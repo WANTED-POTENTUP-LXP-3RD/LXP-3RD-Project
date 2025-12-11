@@ -29,12 +29,12 @@ public class CourseQueryUseCase {
     private final CategoryQueryPort categoryQueryPort;
 
     public Page<CourseResponse> getInstructorCourses(Long instructorId, Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllByInstructorId(instructorId, pageable);
+        Page<Course> courses = courseRepository.findAllByInstructorIdExcludingDeleted(instructorId, pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
     public Page<CourseResponse> getPublishedCourses(Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllByPublished(pageable);
+        Page<Course> courses = courseRepository.findAllPublished(pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
@@ -56,28 +56,6 @@ public class CourseQueryUseCase {
         return categoryQueryPort.findCategoryWithParentNames(categoryId);
     }
 
-    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
-        Course course = courseRepository.findWithCurriculumById(courseId)
-                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
-
-        course.validateOwner(instructorId);
-        List<String> categoryNames = getCategoryNames(course.getCategoryId());
-
-        InstructorResponse instructorResponse = userQueryPort.findInstructorById(course.getInstructorId())
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
-
-        int totalDuration = course.getSections().stream()
-                .flatMap(section -> section.getLectures().stream())
-                .mapToInt(lecture -> lecture.getTotalDurationSeconds() != null ? lecture.getTotalDurationSeconds() : 0)
-                .sum();
-
-        // TODO: enrollmentQueryPort를 통해 수강 완료 여부 조회 & 수강생 수 조회
-        boolean isPurchased = false;
-        int studentCount = 0;
-
-        return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
-    }
-
     public CourseDetailResponse getPublishedCourseDetail(Long courseId, Long userId) {
         Course course = courseRepository.findPublishedWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
@@ -87,15 +65,39 @@ public class CourseQueryUseCase {
         InstructorResponse instructorResponse = userQueryPort.findInstructorById(course.getInstructorId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        int totalDuration = course.getSections().stream()
-                .flatMap(section -> section.getLectures().stream())
-                .mapToInt(lecture -> lecture.getTotalDurationSeconds() != null ? lecture.getTotalDurationSeconds() : 0)
-                .sum();
+        int totalDuration = calculateTotalDuration(course);
 
         // TODO: enrollmentQueryPort를 통해 수강 완료 여부 조회 & 수강생 수 조회
         boolean isPurchased = false;
         int studentCount = 0;
 
         return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
+    }
+
+    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
+        Course course = courseRepository.findWithCurriculumById(courseId)
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+
+        course.validateOwner(instructorId);
+
+        List<String> categoryNames = getCategoryNames(course.getCategoryId());
+
+        InstructorResponse instructorResponse = userQueryPort.findInstructorById(course.getInstructorId())
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        int totalDuration = calculateTotalDuration(course);
+
+        // TODO: enrollmentQueryPort를 통해 수강 완료 여부 조회 & 수강생 수 조회
+        boolean isPurchased = false;
+        int studentCount = 0;
+
+        return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
+    }
+
+    private int calculateTotalDuration(Course course) {
+        return course.getSections().stream()
+                .flatMap(section -> section.getLectures().stream())
+                .mapToInt(lecture -> lecture.getTotalDurationSeconds() != null ? lecture.getTotalDurationSeconds() : 0)
+                .sum();
     }
 }
