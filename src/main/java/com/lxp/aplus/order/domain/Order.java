@@ -1,6 +1,8 @@
 package com.lxp.aplus.order.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.OrderErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -139,7 +141,7 @@ public class Order extends BaseAggregateRoot {
      */
     private void validatePending() {
         if (this.orderStatus != OrderStatus.PENDING) {
-            throw new IllegalStateException("Pending 상태에서만 수행 가능합니다.");
+            throw new BusinessException(OrderErrorCode.ORDER_INVALID_STATUS);
         }
     }
 
@@ -148,7 +150,7 @@ public class Order extends BaseAggregateRoot {
      */
     private void validateNoApprovedPayment() {
         if (this.approvedPaymentId != null) {
-            throw new IllegalStateException("이미 승인된 결제가 존재합니다.");
+            throw new BusinessException(OrderErrorCode.ORDER_ALREADY_PAID);
         }
     }
 
@@ -157,7 +159,7 @@ public class Order extends BaseAggregateRoot {
      */
     private void validateAmount(BigDecimal approvedAmount) {
         if (!this.amount.equals(approvedAmount)) {
-            throw new IllegalArgumentException("Order 금액과 승인 금액이 일치하지 않습니다.");
+            throw new BusinessException(OrderErrorCode.ORDER_AMOUNT_MISMATCH);
         }
     }
 }
