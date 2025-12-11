@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Builder
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "sections")
 @Getter
@@ -85,8 +82,6 @@ public class Section extends BaseTimeEntity {
         return lectures.stream()
                 .anyMatch(l -> l.getId().equals(lectureId));
     }
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Lecture> lectures = new ArrayList<>();
 
     public static Section createSection(Course course, String title, int orderIndex) {
         return Section.builder()
