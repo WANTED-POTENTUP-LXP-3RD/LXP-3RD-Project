@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,9 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,12 +41,13 @@ public class CourseController {
     private final CourseQueryUseCase courseQueryUseCase;
 
     @InstructorOnly
-    @PostMapping("/api/instructor/courses")
+    @PostMapping(value = "/api/instructor/courses", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResultResponse<CourseUpsertResponse>> createCourse(
             @Authenticated Long instructorId,
-            @Valid @RequestBody CourseCreateRequest request
+            @RequestPart("request") @Valid CourseCreateRequest request, // JSON 데이터
+            @RequestPart("thumbnail") MultipartFile thumbnail       // 이미지 파일
     ) {
-        CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.createCourse(instructorId, request.toCommand());
+        CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.createCourse(instructorId, request.toCommand(thumbnail));
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_REGISTER_SUCCESS.getStatus())
@@ -55,8 +59,8 @@ public class CourseController {
     @InstructorOnly
     @PatchMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseUpsertResponse>> updateCourse(
-            @PathVariable Long courseId,
             @Authenticated Long instructorId,
+            @PathVariable Long courseId,
             @RequestBody CourseUpdateRequest request
     ) {
         CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());

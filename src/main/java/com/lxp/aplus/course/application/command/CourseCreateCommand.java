@@ -2,6 +2,7 @@ package com.lxp.aplus.course.application.command;
 
 import com.lxp.aplus.course.domain.CourseLevel;
 import lombok.Builder;
+import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 public record CourseCreateCommand(
@@ -11,6 +12,7 @@ public record CourseCreateCommand(
         Long categoryId,
         int price,
         String thumbnailUrl,
+        MultipartFile thumbnailFile,
         CourseLevel courseLevel
 ) {
 }
