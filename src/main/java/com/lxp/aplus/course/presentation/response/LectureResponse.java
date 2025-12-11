@@ -12,7 +12,7 @@ public record LectureResponse (
         int orderIndex,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        LectureResourceResponse response
+        LectureResourceResponse resource
 ) {
     public static LectureResponse from (LectureResult result) {
         return LectureResponse.builder()
@@ -21,7 +21,7 @@ public record LectureResponse (
                 .orderIndex(result.orderIndex())
                 .createdAt(result.createdAt())
                 .updatedAt(result.updatedAt())
-                .response(new LectureResourceResponse(result.response().resourceType(), result.response().isDownloadable(), result.response().fileUrl()))
+                .resource(new LectureResourceResponse(result.resource().resourceType(), result.resource().isDownloadable(), result.resource().fileUrl()))
                 .build();
     }
 }

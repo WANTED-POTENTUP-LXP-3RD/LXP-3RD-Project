@@ -1,7 +1,6 @@
 package com.lxp.aplus.course.application.result;
 
 import com.lxp.aplus.course.domain.Lecture;
-import com.lxp.aplus.course.presentation.response.LectureResourceResponse;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -13,7 +12,7 @@ public record LectureResult (
         int orderIndex,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        LectureResourceResponse response
+        LectureResourceResult resource
 ) {
     public static LectureResult from (Lecture lecture) {
         return LectureResult.builder()
@@ -22,7 +21,7 @@ public record LectureResult (
                 .orderIndex(lecture.getOrderIndex())
                 .createdAt(lecture.getCreatedAt())
                 .updatedAt(lecture.getUpdatedAt())
-                .response(new LectureResourceResponse(lecture.getLectureResources().get(0).getResourceType(), lecture.getLectureResources().get(0).isDownloadable(), lecture.getLectureResources().get(0).getFileUrl()
+                .resource(new LectureResourceResult(lecture.getLectureResources().get(0).getResourceType(), lecture.getLectureResources().get(0).isDownloadable(), lecture.getLectureResources().get(0).getFileUrl()
                 ))
                 .build();
     }
