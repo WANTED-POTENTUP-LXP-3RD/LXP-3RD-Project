@@ -250,11 +250,8 @@ class ProgressCommandUseCaseTest {
                 Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(currentUser.id()).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
                 Progress existingProgress = Progress.of(enrollment, lectureResource);
         
-                // Mocking for the new method
                 given(enrollmentRepository.findByStudentIdAndCourseId(currentUser.id(), courseId)).willReturn(Optional.of(enrollment));
-        
-                // Mocking for the original updateProgress method that gets called internally
-                given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment)); 
+                given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
                 given(courseRepository.findAllLecturesWithResourcesByCourseId(courseId)).willReturn(List.of(lecture));
                 given(progressRepository.findByEnrollmentAndLectureResource(enrollment, lectureResource)).willReturn(Optional.of(existingProgress));
                 
