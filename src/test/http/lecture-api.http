@@ -1,7 +1,7 @@
 @host = http://localhost:8000
 @courseId = 1
 @sectionId = 1
-@lectureId = 5
+@lectureId = 10
 
 ### 로그인해서 토큰 받기
 POST {{host}}/api/auth/login
