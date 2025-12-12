@@ -50,18 +50,18 @@ public class EnrollmentQueryUseCase {
                                 categoryNames
                         );
                     }
-
+                    long totalResourceCount = lectureResourceIds.size();
                     Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-                    long completedResources = resourceIdToIsCompletedMap.values()
+                    long completedResourceCount = resourceIdToIsCompletedMap.values()
                                                                         .stream()
                                                                         .filter(Boolean::booleanValue)
                                                                         .count();
-                    int progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
+                    int completionPercentage = (int) ((double) completedResourceCount / totalResourceCount * 100);
 
                     return EnrollmentListItemResult.of(
                             enrollment,
                             courseSummary,
-                            progressRate,
+                            completionPercentage,
                             categoryNames
                     );
                 })
@@ -77,17 +77,18 @@ public class EnrollmentQueryUseCase {
         enrollment.validateOwner(studentId);
 
         List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
-        int progressRate = 0;
+        int completionPercentage = 0;
         if (!lectureResourceIds.isEmpty()) {
+            long totalResourceCount = lectureResourceIds.size();
             Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-            long completedResources = resourceIdToIsCompletedMap.values()
+            long completedResourceCount = resourceIdToIsCompletedMap.values()
                                                                 .stream()
                                                                 .filter(Boolean::booleanValue)
                                                                 .count();
-            progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
+            completionPercentage = (int) ((double) completedResourceCount / totalResourceCount * 100);
         }
 
-        return EnrollmentDetailResult.of(enrollment, progressRate);
+        return EnrollmentDetailResult.of(enrollment, completionPercentage);
     }
 
     public EnrollmentDetailResult getEnrollmentDetailByCourseId(Long studentId, Long courseId) {
@@ -95,17 +96,18 @@ public class EnrollmentQueryUseCase {
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
         List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
-        int progressRate = 0;
+        int completionPercentage = 0;
         if (!lectureResourceIds.isEmpty()) {
+            long totalResourceCount = lectureResourceIds.size();
             Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-            long completedResources = resourceIdToIsCompletedMap.values()
+            long completedResourceCount = resourceIdToIsCompletedMap.values()
                                                                 .stream()
                                                                 .filter(Boolean::booleanValue)
                                                                 .count();
-            progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
+            completionPercentage = (int) ((double) completedResourceCount / totalResourceCount * 100);
         }
 
-        return EnrollmentDetailResult.of(enrollment, progressRate);
+        return EnrollmentDetailResult.of(enrollment, completionPercentage);
     }
 
     public long getStudentCountForCourse(Long courseId) {
