@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LectureFileValidator implements FileValidator {
 
-    private final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+    private final long MAX_FILE_SIZE = 480L * 1024 * 1024; // 480MB
 
     @Override
     public void validateRequired(UploadFile file) {
@@ -29,6 +29,9 @@ public class LectureFileValidator implements FileValidator {
 
     @Override
     public void validateIfPresent(UploadFile file) {
+        if (file == null) {
+            return;
+        }
         if (file.size() > MAX_FILE_SIZE) {
             throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_FILE_SIZE_EXCEEDED);
         }

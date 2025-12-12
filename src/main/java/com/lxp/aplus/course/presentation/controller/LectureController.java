@@ -77,8 +77,7 @@ public class LectureController {
 
         UploadFile uploadFile = null;
 
-        // 파일 교체 + 메타 정보 교체
-        if (file != null || !file.isEmpty()) {
+        if (file != null && !file.isEmpty()) {
             uploadFile = UploadFile.from(file);
         }
 

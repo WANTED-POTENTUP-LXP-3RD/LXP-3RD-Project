@@ -1,0 +1,110 @@
+@host = http://localhost:8000
+@courseId = 1
+@sectionId = 1
+@lectureId = 5
+
+### 로그인해서 토큰 받기
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "1234"
+}
+
+> {%
+    // ResultResponse<T> 구조에서 data.accessToken을 꺼냄
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.global.set("tokenType", response.body.data.tokenType ?? "Bearer");
+    client.log("saved accessToken=" + response.body.data.accessToken);
+%}
+
+### 강의 생성 (multipart: meta(json) + file)
+POST {{host}}/api/instructor/courses/{{courseId}}/sections/{{sectionId}}/lectures
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="lecture"
+Content-Type: application/json
+
+{
+  "title": "1. 강의 소개",
+  "totalDurationSeconds": 480,
+  "isPreview": true,
+  "orderIndex": 1,
+  "resource": {
+    "isDownloadable": false
+  }
+}
+--boundary
+Content-Disposition: form-data; name="multiFile"; filename="215926_small.mp4"
+Content-Type: video/mp4
+
+< ./files/215926_small.mp4
+--boundary--
+
+### 강의 조회
+GET {{host}}/api/instructor/courses/{{courseId}}/lectures/{{lectureId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### 강의 수정(파일 없음)
+PUT {{host}}/api/instructor/courses/{{courseId}}/lectures/{{lectureId}}
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+--boundary
+Content-Disposition: form-data; name="lecture"
+Content-Type: application/json
+
+{
+  "title": "1. 강의 소개(메타만 수정)",
+  "totalDurationSeconds": 480,
+  "isPreview": true,
+  "orderIndex": 1,
+  "resource": {
+    "isDownloadable": false
+  }
+}
+--boundary--
+
+### 강의 수정(파일 있음)
+PUT {{host}}/api/instructor/courses/{{courseId}}/lectures/{{lectureId}}
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+--boundary
+Content-Disposition: form-data; name="lecture"
+Content-Type: application/json
+
+{
+  "title": "1. 강의 소개(메타+파일 수정)",
+  "totalDurationSeconds": null,
+  "isPreview": false,
+  "orderIndex": 1,
+  "resource": {
+    "isDownloadable": true
+  }
+}
+--boundary
+Content-Disposition: form-data; name="multiFile"; filename="9b4d4fbf-c699-45c9-9723-e51d528cf0e3_팀_프로젝트_3차_팀_PR_merge주의.pdf"
+Content-Type: application/pdf
+
+< ./files/9b4d4fbf-c699-45c9-9723-e51d528cf0e3_팀_프로젝트_3차_팀_PR_merge주의.pdf
+--boundary--
+
+### 강의 삭제
+DELETE {{host}}/api/instructor/courses/{{courseId}}/lectures/{{lectureId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+
+
+
