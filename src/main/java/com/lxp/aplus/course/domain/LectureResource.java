@@ -35,7 +35,8 @@ public class LectureResource extends BaseTimeEntity {
     @Column(name = "is_downloadable")
     private boolean isDownloadable;
 
-    @Column(name = "extensioin_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "extension_type", nullable = false)
     private ExtensionType extensionType;
 
     public static LectureResource create(Lecture lecture, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
