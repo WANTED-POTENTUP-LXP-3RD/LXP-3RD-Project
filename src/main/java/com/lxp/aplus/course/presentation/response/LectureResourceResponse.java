@@ -13,7 +13,7 @@ public record LectureResourceResponse(
     public static LectureResourceResponse from(LectureResource resource) {
         return LectureResourceResponse.builder()
                 .resourceType(resource.getResourceType())
-                .fileUrl(resource.getFileKey())
+                .fileUrl(resource.getFileUrl())
                 .isDownloadable(resource.isDownloadable())
                 .build();
     }

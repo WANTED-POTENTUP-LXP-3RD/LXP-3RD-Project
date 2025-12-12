@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -30,4 +32,25 @@ public class CategoryQueryAdapter implements CategoryQueryPort {
 
         return categoryNames;
     }
+
+    @Override
+    public Map<Long, List<String>> getCategoryNamesBatch(List<Long> categoryIds) {
+        return categoryRepository.findAllByIdIn(categoryIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        Category::getId,
+                        this::extractCategoryNameList
+                ));
+    }
+
+    private List<String> extractCategoryNameList(Category category) {
+        if (category.getParent() != null) {
+            return List.of(
+                    category.getParent().getName(),
+                    category.getName()
+            );
+        }
+        return List.of(category.getName());
+    }
+
 }
