@@ -20,6 +20,9 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Progress extends BaseTimeEntity {
 
+    private static final int MAX_PERCENTAGE_VALUE = 100; // 최대 백분율 값
+    private static final int PERCENTAGE_CONVERSION_FACTOR = 100; // 백분율 변환 곱셈 인자
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "progress_id")
@@ -80,8 +83,8 @@ public class Progress extends BaseTimeEntity {
     public int calculateProgressRate() {
         int totalDuration = this.lectureResource.getLecture().getTotalDurationSeconds();
         if (totalDuration == 0) {
-            return 0;
+            return this.isCompleted ? MAX_PERCENTAGE_VALUE : 0;
         }
-        return (int) (((double) this.watchedDuration / totalDuration) * 100);
+        return (int) (((double) this.watchedDuration / totalDuration) * PERCENTAGE_CONVERSION_FACTOR);
     }
 }

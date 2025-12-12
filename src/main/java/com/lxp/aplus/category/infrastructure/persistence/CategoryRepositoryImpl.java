@@ -2,6 +2,7 @@ package com.lxp.aplus.category.infrastructure.persistence;
 
 import com.lxp.aplus.category.domain.Category;
 import com.lxp.aplus.category.domain.CategoryRepository;
+import com.lxp.aplus.enrollment.infrastructure.persistence.dto.StudentCountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,5 +27,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Optional<Category> findByIdWithParent(Long id) {
         return jpaRepository.findByIdWithParent(id);
+    }
+
+    @Override
+    public List<Category> findAllByIdIn(List<Long> ids) {
+        return jpaRepository.findAllByIdIn(ids);
     }
 }

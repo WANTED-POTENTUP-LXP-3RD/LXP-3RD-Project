@@ -36,7 +36,8 @@ public class ProgressCommandUseCase {
             throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
         }
 
-        Lecture parentLecture = courseRepository.findAllLecturesWithResourcesByCourseId(enrollment.getCourseId()).stream()
+        Lecture parentLecture = courseRepository.findAllLecturesWithResourcesByCourseId(enrollment
+                        .getCourseId()).stream()
                 .filter(lecture -> lecture.getLectureResources().stream()
                         .anyMatch(resource -> resource.getId().equals(request.resourceId())))
                 .findFirst()
@@ -47,7 +48,8 @@ public class ProgressCommandUseCase {
                 .findFirst()
                 .get();
 
-        Optional<Progress> existingProgress = progressRepository.findByEnrollmentAndLectureResource(enrollment, lectureResource);
+        Optional<Progress> existingProgress = progressRepository
+                .findByEnrollmentAndLectureResource(enrollment, lectureResource);
         Progress progress;
 
         if (existingProgress.isPresent()) {

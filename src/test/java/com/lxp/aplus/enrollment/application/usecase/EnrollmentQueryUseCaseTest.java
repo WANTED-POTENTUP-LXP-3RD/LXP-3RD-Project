@@ -21,13 +21,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.LongStream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -162,8 +160,8 @@ class EnrollmentQueryUseCaseTest {
         assertThat(result.enrollmentId()).isEqualTo(enrollmentId);
         assertThat(result.studentId()).isEqualTo(studentId);
         assertThat(result.courseId()).isEqualTo(courseId);
-        assertThat(result.progressRate()).isEqualTo(40); // 4 / 10 * 100
-        assertThat(result.status()).isEqualTo(EnrollmentStatus.ENROLLED); // Default status
+        assertThat(result.progressRate()).isEqualTo(40);
+        assertThat(result.status()).isEqualTo(EnrollmentStatus.ENROLLED);
     }
 
     @Test

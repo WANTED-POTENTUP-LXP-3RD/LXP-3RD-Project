@@ -38,7 +38,7 @@ public record CourseDetailResponse(
                 .thumbnailUrl(course.getThumbnailUrl())
                 .instructor(instructor)
                 .isPurchased(isPurchased)
-                .studentCount(studentCount) // TODO: 수강생 수 로직 추가 필요
+                .studentCount(studentCount)
                 .totalDuration(totalDuration)
                 .sections(course.getSections().stream()
                         .map(SectionResponse::from)

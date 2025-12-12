@@ -3,6 +3,7 @@ package com.lxp.aplus.enrollment.infrastructure.persistence;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
+import com.lxp.aplus.enrollment.infrastructure.persistence.dto.StudentCountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,5 +60,8 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
                 .orElse(false);
     }
 
-
+    @Override
+    public List<StudentCountDto> findStudentCountsByCourseIds(List<Long> courseIds) {
+        return jpaRepository.findStudentCountsByCourseIds(courseIds);
+    }
 }
