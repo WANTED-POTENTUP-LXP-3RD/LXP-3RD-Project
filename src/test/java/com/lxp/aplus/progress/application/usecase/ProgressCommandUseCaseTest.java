@@ -22,11 +22,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +65,7 @@ class ProgressCommandUseCaseTest {
         Long courseId = 100L;
 
         Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(currentUser.id()).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
-        Progress existingProgress = Progress.of(enrollment, lectureResource); // isCompleted = false
+        Progress existingProgress = Progress.of(enrollment, lectureResource);
 
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
         given(courseRepository.findAllLecturesWithResourcesByCourseId(courseId)).willReturn(List.of(lecture));

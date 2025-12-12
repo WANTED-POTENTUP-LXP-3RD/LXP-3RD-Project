@@ -3,11 +3,10 @@ package com.lxp.aplus.enrollment.infrastructure.adapter;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-
+import com.lxp.aplus.enrollment.application.port.out.LectureResourceSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +34,19 @@ public class CourseFinderAdapter implements CourseFinder {
         return courseRepository.findAllLecturesWithResourcesByCourseId(courseId).stream()
                 .flatMap(lecture -> lecture.getLectureResources().stream())
                 .map(lectureResource -> lectureResource.getId())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LectureResourceSummary> findAllLectureResourcesByCourseId(Long courseId) {
+        return courseRepository.findAllLecturesWithResourcesByCourseId(courseId).stream()
+                .flatMap(lecture -> lecture.getLectureResources().stream())
+                .map(resource -> new LectureResourceSummary(
+                        resource.getId(),
+                        resource.getLecture().getTitle(),
+                        resource.getLecture().getTotalDurationSeconds()
+                ))
                 .collect(Collectors.toList());
     }
 }
