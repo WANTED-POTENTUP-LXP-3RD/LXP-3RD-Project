@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum PaymentResultCode implements ResultCode {
 
-    PAYMENT_PREPARE_SUCCESS(HttpStatus.CREATED, "SP001", "결제 준비가 완료되었습니다.");
+    PAYMENT_PREPARE_SUCCESS(HttpStatus.CREATED, "SPM001", "결제 준비가 완료되었습니다."),
+    PAYMENT_CONFIRM_SUCCESS(HttpStatus.OK, "SPM002", "결제가 정상적으로 완료되었습니다.");
 
     private final HttpStatus status;
     private final String code;
