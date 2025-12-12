@@ -182,7 +182,10 @@ public class Payment extends BaseAggregateRoot {
      * 승인된 금액과 Payment.amount가 동일한지 확인
      */
     private void validateAmount(BigDecimal approvedAmount) {
-        if (this.amount.compareTo(approvedAmount) != 0) {
+
+        boolean isAmountMismatched = this.amount.compareTo(approvedAmount) != 0;
+
+        if (isAmountMismatched) {
             throw new BusinessException(PaymentErrorCode.PAYMENT_AMOUNT_MISMATCH);
         }
     }
