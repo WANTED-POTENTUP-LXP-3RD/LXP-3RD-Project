@@ -19,7 +19,7 @@ public record CourseResponse(
         double rating,
         LocalDateTime lastModifiedAt
 ) {
-    public static CourseResponse of(Course course, List<String> categoryNames) {
+    public static CourseResponse of(Course course, List<String> categoryNames, int studentCount) {
         return CourseResponse.builder()
                 .courseId(course.getId())
                 .title(course.getTitle())
@@ -27,8 +27,8 @@ public record CourseResponse(
                 .thumbnailUrl(course.getThumbnailUrl())
                 .status(course.getCourseStatus())
                 .price(course.getPrice())
-                .studentCount(1)    // 추후 로직을 통해 수정
-                .rating(5.0)        // 추후 로직을 통해 수정
+                .studentCount(studentCount)
+                .rating(5.0)
                 .lastModifiedAt(course.getUpdatedAt())
                 .build();
     }

@@ -43,8 +43,9 @@ public class CourseQueryUseCase {
     private Page<CourseResponse> convertToCourseResponse(Page<Course> courses, Pageable pageable) {
         List<CourseResponse> courseResponses = courses.getContent().stream()
                 .map(course -> {
-                    List<String> categoryPath = getCategoryNames(course.getCategoryId());
-                    return CourseResponse.of(course, categoryPath);
+                    List<String> categoryNames = getCategoryNames(course.getCategoryId());
+                    int studentCount = enrollmentQueryPort.getStudentCount(course.getId());
+                    return CourseResponse.of(course, categoryNames, studentCount);
                 })
                 .toList();
 

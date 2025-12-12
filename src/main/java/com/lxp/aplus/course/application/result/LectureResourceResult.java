@@ -8,5 +8,5 @@ public record LectureResourceResult(
         ResourceType resourceType,
         boolean isDownloadable,
         String fileUrl
-){
+) {
 }
