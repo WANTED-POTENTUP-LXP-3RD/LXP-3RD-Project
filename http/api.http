@@ -24,7 +24,7 @@ Content-Type: {{contentType}}
 
 {
   "name": "{{testName}}",
-  "nickName": "{{testNickName}}",
+  "nickname": "{{testNickName}}",
   "email": "{{testEmail}}",
   "password": "{{testPassword}}",
   "phoneNumber": "{{testPhoneNumber}}"

@@ -7,6 +7,7 @@ import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.CourseCreateCommand;
 import com.lxp.aplus.course.application.command.CourseUpdateCommand;
+import com.lxp.aplus.common.error.code.LectureErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,14 +73,14 @@ public class Course extends BaseAggregateRoot {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    public static Course createDraftCourse(Long instructorId, CourseCreateCommand command) {
+    public static Course createDraftCourse(Long instructorId, String thumbnailUrl, CourseCreateCommand command) {
         return Course.builder()
                 .instructorId(instructorId)
                 .categoryId(command.categoryId())
                 .title(command.title())
                 .summary(command.summary())
                 .description(command.description())
-                .thumbnailUrl(command.thumbnailUrl())
+                .thumbnailUrl(thumbnailUrl)
                 .price(command.price())
                 .courseLevel(command.courseLevel())
                 .build();
@@ -190,4 +191,41 @@ public class Course extends BaseAggregateRoot {
             throw new BusinessException(CourseErrorCode.CANNOT_MODIFY_PUBLISHED_COURSE);
         }
     }
+
+    public Lecture createLecture(Long sectionId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+            Section section = sections.stream()
+                .filter(s -> s.getId().equals(sectionId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
+
+        return section.addLecture(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+    }
+
+    public Lecture updateLecture(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        return section.updateLecture(lectureId, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable);
+    }
+
+    public void deleteLecture(Long lectureId) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        section.deleteLecture(lectureId);
+    }
+
+    public Lecture readLecture(Long lectureId) {
+        Section section = sections.stream()
+                .filter(s -> s.hasLecture(lectureId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
+
+        return section.readLecture(lectureId);
+    }
+
 }

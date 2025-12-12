@@ -35,12 +35,22 @@ public class UserController {
     /**
      * 회원정보 수정 API
      * PATCH /api/users/me
+     *
+     * 현재는 닉네임만 수정 가능합니다.
      */
     @PatchMapping("/me")
     public ResponseEntity<ResultResponse<UserResponse>> updateMyInfo(
             @Authenticated UserInfo userInfo,
             @Valid @RequestBody UpdateMyInfoRequest request) {
-        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(userInfo.id(), request.nickName(), request.email());
+        // 기존 사용자 정보 조회 (이메일은 변경하지 않고 기존 값 유지)
+        UserResponse currentUser = userQueryUseCase.findUserWithRolesById(userInfo.id())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest(
+                userInfo.id(),
+                request.nickname(),
+                currentUser.email() // 기존 이메일 유지
+        );
         UserResponse response = userCommandUseCase.updateUserInfo(updateRequest);
         return ResponseEntity.ok(ResultResponse.of(UserResultCode.USER_UPDATE_SUCCESS, response));
     }

@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
     // 1. 비즈니스 예외 처리
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+        e.printStackTrace();
         log.warn("Business Exception : [Code: {}] {}", e.getErrorCode().getCode(), e.getErrorCode().getMessage());
         return makeErrorResponse(e.getErrorCode());
     }
