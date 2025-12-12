@@ -4,7 +4,9 @@ import com.lxp.aplus.common.result.PageResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.CourseResultCode;
 import com.lxp.aplus.common.security.Authenticated;
+import com.lxp.aplus.common.security.CurrentUser;
 import com.lxp.aplus.common.security.InstructorOnly;
+import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
 import com.lxp.aplus.course.application.usecase.CourseQueryUseCase;
 import com.lxp.aplus.course.presentation.request.CourseCreateRequest;
@@ -80,10 +82,10 @@ public class CourseController {
 
     @GetMapping("/api/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseDetailResponse>> getPublishedCourseDetail(
-            @Authenticated Long userId,
+            @CurrentUser UserInfo userInfo,
             @PathVariable("courseId") Long courseId
     ) {
-        CourseDetailResponse courseDetailResponse = courseQueryUseCase.getPublishedCourseDetail(courseId, userId);
+        CourseDetailResponse courseDetailResponse = courseQueryUseCase.getPublishedCourseDetail(courseId, userInfo.id());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_READ_SUCCESS.getStatus())
