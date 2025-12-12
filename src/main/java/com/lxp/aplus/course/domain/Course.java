@@ -228,4 +228,31 @@ public class Course extends BaseAggregateRoot {
         return section.readLecture(lectureId);
     }
 
+    public void publish() {
+        validateStatusForPublish();
+        validateCurriculumForPublish();
+        this.courseStatus = CourseStatus.PUBLISHED;
+    }
+
+    private void validateStatusForPublish() {
+        if (this.courseStatus == CourseStatus.DELETED) {
+            throw new BusinessException(CourseErrorCode.COURSE_NOT_FOUND);
+        }
+    }
+
+    private void validateCurriculumForPublish() {
+        validateHasSection();
+
+        this.sections.forEach(Section::validateHasLecture);
+
+        this.sections.stream()
+                .flatMap(section -> section.getLectures().stream())
+                .forEach(Lecture::validateHasResource);
+    }
+
+    private void validateHasSection() {
+        if (this.sections == null || this.sections.isEmpty()) {
+            throw new BusinessException(CourseErrorCode.COURSE_SECTION_EMPTY);
+        }
+    }
 }
