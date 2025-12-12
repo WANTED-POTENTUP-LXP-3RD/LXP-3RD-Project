@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,5 +24,5 @@ public interface EnrollmentJpaRepository extends JpaRepository<Enrollment, Long>
             WHERE e.courseId in :courseIds
             GROUP BY e.courseId
             """)
-    List<StudentCountDto> findStudentCountsByCourseIds(List<Long> courseIds);
+    List<StudentCountDto> findStudentCountsByCourseIds(@Param("courseIds") List<Long> courseIds);
 }
