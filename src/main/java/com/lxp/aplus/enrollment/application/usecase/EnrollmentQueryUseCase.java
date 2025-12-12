@@ -38,13 +38,16 @@ public class EnrollmentQueryUseCase {
                 .map(enrollment -> {
                     CourseSummary courseSummary = courseFinder.findCourseById(enrollment.getCourseId())
                             .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+                    
+                    List<String> categoryNames = courseFinder.findCategoryNamesByCourseId(enrollment.getCourseId());
 
                     List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
                     if (lectureResourceIds.isEmpty()) {
                         return EnrollmentListItemResult.of(
                                 enrollment,
                                 courseSummary,
-                                0
+                                0,
+                                categoryNames
                         );
                     }
 
@@ -58,7 +61,8 @@ public class EnrollmentQueryUseCase {
                     return EnrollmentListItemResult.of(
                             enrollment,
                             courseSummary,
-                            progressRate
+                            progressRate,
+                            categoryNames
                     );
                 })
                 .collect(Collectors.toList());
@@ -86,9 +90,26 @@ public class EnrollmentQueryUseCase {
         return EnrollmentDetailResult.of(enrollment, progressRate);
     }
 
+    public EnrollmentDetailResult getEnrollmentDetailByCourseId(Long studentId, Long courseId) {
+        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
+                .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
+        List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
+        int progressRate = 0;
+        if (!lectureResourceIds.isEmpty()) {
+            Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
+            long completedResources = resourceIdToIsCompletedMap.values()
+                                                                .stream()
+                                                                .filter(Boolean::booleanValue)
+                                                                .count();
+            progressRate = (int) ((double) completedResources / lectureResourceIds.size() * 100);
+        }
+
+        return EnrollmentDetailResult.of(enrollment, progressRate);
+    }
 
     public long getStudentCountForCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
     }
 }
+

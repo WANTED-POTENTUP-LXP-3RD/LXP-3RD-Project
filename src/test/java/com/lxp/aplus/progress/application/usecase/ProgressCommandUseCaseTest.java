@@ -236,6 +236,61 @@ class ProgressCommandUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class, () -> progressCommandUseCase.updateProgress(currentUser, enrollmentId, request));
-        assertThat(exception.getErrorCode()).isEqualTo(ProgressErrorCode.WATCHED_DURATION_EXCEEDS_TOTAL);
-    }
-}
+                assertThat(exception.getErrorCode()).isEqualTo(ProgressErrorCode.WATCHED_DURATION_EXCEEDS_TOTAL);
+            }
+        
+            @Test
+            @DisplayName("성공 - courseId로 진도율을 갱신한다")
+            void updateProgressByCourseId_success() {
+                // given
+                Long resourceId = 1L;
+                Long courseId = 100L;
+                Long enrollmentId = 1L;
+        
+                Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(currentUser.id()).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
+                Progress existingProgress = Progress.of(enrollment, lectureResource);
+        
+                // Mocking for the new method
+                given(enrollmentRepository.findByStudentIdAndCourseId(currentUser.id(), courseId)).willReturn(Optional.of(enrollment));
+        
+                // Mocking for the original updateProgress method that gets called internally
+                given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment)); 
+                given(courseRepository.findAllLecturesWithResourcesByCourseId(courseId)).willReturn(List.of(lecture));
+                given(progressRepository.findByEnrollmentAndLectureResource(enrollment, lectureResource)).willReturn(Optional.of(existingProgress));
+                
+                when(lecture.getLectureResources()).thenReturn(List.of(lectureResource));
+                when(lectureResource.getId()).thenReturn(resourceId);
+                when(lectureResource.getLecture()).thenReturn(lecture);
+                when(lecture.getTotalDurationSeconds()).thenReturn(300);
+        
+                given(progressRepository.save(any(Progress.class))).willAnswer(invocation -> invocation.getArgument(0));
+                
+                // when
+                ProgressUpdateRequest request = new ProgressUpdateRequest(resourceId, 150);
+                ProgressUpdateResponse response = progressCommandUseCase.updateProgressByCourseId(currentUser, courseId, request);
+        
+                // then
+                ArgumentCaptor<Progress> progressCaptor = ArgumentCaptor.forClass(Progress.class);
+                verify(progressRepository).save(progressCaptor.capture());
+                Progress savedProgress = progressCaptor.getValue();
+        
+                assertThat(response).isNotNull();
+                assertThat(savedProgress.getWatchedDuration()).isEqualTo(150);
+                assertThat(response.progressRate()).isEqualTo(50);
+            }
+        
+            @Test
+            @DisplayName("실패 - courseId로 갱신 시 수강 내역이 없으면 예외를 발생시킨다")
+            void updateProgressByCourseId_fail_enrollmentNotFound() {
+                // given
+                Long courseId = 999L;
+                ProgressUpdateRequest request = new ProgressUpdateRequest(1L, 150);
+                given(enrollmentRepository.findByStudentIdAndCourseId(currentUser.id(), courseId)).willReturn(Optional.empty());
+        
+                // when & then
+                BusinessException exception = assertThrows(BusinessException.class, 
+                    () -> progressCommandUseCase.updateProgressByCourseId(currentUser, courseId, request));
+                assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
+            }
+        }
+        
