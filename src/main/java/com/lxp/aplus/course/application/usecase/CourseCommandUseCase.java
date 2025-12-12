@@ -11,6 +11,7 @@ import com.lxp.aplus.course.application.command.SectionUpdateCommand;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.course.domain.Section;
+import com.lxp.aplus.course.presentation.response.CoursePublishResponse;
 import com.lxp.aplus.course.presentation.response.CourseUpsertResponse;
 import com.lxp.aplus.course.presentation.response.SectionUpsertResponse;
 import lombok.RequiredArgsConstructor;
@@ -84,5 +85,15 @@ public class CourseCommandUseCase {
 
         course.validateOwner(instructorId);
         course.deleteSection(sectionId);
+    }
+
+    public CoursePublishResponse publishCourse(Long courseId, Long instructorId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+
+        course.validateOwner(instructorId);
+        course.publish();
+
+        return CoursePublishResponse.from(course);
     }
 }

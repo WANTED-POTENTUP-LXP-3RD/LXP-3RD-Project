@@ -10,7 +10,10 @@ import org.springframework.http.HttpStatus;
 public enum CourseErrorCode implements ErrorCode {
     COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "EC001", "해당 강좌를 찾을 수 없습니다."),
     COURSE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "EC002", "해당 강좌에 대한 접근 권한이 없습니다."),
-    CANNOT_MODIFY_PUBLISHED_COURSE(HttpStatus.BAD_REQUEST, "EC003", "이미 발행된 강좌는 수정하거나 삭제할 수 없습니다.");
+    CANNOT_MODIFY_PUBLISHED_COURSE(HttpStatus.BAD_REQUEST, "EC003", "이미 발행된 강좌는 수정하거나 삭제할 수 없습니다."),
+    COURSE_SECTION_EMPTY(HttpStatus.BAD_REQUEST, "EC004", "강좌에는 최소 1개 이상의 섹션이 있어야 합니다."),
+    COURSE_LECTURE_EMPTY(HttpStatus.BAD_REQUEST, "EC005", "모든 섹션에는 최소 1개 이상의 강의가 있어야 합니다."),
+    COURSE_CONTENT_EMPTY(HttpStatus.BAD_REQUEST, "EC006", "모든 강의에는 영상 또는 자료가 등록되어야 합니다.");
 
     private final HttpStatus status;
     private final String code;

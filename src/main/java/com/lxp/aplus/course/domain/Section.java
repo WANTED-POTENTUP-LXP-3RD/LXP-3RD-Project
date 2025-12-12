@@ -2,6 +2,7 @@ package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.LectureErrorCode;
 import jakarta.persistence.*;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
@@ -114,5 +115,11 @@ public class Section extends BaseTimeEntity {
 
         this.title = title;
         this.orderIndex = orderIndex;
+    }
+
+    public void validateHasLecture() {
+        if (this.lectures == null || this.lectures.isEmpty()) {
+            throw new BusinessException(CourseErrorCode.COURSE_LECTURE_EMPTY);
+        }
     }
 }

@@ -3,19 +3,18 @@ package com.lxp.aplus.course.presentation.controller;
 import com.lxp.aplus.common.result.PageResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.CourseResultCode;
-import com.lxp.aplus.common.result.code.SectionResultCode;
 import com.lxp.aplus.common.security.Authenticated;
+import com.lxp.aplus.common.security.CurrentUser;
 import com.lxp.aplus.common.security.InstructorOnly;
+import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
 import com.lxp.aplus.course.application.usecase.CourseQueryUseCase;
 import com.lxp.aplus.course.presentation.request.CourseCreateRequest;
 import com.lxp.aplus.course.presentation.request.CourseUpdateRequest;
-import com.lxp.aplus.course.presentation.request.SectionCreateRequest;
-import com.lxp.aplus.course.presentation.request.SectionUpdateRequest;
 import com.lxp.aplus.course.presentation.response.CourseDetailResponse;
+import com.lxp.aplus.course.presentation.response.CoursePublishResponse;
 import com.lxp.aplus.course.presentation.response.CourseResponse;
 import com.lxp.aplus.course.presentation.response.CourseUpsertResponse;
-import com.lxp.aplus.course.presentation.response.SectionUpsertResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,39 +43,35 @@ public class CourseController {
     @PostMapping(value = "/api/instructor/courses", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResultResponse<CourseUpsertResponse>> createCourse(
             @Authenticated Long instructorId,
-            @RequestPart("request") @Valid CourseCreateRequest request, // JSON 데이터
-            @RequestPart("thumbnail") MultipartFile thumbnail       // 이미지 파일
+            @RequestPart("request") @Valid CourseCreateRequest request,
+            @RequestPart("thumbnail") MultipartFile thumbnail
     ) {
         CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.createCourse(instructorId, request.toCommand(thumbnail));
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_REGISTER_SUCCESS.getStatus())
-                .body(ResultResponse.of(
-                        CourseResultCode.COURSE_REGISTER_SUCCESS,
-                        courseUpsertResponse));
+                .body(ResultResponse.of(CourseResultCode.COURSE_REGISTER_SUCCESS, courseUpsertResponse));
     }
 
     @InstructorOnly
     @PatchMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseUpsertResponse>> updateCourse(
             @Authenticated Long instructorId,
-            @PathVariable Long courseId,
+            @PathVariable("courseId") Long courseId,
             @RequestBody CourseUpdateRequest request
     ) {
         CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_UPDATE_SUCCESS.getStatus())
-                .body(ResultResponse.of(
-                        CourseResultCode.COURSE_UPDATE_SUCCESS,
-                        courseUpsertResponse));
+                .body(ResultResponse.of(CourseResultCode.COURSE_UPDATE_SUCCESS, courseUpsertResponse));
     }
 
     @InstructorOnly
     @GetMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseDetailResponse>> getInstructorCourseDetail(
-            @PathVariable Long courseId,
-            @Authenticated Long instructorId
+            @Authenticated Long instructorId,
+            @PathVariable("courseId") Long courseId
     ) {
         CourseDetailResponse courseDetailResponse = courseQueryUseCase.getInstructorCourseDetail(courseId, instructorId);
 
@@ -87,10 +82,10 @@ public class CourseController {
 
     @GetMapping("/api/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseDetailResponse>> getPublishedCourseDetail(
-            @PathVariable Long courseId,
-            @Authenticated Long userId
+            @CurrentUser UserInfo userInfo,
+            @PathVariable("courseId") Long courseId
     ) {
-        CourseDetailResponse courseDetailResponse = courseQueryUseCase.getPublishedCourseDetail(courseId, userId);
+        CourseDetailResponse courseDetailResponse = courseQueryUseCase.getPublishedCourseDetail(courseId, userInfo.id());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_READ_SUCCESS.getStatus())
@@ -124,8 +119,8 @@ public class CourseController {
     @InstructorOnly
     @DeleteMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<Void>> deleteCourse(
-            @PathVariable Long courseId,
-            @Authenticated Long instructorId
+            @Authenticated Long instructorId,
+            @PathVariable("courseId") Long courseId
     ) {
         courseCommandUseCase.deleteCourse(courseId, instructorId);
 
@@ -135,45 +130,15 @@ public class CourseController {
     }
 
     @InstructorOnly
-    @PostMapping("/api/instructor/courses/{courseId}/sections")
-    public ResponseEntity<ResultResponse<SectionUpsertResponse>> createSection(
+    @PatchMapping("/api/instructor/courses/{courseId}/publish")
+    public ResponseEntity<ResultResponse<CoursePublishResponse>> publishCourse(
             @PathVariable Long courseId,
-            @Authenticated Long instructorId,
-            @Valid @RequestBody SectionCreateRequest request
-    ) {
-        SectionUpsertResponse response = courseCommandUseCase.createSection(courseId, instructorId, request.toCommand());
-
-        return ResponseEntity
-                .status(SectionResultCode.SECTION_REGISTER_SUCCESS.getStatus())
-                .body(ResultResponse.of(SectionResultCode.SECTION_REGISTER_SUCCESS, response));
-    }
-
-    @InstructorOnly
-    @PatchMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
-    public ResponseEntity<ResultResponse<SectionUpsertResponse>> updateSection(
-            @PathVariable Long courseId,
-            @PathVariable Long sectionId,
-            @Authenticated Long instructorId,
-            @RequestBody SectionUpdateRequest request
-    ) {
-        SectionUpsertResponse response = courseCommandUseCase.updateSection(courseId, instructorId, sectionId, request.toCommand());
-
-        return ResponseEntity
-                .status(SectionResultCode.SECTION_UPDATE_SUCCESS.getStatus())
-                .body(ResultResponse.of(SectionResultCode.SECTION_UPDATE_SUCCESS, response));
-    }
-
-    @InstructorOnly
-    @DeleteMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
-    public ResponseEntity<ResultResponse<Void>> deleteSection(
-            @PathVariable Long courseId,
-            @PathVariable Long sectionId,
             @Authenticated Long instructorId
     ) {
-        courseCommandUseCase.deleteSection(courseId, instructorId, sectionId);
+        CoursePublishResponse response = courseCommandUseCase.publishCourse(courseId, instructorId);
 
         return ResponseEntity
-                .status(SectionResultCode.SECTION_DELETE_SUCCESS.getStatus())
-                .body(ResultResponse.from(SectionResultCode.SECTION_DELETE_SUCCESS));
+                .status(CourseResultCode.COURSE_PUBLISH_SUCCESS.getStatus())
+                .body(ResultResponse.of(CourseResultCode.COURSE_PUBLISH_SUCCESS, response));
     }
 }

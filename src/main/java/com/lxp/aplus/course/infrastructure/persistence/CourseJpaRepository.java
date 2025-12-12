@@ -13,19 +13,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseJpaRepository extends JpaRepository<Course, Long> {
+    Page<Course> findAllByInstructorIdAndCourseStatusNot(Long instructorId, CourseStatus courseStatus, Pageable pageable);
+
+    Page<Course> findAllByCourseStatus(CourseStatus courseStatus, Pageable pageable);
+
     @Query("SELECT DISTINCT c FROM Course c " +
             "LEFT JOIN FETCH c.sections s " +
-            "WHERE c.id = :courseId AND c.courseStatus <> 'DELETED'")
+            "WHERE c.id = :courseId")
     Optional<Course> findWithCurriculumById(@Param("courseId") Long courseId);
 
     @Query("SELECT DISTINCT c FROM Course c " +
             "LEFT JOIN FETCH c.sections s " +
-            "WHERE c.id = :courseId AND c.courseStatus = 'PUBLISHED' AND c.courseStatus <> 'DELETED'")
+            "WHERE c.id = :courseId AND c.courseStatus = 'PUBLISHED'")
     Optional<Course> findPublishedWithCurriculumById(@Param("courseId") Long courseId);
-
-    Page<Course> findAllByInstructorIdAndCourseStatusNot(Long instructorId, CourseStatus courseStatus, Pageable pageable);
-
-    Page<Course> findAllByCourseStatus(CourseStatus courseStatus, Pageable pageable);
 
     @Query("SELECT COUNT(l) FROM Lecture l " +
             "INNER JOIN l.section s " +

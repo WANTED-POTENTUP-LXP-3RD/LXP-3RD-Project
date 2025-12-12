@@ -35,13 +35,15 @@ public class Payment extends BaseAggregateRoot {
     @Column(nullable = false, updatable = false)
     private String orderId;
 
-    @Column(unique = true, updatable = false)
+    @Column(unique = true)
     private String paymentKey; // PG transactionId
 
     @Column(nullable = false, updatable = false, length = 3)
     private String currency;
 
-    @Column(nullable = false, updatable = false)
+    // NOTE: precision = 19 -> 최대 19자리, scale = 0 -> 정수
+    // 대형 B2B 거래도 고려한 수치입니다.
+    @Column(nullable = false, updatable = false, precision = 19, scale = 0)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -102,7 +104,6 @@ public class Payment extends BaseAggregateRoot {
                 amount
         );
     }
-
 
     /* ========= 도메인 행위 ========= */
 
@@ -182,7 +183,10 @@ public class Payment extends BaseAggregateRoot {
      * 승인된 금액과 Payment.amount가 동일한지 확인
      */
     private void validateAmount(BigDecimal approvedAmount) {
-        if (!this.amount.equals(approvedAmount)) {
+
+        boolean isAmountMismatched = this.amount.compareTo(approvedAmount) != 0;
+
+        if (isAmountMismatched) {
             throw new BusinessException(PaymentErrorCode.PAYMENT_AMOUNT_MISMATCH);
         }
     }

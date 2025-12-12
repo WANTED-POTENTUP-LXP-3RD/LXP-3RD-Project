@@ -1,6 +1,8 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CourseErrorCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -74,5 +76,11 @@ public class Lecture extends BaseTimeEntity {
         this.lectureResources.clear();
         LectureResource resource = LectureResource.create(this, isDownloadable, fileKey, fileUrl, originFileName);
         this.lectureResources.add(resource);
+    }
+
+    public void validateHasResource() {
+        if (this.lectureResources == null || this.lectureResources.isEmpty()) {
+            throw new BusinessException(CourseErrorCode.COURSE_CONTENT_EMPTY);
+        }
     }
 }
