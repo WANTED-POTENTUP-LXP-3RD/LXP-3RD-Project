@@ -11,13 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 /**
  * @InstructorOnly 어노테이션을 처리하는 AOP Aspect
- * 
+ * <p>
  * 메서드 실행 전에 강사 권한을 체크합니다.
  */
 @Slf4j
@@ -32,7 +34,7 @@ public class InstructorOnlyAspect {
     public void checkInstructorRole(JoinPoint joinPoint) {
         // 메서드 파라미터에서 @Authenticated로 주입된 userId 찾기
         Object[] args = joinPoint.getArgs();
-        Long userId = findUserIdFromArgs(args);
+        Long userId = findUserId(joinPoint);
 
         if (userId == null) {
             log.warn("@InstructorOnly 메서드에 @Authenticated 파라미터가 없습니다: {}", joinPoint.getSignature());
@@ -47,7 +49,7 @@ public class InstructorOnlyAspect {
                 .anyMatch(role -> role.getRoleType() == RoleType.INSTRUCTOR && role.getDeletedAt() == null);
 
         if (!hasInstructorRole) {
-            log.warn("강사 권한이 없는 사용자가 강사 전용 메서드에 접근 시도: userId={}, method={}", 
+            log.warn("강사 권한이 없는 사용자가 강사 전용 메서드에 접근 시도: userId={}, method={}",
                     userId, joinPoint.getSignature());
             throw new BusinessException(UserErrorCode.NOT_INSTRUCTOR);
         }
@@ -55,16 +57,29 @@ public class InstructorOnlyAspect {
 
     /**
      * 메서드 파라미터에서 Long 타입의 userId를 찾습니다.
-     * 
+     *
      * @param args 메서드 파라미터 배열
      * @return userId (없으면 null)
      */
-    private Long findUserIdFromArgs(Object[] args) {
-        return Arrays.stream(args)
-                .filter(arg -> arg instanceof Long)
-                .map(arg -> (Long) arg)
-                .findFirst()
-                .orElse(null);
+    private Long findUserId(JoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        Object[] args = joinPoint.getArgs();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < args.length; i++) {
+            for (Annotation annotation : parameterAnnotations[i]) {
+                if (annotation instanceof Authenticated) {
+                    Object arg = args[i]; // 1. Long 타입인 경우 (userId)
+                    if (arg instanceof Long) {
+                        return (Long) arg;
+                    } // 2. UserInfo 타입인 경우(userInfo.id())
+                    if (arg instanceof UserInfo) {
+                        return ((UserInfo) arg).id();
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
 

@@ -1,7 +1,5 @@
 package com.lxp.aplus.common.security;
 
-import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.user.domain.Role;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
@@ -15,11 +13,13 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @CurrentUser 어노테이션이 붙은 파라미터에 현재 로그인한 사용자 정보를 주입하는 Resolver
  * 
- * 인증되지 않은 사용자가 접근하면 UNAUTHORIZED 예외를 발생시킵니다.
+ * 인증되지 않은 사용자가 접근하면 null을 반환합니다. (예외 발생하지 않음)
+ * 선택적 인증이 필요한 경우에 사용합니다.
  */
 @Component
 @RequiredArgsConstructor
@@ -42,21 +42,26 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         
         Long userId = SecurityUtils.getCurrentUserId();
         
+        // 사용자가 없으면 null 반환 (예외 발생하지 않음)
         if (userId == null) {
-            throw new BusinessException(GlobalErrorCode.UNAUTHORIZED);
+            return null;
         }
 
         // 사용자와 역할 정보 조회
-        User user = userRepository.findUserWithRolesById(userId)
-                .orElseThrow(() -> new BusinessException(com.lxp.aplus.common.error.code.UserErrorCode.USER_NOT_FOUND));
+        Optional<User> user = userRepository.findUserWithRolesById(userId);
+        
+        // 사용자를 찾을 수 없으면 null 반환
+        if (user == null) {
+            return null;
+        }
 
         // Role 목록 추출 (삭제되지 않은 Role만)
-        List<RoleType> roles = user.getRoles().stream()
+        List<RoleType> roles = user.get().getRoles().stream()
                 .filter(role -> role.getDeletedAt() == null)
                 .map(Role::getRoleType)
                 .toList();
 
-        return new UserInfo(user.getId(), roles);
+        return new UserInfo(userId, roles);
     }
 }
 
