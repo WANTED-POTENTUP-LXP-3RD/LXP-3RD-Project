@@ -1,0 +1,81 @@
+### API HTTP Client
+### IntelliJ에서 직접 실행 가능 (▶ 버튼 클릭)
+### 변수 설정: baseUrl, accessToken, refreshToken 등
+
+### 변수 설정 (실행 전에 수정 가능)
+@baseUrl = http://localhost:8080
+@contentType = application/json
+# 로그인 API 실행 후 아래 토큰은 자동으로 채워집니다.
+@accessToken =
+@refreshToken =
+
+### 테스트용 데이터 (실행 전에 수정 가능)
+### 실제 DB에 존재하는 유효한 ID로 변경해야 합니다.
+@testCourseId = 1
+@testEnrollmentId = 1
+@testResourceId = 1
+
+
+##########################################
+### 사전 준비: 인증 (Auth)
+### 다른 .http 파일에서 이미 로그인했다면 이 단계를 건너뛰어도 됩니다.
+##########################################
+
+### 로그인 (테스트 전 필수)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+%}
+
+### 로그인 확인 (내 정보 조회)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+
+###
+##########################################
+### 진도(Progress) API (/api/progresses)
+##########################################
+
+### 1. 학습 이력 상세 조회 (by Enrollment ID)
+GET {{baseUrl}}/api/progresses/{{testEnrollmentId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### 2. 강좌별 학습 이력 조회 (by Course ID)
+# enrollmentId를 모를 때 사용
+GET {{baseUrl}}/api/progresses/course/{{testCourseId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### 3. 진도율 갱신 (by Enrollment ID)
+PATCH {{baseUrl}}/api/progresses/{{testEnrollmentId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "resourceId": {{testResourceId}},
+  "watchedDuration": 180
+}
+
+###
+### 4. 강좌별 진도율 갱신 (by Course ID)
+# enrollmentId를 모를 때 사용
+PATCH {{baseUrl}}/api/progresses/course/{{testCourseId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "resourceId": {{testResourceId}},
+  "watchedDuration": 200
+}
