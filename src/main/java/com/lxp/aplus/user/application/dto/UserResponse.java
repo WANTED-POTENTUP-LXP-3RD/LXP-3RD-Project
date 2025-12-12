@@ -11,9 +11,9 @@ import java.util.List;
 public record UserResponse(
         Long id,
         String name,
-        String nickName,
+        String nickname,
         String email,
-        String phoneNumber,
+        String phonenumber,
         UserStatus status,
         List<RoleType> roles,
         LocalDateTime createdAt,
