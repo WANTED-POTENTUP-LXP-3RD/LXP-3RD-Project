@@ -1,0 +1,50 @@
+package com.lxp.aplus.payment.infrastructure.adapter;
+
+import com.lxp.aplus.enrollment.domain.Enrollment;
+import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.payment.application.port.out.EnrollmentCommandPort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * EnrollmentCommandPort의 구현체 (Adapter)
+ * // TODO: 향후 이 메서드 내용은 Enrollment BC에서 구현하여 전달받도록 리팩터해야 합니다.
+ */
+@Component
+@RequiredArgsConstructor
+@Transactional
+public class EnrollmentCommandAdapter implements EnrollmentCommandPort {
+
+    private final EnrollmentRepository enrollmentRepository;
+
+    @Override
+    public void enrollUserInCourses(Long userId, List<Long> courseIds) {
+
+        // 1. 중복 수강 여부 확인 -> Enrollment 생성
+        // TODO: Enrollment 도메인 규칙으로 이동
+        List<Enrollment> newEnrollments = new ArrayList<>();
+
+        for (Long courseId : courseIds) {
+            boolean isEnrolled = enrollmentRepository.existsByStudentIdAndCourseId(userId, courseId);
+
+            if (!isEnrolled) {
+                Enrollment enrollment = Enrollment.of(
+                        userId,
+                        courseId,
+                        LocalDateTime.now().plusYears(2)
+                );
+
+                newEnrollments.add(enrollment);
+            }
+        }
+
+        // 3. Enrollment 저장
+        // FIXME: 이 트랜잭션이 실패하면 Payment 트랜잭션도 롤백되는 문제 -> 추후 이벤트로 수정!! 🚨
+        enrollmentRepository.saveAll(newEnrollments);
+    }
+}
