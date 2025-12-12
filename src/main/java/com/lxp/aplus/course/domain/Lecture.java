@@ -52,22 +52,29 @@ public class Lecture extends BaseTimeEntity {
         this.lectureResources = new ArrayList<>();
     }
 
-    public static Lecture create(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+    public static Lecture create(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
         Lecture lecture = new Lecture(section, title, totalDurationSeconds, isPreview, orderIndex);
-        LectureResource resource = LectureResource.create(lecture, isDownloadable);
+        LectureResource resource = LectureResource.create(lecture, isDownloadable, fileKey, fileUrl,  originFileName);
         lecture.lectureResources.add(resource);
 
         return lecture;
     }
 
-    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable) {
+    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
+        this.title = title;
+        this.totalDurationSeconds = totalDurationSeconds;
+        this.isPreview = isPreview;
+        this.orderIndex = orderIndex;
+    }
+
+    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
         this.title = title;
         this.totalDurationSeconds = totalDurationSeconds;
         this.isPreview = isPreview;
         this.orderIndex = orderIndex;
 
         this.lectureResources.clear();
-        LectureResource resource = LectureResource.create(this, isDownloadable);
+        LectureResource resource = LectureResource.create(this, isDownloadable, fileKey, fileUrl, originFileName);
         this.lectureResources.add(resource);
     }
 

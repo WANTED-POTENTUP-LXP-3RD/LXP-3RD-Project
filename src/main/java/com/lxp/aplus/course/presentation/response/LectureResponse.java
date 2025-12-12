@@ -41,9 +41,18 @@ public record LectureResponse(
         return LectureResponse.builder()
                 .lectureId(result.id())
                 .title(result.title())
+                .totalDurationSeconds(result.totalDurationSeconds())
+                .isPreview(result.isPreview())
                 .orderIndex(result.orderIndex())
                 .createdAt(result.createdAt())
-                .resource(new LectureResourceResponse(result.resource().resourceType(), result.resource().isDownloadable(), result.resource().fileUrl()))
+                .updatedAt(result.updatedAt())
+                .resource(
+                        LectureResourceResponse.builder()
+                                .resourceType(result.resource().resourceType())
+                                .isDownloadable(result.resource().isDownloadable())
+                                .fileUrl(result.resource().fileUrl())
+                                .build()
+                )
                 .build();
     }
 }

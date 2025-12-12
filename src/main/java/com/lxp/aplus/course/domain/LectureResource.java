@@ -4,8 +4,6 @@ import com.lxp.aplus.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @Builder
 @Getter
@@ -37,10 +35,22 @@ public class LectureResource extends BaseTimeEntity {
     @Column(name = "is_downloadable")
     private boolean isDownloadable;
 
-    public static LectureResource create(Lecture lecture, boolean isDownloadable) {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "extension_type", nullable = false)
+    private ExtensionType extensionType;
+
+    public static LectureResource create(Lecture lecture, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
+        ExtensionType extensionType = ExtensionType.fromFileName(originFileName);
+        ResourceType resourceType = ResourceType.fromExtension(extensionType.getExtension());
+
         return LectureResource.builder()
                 .lecture(lecture)
                 .isDownloadable(isDownloadable)
+                .fileUrl(fileUrl)
+                .fileKey(fileKey)
+                .originalFileName(originFileName)
+                .extensionType(extensionType)
+                .resourceType(resourceType)
                 .build();
     }
 }
