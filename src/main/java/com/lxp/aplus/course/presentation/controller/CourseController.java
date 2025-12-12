@@ -59,8 +59,8 @@ public class CourseController {
     @InstructorOnly
     @PatchMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseUpsertResponse>> updateCourse(
+            @PathVariable("courseId") Long courseId,
             @Authenticated Long instructorId,
-            @PathVariable Long courseId,
             @RequestBody CourseUpdateRequest request
     ) {
         CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());
@@ -75,7 +75,7 @@ public class CourseController {
     @InstructorOnly
     @GetMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseDetailResponse>> getInstructorCourseDetail(
-            @PathVariable Long courseId,
+            @PathVariable("courseId") Long courseId,
             @Authenticated Long instructorId
     ) {
         CourseDetailResponse courseDetailResponse = courseQueryUseCase.getInstructorCourseDetail(courseId, instructorId);
@@ -87,7 +87,7 @@ public class CourseController {
 
     @GetMapping("/api/courses/{courseId}")
     public ResponseEntity<ResultResponse<CourseDetailResponse>> getPublishedCourseDetail(
-            @PathVariable Long courseId,
+            @PathVariable("courseId") Long courseId,
             @Authenticated Long userId
     ) {
         CourseDetailResponse courseDetailResponse = courseQueryUseCase.getPublishedCourseDetail(courseId, userId);
@@ -124,7 +124,7 @@ public class CourseController {
     @InstructorOnly
     @DeleteMapping("/api/instructor/courses/{courseId}")
     public ResponseEntity<ResultResponse<Void>> deleteCourse(
-            @PathVariable Long courseId,
+            @PathVariable("courseId") Long courseId,
             @Authenticated Long instructorId
     ) {
         courseCommandUseCase.deleteCourse(courseId, instructorId);
@@ -137,7 +137,7 @@ public class CourseController {
     @InstructorOnly
     @PostMapping("/api/instructor/courses/{courseId}/sections")
     public ResponseEntity<ResultResponse<SectionUpsertResponse>> createSection(
-            @PathVariable Long courseId,
+            @PathVariable("courseId") Long courseId,
             @Authenticated Long instructorId,
             @Valid @RequestBody SectionCreateRequest request
     ) {
@@ -151,8 +151,8 @@ public class CourseController {
     @InstructorOnly
     @PatchMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
     public ResponseEntity<ResultResponse<SectionUpsertResponse>> updateSection(
-            @PathVariable Long courseId,
-            @PathVariable Long sectionId,
+            @PathVariable("courseId") Long courseId,
+            @PathVariable("sectionId") Long sectionId,
             @Authenticated Long instructorId,
             @RequestBody SectionUpdateRequest request
     ) {
@@ -166,8 +166,8 @@ public class CourseController {
     @InstructorOnly
     @DeleteMapping("/api/instructor/courses/{courseId}/sections/{sectionId}")
     public ResponseEntity<ResultResponse<Void>> deleteSection(
-            @PathVariable Long courseId,
-            @PathVariable Long sectionId,
+            @PathVariable("courseId") Long courseId,
+            @PathVariable("sectionId") Long sectionId,
             @Authenticated Long instructorId
     ) {
         courseCommandUseCase.deleteSection(courseId, instructorId, sectionId);

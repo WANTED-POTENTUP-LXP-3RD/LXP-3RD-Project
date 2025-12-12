@@ -25,7 +25,7 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
 
     Page<Course> findAllByInstructorIdAndCourseStatusNot(Long instructorId, CourseStatus courseStatus, Pageable pageable);
 
-    Page<Course> findAllByCourseStatus(CourseStatus courseStatus, Pageable pageable);
+    Page<Course> findAllByCourseStatus(@Param("courseStatus") CourseStatus courseStatus, @Param("pageable") Pageable pageable);
 
     @Query("SELECT COUNT(l) FROM Lecture l " +
             "INNER JOIN l.section s " +
