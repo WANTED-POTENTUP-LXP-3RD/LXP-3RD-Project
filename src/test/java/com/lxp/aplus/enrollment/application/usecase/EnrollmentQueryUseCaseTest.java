@@ -60,12 +60,14 @@ class EnrollmentQueryUseCaseTest {
 
         Enrollment enrollment1 = Enrollment.of(STUDENT_ID, COURSE_ID_1, LocalDateTime.now().plusYears(1));
         ReflectionTestUtils.setField(enrollment1, "id", 5001L);
+        List<String> categories1 = List.of("프로그래밍", "백엔드");
 
         List<Long> resourceIds1 = LongStream.rangeClosed(1, 10).boxed().toList();
         Map<Long, Boolean> completionMap1 = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
 
         Enrollment enrollment2 = Enrollment.of(STUDENT_ID, COURSE_ID_2, LocalDateTime.now().plusYears(1));
         ReflectionTestUtils.setField(enrollment2, "id", 5002L);
+        List<String> categories2 = List.of("프로그래밍", "프론트엔드");
         
         List<Long> resourceIds2 = LongStream.rangeClosed(11, 30).boxed().toList();
         Map<Long, Boolean> completionMap2 = Map.of(11L, true, 12L, true, 13L, true, 14L, true, 15L, true, 16L, true, 17L, true);
@@ -79,6 +81,9 @@ class EnrollmentQueryUseCaseTest {
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_1, COURSE_NAME_1)));
         given(courseFinder.findCourseById(COURSE_ID_2))
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_2, COURSE_NAME_2)));
+
+        given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
+        given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
 
         given(courseFinder.getLectureResourceIds(COURSE_ID_1)).willReturn(resourceIds1);
         given(courseFinder.getLectureResourceIds(COURSE_ID_2)).willReturn(resourceIds2);
@@ -96,10 +101,12 @@ class EnrollmentQueryUseCaseTest {
         EnrollmentListItemResult result1 = result.getContent().get(0);
         assertThat(result1.courseId()).isEqualTo(COURSE_ID_1);
         assertThat(result1.progressRate()).isEqualTo(40);
+        assertThat(result1.categories()).containsExactly("프로그래밍", "백엔드");
 
         EnrollmentListItemResult result2 = result.getContent().get(1);
         assertThat(result2.courseId()).isEqualTo(COURSE_ID_2);
         assertThat(result2.progressRate()).isEqualTo(35);
+        assertThat(result2.categories()).containsExactly("프로그래밍", "프론트엔드");
     }
 
     @Test
@@ -196,6 +203,51 @@ class EnrollmentQueryUseCaseTest {
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> enrollmentQueryUseCase.getEnrollmentDetail(requestingStudentId, enrollmentId));
+        assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
+    }
+
+    @Test
+    @DisplayName("성공 - courseId로 수강 상세 정보를 조회해야 한다.")
+    void getEnrollmentDetailByCourseId_success() {
+        // given
+        Long studentId = STUDENT_ID;
+        Long courseId = COURSE_ID_1;
+        Long enrollmentId = 5001L;
+
+        Enrollment enrollment = Enrollment.of(studentId, courseId, LocalDateTime.now().plusYears(1));
+        ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
+
+        List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();
+        Map<Long, Boolean> completionMap = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
+
+        given(enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)).willReturn(Optional.of(enrollment));
+        given(courseFinder.getLectureResourceIds(courseId)).willReturn(lectureResourceIds);
+        given(progressFinder.getCompletionStatusMap(enrollmentId, lectureResourceIds)).willReturn(completionMap);
+
+        // when
+        EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetailByCourseId(studentId, courseId);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.enrollmentId()).isEqualTo(enrollmentId);
+        assertThat(result.studentId()).isEqualTo(studentId);
+        assertThat(result.courseId()).isEqualTo(courseId);
+        assertThat(result.progressRate()).isEqualTo(40);
+        assertThat(result.status()).isEqualTo(EnrollmentStatus.ENROLLED);
+    }
+
+    @Test
+    @DisplayName("실패 - courseId로 조회 시 수강 내역이 없으면 ENROLLMENT_NOT_FOUND_OR_NO_ACCESS 예외를 던져야 한다.")
+    void getEnrollmentDetailByCourseId_fail_notFound() {
+        // given
+        Long studentId = STUDENT_ID;
+        Long courseId = 9999L;
+
+        given(enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)).willReturn(Optional.empty());
+
+        // when & then
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> enrollmentQueryUseCase.getEnrollmentDetailByCourseId(studentId, courseId));
         assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 }

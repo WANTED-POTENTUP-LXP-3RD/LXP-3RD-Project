@@ -88,6 +88,13 @@ public class ProgressQueryUseCase {
         );
     }
 
+    public LearningHistoryResult getLearningHistoryByCourseId(Long studentId, Long courseId) {
+        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
+                .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
+
+        return getLearningHistory(studentId, enrollment.getId());
+    }
+
     private LectureProgressResult createLectureProgressResult(LectureResourceSummary resourceSummary, Map<Long, Progress> progressMap) {
         Progress progress = progressMap.get(resourceSummary.resourceId());
         int watchedDuration = progress != null ? progress.getWatchedDuration() : 0;
