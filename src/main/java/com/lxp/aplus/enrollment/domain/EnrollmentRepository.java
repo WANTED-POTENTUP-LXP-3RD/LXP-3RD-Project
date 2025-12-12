@@ -1,5 +1,6 @@
 package com.lxp.aplus.enrollment.domain;
 
+import com.lxp.aplus.enrollment.infrastructure.persistence.dto.StudentCountDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +25,5 @@ public interface EnrollmentRepository {
 
     boolean isEnrollmentCompleted(Long studentId, Long courseId);
 
+    List<StudentCountDto> findStudentCountsByCourseIds(List<Long> courseIds);
 }
