@@ -55,11 +55,18 @@ public class CourseQueryUseCase {
         Map<Long, Integer> studentCountMap = enrollmentQueryPort.getStudentCountBatch(courseIds);
 
         List<CourseResponse> courseResponses = courses.getContent().stream()
-                .map(course -> CourseResponse.of(
-                        course,
-                        categoryNamesMap.get(course.getCategoryId()),
-                        studentCountMap.getOrDefault(course.getId(), 0)
-                ))
+                .map(course -> {
+                    String instructorName = userQueryPort.findInstructorById(course.getInstructorId())
+                            .map(InstructorResponse::name)
+                            .orElse("알 수 없음");
+
+                    return CourseResponse.of(
+                            course,
+                            categoryNamesMap.get(course.getCategoryId()),
+                            instructorName,
+                            studentCountMap.getOrDefault(course.getId(), 0)
+                    );
+                })
                 .toList();
 
         return new PageImpl<>(courseResponses, pageable, courses.getTotalElements());
