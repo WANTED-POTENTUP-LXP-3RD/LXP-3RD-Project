@@ -1,18 +1,15 @@
 package com.lxp.aplus.course.presentation.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.lxp.aplus.course.domain.Lecture;
 import com.lxp.aplus.course.application.result.LectureResult;
+import com.lxp.aplus.course.domain.Lecture;
 import lombok.Builder;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record LectureResponse(
-        Long id,
         Long lectureId,
         String title,
         Integer totalDurationSeconds,
@@ -20,25 +17,29 @@ public record LectureResponse(
         int orderIndex,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        LectureResourceResponse resource,
-        List<ResourceResponse> resources
-
+        LectureResourceResponse resource
 ) {
     public static LectureResponse from(Lecture lecture) {
+        LectureResourceResponse resource = null;
+
+        if (lecture.getLectureResources() != null && !lecture.getLectureResources().isEmpty()) {
+            resource = LectureResourceResponse.from(lecture.getLectureResources().get(0));
+        }
+
         return LectureResponse.builder()
                 .lectureId(lecture.getId())
                 .title(lecture.getTitle())
                 .totalDurationSeconds(lecture.getTotalDurationSeconds())
                 .isPreview(lecture.isPreview())
                 .orderIndex(lecture.getOrderIndex())
-                .resources(lecture.getLectureResources().stream()
-                        .map(ResourceResponse::from)
-                        .collect(Collectors.toList()))
+                .createdAt(lecture.getCreatedAt())
+                .updatedAt(lecture.getUpdatedAt())
+                .resource(resource)
                 .build();
     }
-    public static LectureResponse from (LectureResult result) {
+    public static LectureResponse from(LectureResult result) {
         return LectureResponse.builder()
-                .id(result.id())
+                .lectureId(result.id())
                 .title(result.title())
                 .orderIndex(result.orderIndex())
                 .createdAt(result.createdAt())

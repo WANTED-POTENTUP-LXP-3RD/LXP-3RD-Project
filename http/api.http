@@ -23,12 +23,28 @@ POST {{baseUrl}}/api/auth/signup
 Content-Type: {{contentType}}
 
 {
-  "name": "{{testName}}",
   "nickname": "{{testNickName}}",
   "email": "{{testEmail}}",
-  "password": "{{testPassword}}",
-  "phoneNumber": "{{testPhoneNumber}}"
+  "password": "{{testPassword}}"
 }
+
+### 1-1. 회원가입 및 자동 로그인 (토큰 자동 저장)
+# @name signupAndLogin
+POST {{baseUrl}}/api/auth/signup-and-login
+Content-Type: {{contentType}}
+
+{
+  "nickname": "{{testNickName}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+    client.log("Refresh Token: " + response.body.data.refreshToken);
+%}
 
 ### 2. 로그인 (토큰 자동 저장)
 # @name login
@@ -189,4 +205,3 @@ Authorization: Bearer expired-access-token
 ### 3. "6. 내 정보 수정" 실행
 ### 4. "7. 비밀번호 변경" 실행
 ### 5. "8. 회원탈퇴" 실행
-

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,10 +42,30 @@ public class CourseQueryUseCase {
     }
 
     private Page<CourseResponse> convertToCourseResponse(Page<Course> courses, Pageable pageable) {
+        List<Long> categoryIds = courses.getContent().stream()
+                .map(Course::getCategoryId)
+                .distinct()
+                .toList();
+
+        List<Long> courseIds = courses.getContent().stream()
+                .map(Course::getId)
+                .toList();
+
+        Map<Long, List<String>> categoryNamesMap = categoryQueryPort.getCategoryNamesBatch(categoryIds);
+        Map<Long, Integer> studentCountMap = enrollmentQueryPort.getStudentCountBatch(courseIds);
+
         List<CourseResponse> courseResponses = courses.getContent().stream()
                 .map(course -> {
-                    List<String> categoryPath = getCategoryNames(course.getCategoryId());
-                    return CourseResponse.of(course, categoryPath);
+                    String instructorName = userQueryPort.findInstructorById(course.getInstructorId())
+                            .map(InstructorResponse::name)
+                            .orElse("알 수 없음");
+
+                    return CourseResponse.of(
+                            course,
+                            categoryNamesMap.get(course.getCategoryId()),
+                            instructorName,
+                            studentCountMap.getOrDefault(course.getId(), 0)
+                    );
                 })
                 .toList();
 
