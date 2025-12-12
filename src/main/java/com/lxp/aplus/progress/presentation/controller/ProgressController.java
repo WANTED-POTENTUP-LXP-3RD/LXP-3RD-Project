@@ -47,4 +47,24 @@ public class ProgressController {
         return ResponseEntity.ok(ResultResponse
                 .of(ProgressResultCode.GET_PROGRESS_SUCCESS, LearningHistoryResponse.from(result)));
     }
+
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<ResultResponse<LearningHistoryResponse>> getLearningHistoryByCourseId(
+            @Authenticated UserInfo currentUser,
+            @PathVariable Long courseId
+    ) {
+        LearningHistoryResult result = progressQueryUseCase.getLearningHistoryByCourseId(currentUser.id(), courseId);
+        return ResponseEntity.ok(ResultResponse
+                .of(ProgressResultCode.GET_PROGRESS_SUCCESS, LearningHistoryResponse.from(result)));
+    }
+
+    @PatchMapping("/course/{courseId}")
+    public ResponseEntity<ResultResponse<ProgressUpdateResponse>> updateProgressByCourseId(
+            @Authenticated UserInfo currentUser,
+            @PathVariable Long courseId,
+            @Valid @RequestBody ProgressUpdateRequest request
+    ) {
+        ProgressUpdateResponse response = progressCommandUseCase.updateProgressByCourseId(currentUser, courseId, request);
+        return ResponseEntity.ok(ResultResponse.of(ProgressResultCode.UPDATE_PROGRESS_SUCCESS, response));
+    }
 }

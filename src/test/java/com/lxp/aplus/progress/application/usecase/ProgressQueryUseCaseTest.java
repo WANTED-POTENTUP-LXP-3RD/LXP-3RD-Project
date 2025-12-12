@@ -190,7 +190,7 @@ class ProgressQueryUseCaseTest {
         given(enrollmentRepository.findById(ENROLLMENT_ID)).willReturn(Optional.of(enrollment));
         
         List<LectureResourceSummary> emptyLectureResources = new ArrayList<>();
-        given(courseFinder.findAllLectureResourcesByCourseId(enrollment.getCourseId())).willReturn(emptyLectureResources); // enrollment.getCourseId()를 직접 사용
+        given(courseFinder.findAllLectureResourcesByCourseId(enrollment.getCourseId())).willReturn(emptyLectureResources);
 
         // when
         LearningHistoryResult result = progressQueryUseCase.getLearningHistory(currentUser.id(), ENROLLMENT_ID);
@@ -238,6 +238,79 @@ class ProgressQueryUseCaseTest {
         assertThat(result.lectureProgresses().get(0).watchedDuration()).isEqualTo(0);
         assertThat(result.lastWatchedVideoId()).isEqualTo(0L);
         assertThat(result.lastWatchedDurationOfLastVideo()).isEqualTo(0);
-        assertThat(result.lastWatchedAt()).isNull();
+                assertThat(result.lastWatchedAt()).isNull();
+            }
+
+    @Test
+    @DisplayName("성공 - courseId로 학습 이력을 조회해야 한다.")
+    void getLearningHistoryByCourseId_success() {
+        // given
+        Enrollment enrollment = Enrollment.builder()
+                .id(ENROLLMENT_ID)
+                .studentId(STUDENT_ID)
+                .courseId(COURSE_ID)
+                .expiredAt(LocalDateTime.now().plusDays(1))
+                .status(EnrollmentStatus.ENROLLED)
+                .build();
+        ReflectionTestUtils.setField(enrollment, "createdAt", LocalDateTime.now().minusDays(10));
+
+        List<LectureResourceSummary> lectureResourceSummaries = List.of(
+                new LectureResourceSummary(RESOURCE_ID_1, "Spring Boot 개념 설명", 240),
+                new LectureResourceSummary(RESOURCE_ID_2, "Spring Data JPA 활용", 300)
+        );
+
+        Progress progress1 = mock(Progress.class);
+        LectureResource lr1_mock = mock(LectureResource.class);
+        given(lr1_mock.getId()).willReturn(RESOURCE_ID_1);
+        given(progress1.getLectureResource()).willReturn(lr1_mock);
+        given(progress1.getWatchedDuration()).willReturn(180);
+        given(progress1.isCompleted()).willReturn(true);
+        given(progress1.getLastWatchedAt()).willReturn(LocalDateTime.now().minusHours(1));
+        given(progress1.calculateProgressRate()).willReturn(75);
+
+        List<Progress> progresses = List.of(progress1);
+
+        // Mocking
+        given(enrollmentRepository.findByStudentIdAndCourseId(STUDENT_ID, COURSE_ID)).willReturn(Optional.of(enrollment));
+        given(enrollmentRepository.findById(ENROLLMENT_ID)).willReturn(Optional.of(enrollment));
+
+        given(courseFinder.findAllLectureResourcesByCourseId(COURSE_ID)).willReturn(lectureResourceSummaries);
+        given(progressRepository.findByEnrollmentIdAndLectureResourceIds(any(Long.class), any(List.class)))
+                .willReturn(progresses);
+
+        // when
+        LearningHistoryResult result = progressQueryUseCase.getLearningHistoryByCourseId(STUDENT_ID, COURSE_ID);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.enrollmentId()).isEqualTo(ENROLLMENT_ID);
+        assertThat(result.overallProgressRate()).isEqualTo(50); // 1 completed out of 2 resources
+        
+        assertThat(result.lastWatchedVideoId()).isEqualTo(RESOURCE_ID_1);
+        assertThat(result.lastWatchedDurationOfLastVideo()).isEqualTo(180);
+        assertThat(result.lastWatchedAt()).isNotNull();
+
+        assertThat(result.lectureProgresses()).hasSize(2);
+        assertThat(result.lectureProgresses().get(0).resourceId()).isEqualTo(RESOURCE_ID_1);
+        assertThat(result.lectureProgresses().get(0).isCompleted()).isTrue();
+        assertThat(result.lectureProgresses().get(0).watchedDuration()).isEqualTo(180);
+        assertThat(result.lectureProgresses().get(0).currentProgressRate()).isEqualTo(75);
+
+        assertThat(result.lectureProgresses().get(1).resourceId()).isEqualTo(RESOURCE_ID_2);
+        assertThat(result.lectureProgresses().get(1).isCompleted()).isFalse();
+        assertThat(result.lectureProgresses().get(1).watchedDuration()).isEqualTo(0);
+        assertThat(result.lectureProgresses().get(1).currentProgressRate()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("실패 - courseId로 조회 시 수강 내역이 없으면 ENROLLMENT_NOT_FOUND_OR_NO_ACCESS 예외를 던져야 한다.")
+    void getLearningHistoryByCourseId_fail_enrollmentNotFound() {
+        // given
+        given(enrollmentRepository.findByStudentIdAndCourseId(STUDENT_ID, COURSE_ID)).willReturn(Optional.empty());
+
+        // when & then
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> progressQueryUseCase.getLearningHistoryByCourseId(STUDENT_ID, COURSE_ID));
+        assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 }

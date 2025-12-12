@@ -50,4 +50,15 @@ public class EnrollmentController {
                 ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENT_DETAIL_SUCCESS, EnrollmentDetailResponse.from(result))
         );
     }
+
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<ResultResponse<EnrollmentDetailResponse>> getEnrollmentDetailByCourseId(
+            @Authenticated UserInfo currentUser,
+            @PathVariable Long courseId
+    ) {
+        EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetailByCourseId(currentUser.id(), courseId);
+        return ResponseEntity.ok(
+                ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENT_DETAIL_SUCCESS, EnrollmentDetailResponse.from(result))
+        );
+    }
 }

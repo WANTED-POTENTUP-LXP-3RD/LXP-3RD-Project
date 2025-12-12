@@ -2,6 +2,9 @@
 ### 결제 API (/api/payments)
 ##########################################
 
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
 ### 1. 결제 준비 (주문 항목 기반으로 주문 생성 및 결제 준비)
 ### 강좌 생성 API를 먼저 실행 후 응답으로 받은 courseId를 Request Body에 넣어주세요!
 POST {{baseUrl}}/api/payments/prepare
@@ -11,10 +14,24 @@ Authorization: Bearer {{accessToken}}
 {
   "items": [
     {
-      "courseId": 101
+      "courseId": 1
     }
   ]
 }
+
+> {%
+    // 💡 이 스크립트가 누락되었거나 실행되지 않았을 수 있습니다.
+    const orderId = response.body.data.orderId;
+    const amount = response.body.data.amount;
+
+    if (orderId && amount) {
+        client.global.set("orderId", orderId);
+        client.global.set("amount", amount);
+        client.log("Order ID saved: " + orderId + ", Amount: " + amount);
+    } else {
+        client.log("Error: orderId or amount not found in prepare response.");
+    }
+%}
 
 ### 2. 결제 완료
 POST {{baseUrl}}/api/payments/confirm
@@ -22,5 +39,7 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 {
-
+  "orderId": "{{orderId}}",
+  "paymentKey": "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+  "amount": {{amount}}
 }

@@ -72,4 +72,11 @@ public class ProgressCommandUseCase {
 
         return ProgressUpdateResponse.of(savedProgress, currentProgressRate);
     }
+
+    public ProgressUpdateResponse updateProgressByCourseId(UserInfo currentUser, Long courseId, ProgressUpdateRequest request) {
+        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(currentUser.id(), courseId)
+                .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
+
+        return updateProgress(currentUser, enrollment.getId(), request);
+    }
 }
