@@ -41,7 +41,9 @@ public class Payment extends BaseAggregateRoot {
     @Column(nullable = false, updatable = false, length = 3)
     private String currency;
 
-    @Column(nullable = false, updatable = false, precision = 10, scale = 0)
+    // NOTE: precision = 19 -> 최대 19자리, scale = 0 -> 정수
+    // 대형 B2B 거래도 고려한 수치입니다.
+    @Column(nullable = false, updatable = false, precision = 19, scale = 0)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -102,7 +104,6 @@ public class Payment extends BaseAggregateRoot {
                 amount
         );
     }
-
 
     /* ========= 도메인 행위 ========= */
 
