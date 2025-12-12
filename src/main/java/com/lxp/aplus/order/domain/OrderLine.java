@@ -1,6 +1,7 @@
 package com.lxp.aplus.order.domain;
 
 import com.lxp.aplus.order.application.CoursePrice;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,6 +47,8 @@ public class OrderLine {
     private ItemType itemType;
 
     private Long itemId;
+
+    @Column(nullable = false, precision = 10, scale = 0)
     private BigDecimal price;
 
     protected OrderLine(ItemType itemType, Long itemId, BigDecimal price) {

@@ -34,7 +34,7 @@ public class Order extends BaseAggregateRoot {
     @Column(nullable = false, updatable = false)
     private String currency;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, precision = 19, scale = 0)
     private BigDecimal amount;
 
     @ElementCollection
@@ -159,7 +159,9 @@ public class Order extends BaseAggregateRoot {
      */
     private void validateAmount(BigDecimal approvedAmount) {
 
-        if (this.amount.compareTo(approvedAmount) != 0) {
+        boolean isAmountMismatched = this.amount.compareTo(approvedAmount) != 0;
+
+        if (isAmountMismatched) {
             throw new BusinessException(OrderErrorCode.ORDER_AMOUNT_MISMATCH);
         }
     }
