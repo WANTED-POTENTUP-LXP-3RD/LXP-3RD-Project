@@ -29,7 +29,7 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     @Override
     public Optional<Course> findById(Long id) {
-        return jpaRepository.findById(id);
+        return jpaRepository.findByIdAndCourseStatusNot(id, CourseStatus.DELETED);
     }
 
     @Override
