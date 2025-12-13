@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;
 import lombok.Builder;
@@ -25,22 +25,22 @@ public record CourseDetailResponse(
         int totalDuration,
         List<SectionResponse> sections
 ) {
-    public static CourseDetailResponse of(Course course, List<String> categoryNames, InstructorResponse instructor, boolean isPurchased, int studentCount, int totalDuration) {
+    public static CourseDetailResponse from(CourseDetailResult result) {
         return CourseDetailResponse.builder()
-                .courseId(course.getId())
-                .categories(categoryNames)
-                .title(course.getTitle())
-                .summary(course.getSummary())
-                .description(course.getDescription())
-                .price(course.getPrice())
-                .status(course.getCourseStatus())
-                .level(course.getCourseLevel())
-                .thumbnailUrl(course.getThumbnailUrl())
-                .instructor(instructor)
-                .isPurchased(isPurchased)
-                .studentCount(studentCount)
-                .totalDuration(totalDuration)
-                .sections(course.getSections().stream()
+                .courseId(result.courseId())
+                .categories(result.categories())
+                .title(result.title())
+                .summary(result.summary())
+                .description(result.description())
+                .price(result.price())
+                .status(result.status())
+                .level(result.level())
+                .thumbnailUrl(result.thumbnailUrl())
+                .instructor(InstructorResponse.from(result.instructor()))
+                .isPurchased(result.isPurchased())
+                .studentCount(result.studentCount())
+                .totalDuration(result.totalDuration())
+                .sections(result.sections().stream()
                         .map(SectionResponse::from)
                         .collect(Collectors.toList()))
                 .build();

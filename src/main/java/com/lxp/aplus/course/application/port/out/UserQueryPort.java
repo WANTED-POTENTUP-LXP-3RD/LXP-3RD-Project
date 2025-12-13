@@ -1,9 +1,9 @@
 package com.lxp.aplus.course.application.port.out;
 
-import com.lxp.aplus.course.presentation.response.InstructorResponse;
+import com.lxp.aplus.course.application.result.InstructorResult;
 
 import java.util.Optional;
 
 public interface UserQueryPort {
-    Optional<InstructorResponse> findInstructorById(Long userId);
+    Optional<InstructorResult> findInstructorById(Long userId);
 }

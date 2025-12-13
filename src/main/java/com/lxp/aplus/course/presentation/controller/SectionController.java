@@ -4,8 +4,8 @@ import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.SectionResultCode;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.InstructorOnly;
-import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
-import com.lxp.aplus.course.application.usecase.CourseQueryUseCase;
+import com.lxp.aplus.course.application.result.SectionUpsertResult;
+import com.lxp.aplus.course.application.usecase.SectionCommandUseCase;
 import com.lxp.aplus.course.presentation.request.SectionCreateRequest;
 import com.lxp.aplus.course.presentation.request.SectionUpdateRequest;
 import com.lxp.aplus.course.presentation.response.SectionUpsertResponse;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class SectionController {
-    private final CourseCommandUseCase courseCommandUseCase;
+    private final SectionCommandUseCase sectionCommandUseCase;
 
     @InstructorOnly
     @PostMapping("/api/instructor/courses/{courseId}/sections")
@@ -31,11 +31,11 @@ public class SectionController {
             @PathVariable("courseId") Long courseId,
             @Valid @RequestBody SectionCreateRequest request
     ) {
-        SectionUpsertResponse response = courseCommandUseCase.createSection(courseId, instructorId, request.toCommand());
+        SectionUpsertResult result = sectionCommandUseCase.createSection(courseId, instructorId, request.toCommand());
 
         return ResponseEntity
                 .status(SectionResultCode.SECTION_REGISTER_SUCCESS.getStatus())
-                .body(ResultResponse.of(SectionResultCode.SECTION_REGISTER_SUCCESS, response));
+                .body(ResultResponse.of(SectionResultCode.SECTION_REGISTER_SUCCESS, SectionUpsertResponse.from(result)));
     }
 
     @InstructorOnly
@@ -46,11 +46,11 @@ public class SectionController {
             @PathVariable("sectionId") Long sectionId,
             @RequestBody SectionUpdateRequest request
     ) {
-        SectionUpsertResponse response = courseCommandUseCase.updateSection(courseId, instructorId, sectionId, request.toCommand());
+        SectionUpsertResult result = sectionCommandUseCase.updateSection(courseId, instructorId, sectionId, request.toCommand());
 
         return ResponseEntity
                 .status(SectionResultCode.SECTION_UPDATE_SUCCESS.getStatus())
-                .body(ResultResponse.of(SectionResultCode.SECTION_UPDATE_SUCCESS, response));
+                .body(ResultResponse.of(SectionResultCode.SECTION_UPDATE_SUCCESS, SectionUpsertResponse.from(result)));
     }
 
     @InstructorOnly
@@ -60,7 +60,7 @@ public class SectionController {
             @PathVariable("courseId") Long courseId,
             @PathVariable("sectionId") Long sectionId
     ) {
-        courseCommandUseCase.deleteSection(courseId, instructorId, sectionId);
+        sectionCommandUseCase.deleteSection(courseId, instructorId, sectionId);
 
         return ResponseEntity
                 .status(SectionResultCode.SECTION_DELETE_SUCCESS.getStatus())
