@@ -2,6 +2,7 @@ package com.lxp.aplus.course.presentation.controller;
 
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.LectureResultCode;
+import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.InstructorOnly;
 import com.lxp.aplus.course.application.command.CreateLectureCommand;
 import com.lxp.aplus.course.application.command.UpdateLectureCommand;
@@ -35,6 +36,7 @@ public class LectureController {
             value = "/instructor/courses/{courseId}/sections/{sectionId}/lectures",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResultResponse<LectureResponse>> createLecture (@Valid @PathVariable Long courseId,
+                                                                          @Authenticated Long instructorId,
                                                                           @PathVariable Long sectionId,
                                                                           @RequestPart("lecture") LectureCreateRequest request,
                                                                           @RequestPart("multiFile") MultipartFile file) throws IOException {
@@ -56,7 +58,9 @@ public class LectureController {
     /** 강의 상세 조회 **/
     @InstructorOnly
     @GetMapping("/instructor/courses/{courseId}/lectures/{lectureId}")
-    public ResponseEntity<ResultResponse<LectureResponse>> getLectureDetail(@PathVariable Long courseId, @PathVariable Long lectureId) {
+    public ResponseEntity<ResultResponse<LectureResponse>> getLectureDetail(@PathVariable Long courseId,
+                                                                            @Authenticated Long instructorId,
+                                                                            @PathVariable Long lectureId) {
         LectureResult result = lectureQueryUseCase.getLectureDetails(courseId, lectureId);
 
         return ResponseEntity
@@ -71,7 +75,9 @@ public class LectureController {
     @PutMapping(
             value = "/instructor/courses/{courseId}/lectures/{lectureId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResultResponse<LectureResponse>> updateLecture(@Valid @PathVariable Long courseId, @PathVariable Long lectureId,
+    public ResponseEntity<ResultResponse<LectureResponse>> updateLecture(@Valid @PathVariable Long courseId,
+                                                                         @Authenticated Long instructorId,
+                                                                         @PathVariable Long lectureId,
                                                                          @RequestPart("lecture") LectureUpdateRequest request,
                                                                          @RequestPart(value = "multiFile", required = false) MultipartFile file) throws IOException{
 
@@ -95,7 +101,9 @@ public class LectureController {
     /** 강의 삭제 **/
     @InstructorOnly
     @DeleteMapping("/instructor/courses/{courseId}/lectures/{lectureId}")
-    public ResponseEntity<ResultResponse<Void>> deleteLecture(@PathVariable Long courseId, @PathVariable Long lectureId) {
+    public ResponseEntity<ResultResponse<Void>> deleteLecture(@PathVariable Long courseId,
+                                                              @Authenticated Long instructorId,
+                                                              @PathVariable Long lectureId) {
         lectureCommandUseCase.deleteLecture(courseId, lectureId);
 
         return ResponseEntity

@@ -4,7 +4,6 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import com.lxp.aplus.course.application.file.FileValidator;
 import com.lxp.aplus.course.application.vo.UploadFile;
-import com.lxp.aplus.course.domain.ExtensionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +22,6 @@ public class LectureFileValidator implements FileValidator {
         if (file.size() > MAX_FILE_SIZE) {
             throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_FILE_SIZE_EXCEEDED);
         }
-
-        ExtensionType ext = ExtensionType.fromFileName(file.originalFileName());
     }
 
     @Override
@@ -35,7 +32,5 @@ public class LectureFileValidator implements FileValidator {
         if (file.size() > MAX_FILE_SIZE) {
             throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_FILE_SIZE_EXCEEDED);
         }
-
-        ExtensionType ext = ExtensionType.fromFileName(file.originalFileName());
     }
 }
