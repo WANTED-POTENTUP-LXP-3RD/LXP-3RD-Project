@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
+import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.user.domain.User;
 import lombok.Builder;
 
@@ -8,10 +9,10 @@ public record InstructorResponse(
         Long id,
         String name
 ) {
-    public static InstructorResponse from(User user) {
+    public static InstructorResponse from(InstructorResult result) {
         return InstructorResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
+                .id(result.id())
+                .name(result.name())
                 .build();
     }
 }

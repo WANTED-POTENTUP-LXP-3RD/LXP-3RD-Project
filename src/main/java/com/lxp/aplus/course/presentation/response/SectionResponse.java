@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.domain.Section;
+import com.lxp.aplus.course.application.result.SectionResult;
 import lombok.Builder;
 
 import java.util.List;
@@ -13,12 +13,12 @@ public record SectionResponse(
         int order,
         List<LectureResponse> lectures
 ) {
-    public static SectionResponse from(Section section) {
+    public static SectionResponse from(SectionResult result) {
         return SectionResponse.builder()
-                .sectionId(section.getId())
-                .title(section.getTitle())
-                .order(section.getOrderIndex())
-                .lectures(section.getLectures().stream()
+                .sectionId(result.sectionId())
+                .title(result.title())
+                .order(result.order())
+                .lectures(result.lectures().stream()
                         .map(LectureResponse::from)
                         .collect(Collectors.toList()))
                 .build();

@@ -1,15 +1,15 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.application.result.CourseUpsertResult;
 import lombok.Builder;
 
 @Builder
 public record CourseUpsertResponse(
         Long courseId
 ) {
-    public static CourseUpsertResponse from(Course course) {
+    public static CourseUpsertResponse from(CourseUpsertResult result) {
         return CourseUpsertResponse.builder()
-                .courseId(course.getId())
+                .courseId(result.courseId())
                 .build();
     }
 }

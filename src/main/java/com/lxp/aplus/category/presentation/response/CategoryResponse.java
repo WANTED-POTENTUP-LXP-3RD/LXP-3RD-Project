@@ -1,12 +1,10 @@
 package com.lxp.aplus.category.presentation.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.lxp.aplus.category.domain.Category;
+import com.lxp.aplus.category.application.result.CategoryResult;
 import lombok.Builder;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -15,20 +13,19 @@ public record CategoryResponse(
         String name,
         List<CategoryResponse> children
 ) {
-    public static CategoryResponse from(Category category) {
+    public static CategoryResponse from(CategoryResult result) {
         return CategoryResponse.builder()
-                .categoryId(category.getId())
-                .name(category.getName())
-                .children(category.getChildren().stream()
-                                .map(CategoryResponse::from)
-                                .collect(Collectors.toList())
-                )
+                .categoryId(result.categoryId())
+                .name(result.name())
+                .children(result.children().stream()
+                        .map(CategoryResponse::from)
+                        .toList())
                 .build();
     }
 
-    public static List<CategoryResponse> from(List<Category> categories) {
-        return categories.stream()
+    public static List<CategoryResponse> from(List<CategoryResult> results) {
+        return results.stream()
                 .map(CategoryResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

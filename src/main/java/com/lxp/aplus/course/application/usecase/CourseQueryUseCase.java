@@ -6,11 +6,11 @@ import com.lxp.aplus.common.error.code.UserErrorCode;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;
 import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
 import com.lxp.aplus.course.application.port.out.UserQueryPort;
+import com.lxp.aplus.course.application.result.CourseDetailResult;
+import com.lxp.aplus.course.application.result.CourseResult;
+import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
-import com.lxp.aplus.course.presentation.response.CourseDetailResponse;
-import com.lxp.aplus.course.presentation.response.CourseResponse;
-import com.lxp.aplus.course.presentation.response.InstructorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,17 +31,17 @@ public class CourseQueryUseCase {
     private final CategoryQueryPort categoryQueryPort;
     private final EnrollmentQueryPort enrollmentQueryPort;
 
-    public Page<CourseResponse> getInstructorCourses(Long instructorId, Pageable pageable) {
+    public Page<CourseResult> getInstructorCourses(Long instructorId, Pageable pageable) {
         Page<Course> courses = courseRepository.findAllByInstructorIdExcludingDeleted(instructorId, pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
-    public Page<CourseResponse> getPublishedCourses(Pageable pageable) {
+    public Page<CourseResult> getPublishedCourses(Pageable pageable) {
         Page<Course> courses = courseRepository.findAllPublished(pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
-    private Page<CourseResponse> convertToCourseResponse(Page<Course> courses, Pageable pageable) {
+    private Page<CourseResult> convertToCourseResponse(Page<Course> courses, Pageable pageable) {
         List<Long> categoryIds = courses.getContent().stream()
                 .map(Course::getCategoryId)
                 .distinct()
@@ -54,13 +54,13 @@ public class CourseQueryUseCase {
         Map<Long, List<String>> categoryNamesMap = categoryQueryPort.getCategoryNamesBatch(categoryIds);
         Map<Long, Integer> studentCountMap = enrollmentQueryPort.getStudentCountBatch(courseIds);
 
-        List<CourseResponse> courseResponses = courses.getContent().stream()
+        List<CourseResult> courseResponses = courses.getContent().stream()
                 .map(course -> {
                     String instructorName = userQueryPort.findInstructorById(course.getInstructorId())
-                            .map(InstructorResponse::name)
+                            .map(InstructorResult::name)
                             .orElse("알 수 없음");
 
-                    return CourseResponse.of(
+                    return CourseResult.of(
                             course,
                             categoryNamesMap.get(course.getCategoryId()),
                             instructorName,
@@ -79,13 +79,13 @@ public class CourseQueryUseCase {
         return categoryQueryPort.findCategoryWithParentNames(categoryId);
     }
 
-    public CourseDetailResponse getPublishedCourseDetail(Long courseId, Long userId) {
+    public CourseDetailResult getPublishedCourseDetail(Long courseId, Long userId) {
         Course course = courseRepository.findPublishedWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
-        InstructorResponse instructorResponse = userQueryPort.findInstructorById(course.getInstructorId())
+        InstructorResult instructorResult = userQueryPort.findInstructorById(course.getInstructorId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         int totalDuration = calculateTotalDuration(course);
@@ -93,10 +93,10 @@ public class CourseQueryUseCase {
         boolean isPurchased = enrollmentQueryPort.isEnrolled(userId, courseId);
         int studentCount = enrollmentQueryPort.getStudentCount(courseId);
 
-        return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
+        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration);
     }
 
-    public CourseDetailResponse getInstructorCourseDetail(Long courseId, Long instructorId) {
+    public CourseDetailResult getInstructorCourseDetail(Long courseId, Long instructorId) {
         Course course = courseRepository.findWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
@@ -104,7 +104,7 @@ public class CourseQueryUseCase {
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
-        InstructorResponse instructorResponse = userQueryPort.findInstructorById(course.getInstructorId())
+        InstructorResult instructorResult = userQueryPort.findInstructorById(course.getInstructorId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         int totalDuration = calculateTotalDuration(course);
@@ -112,7 +112,7 @@ public class CourseQueryUseCase {
         boolean isPurchased = enrollmentQueryPort.isEnrolled(instructorId, courseId);
         int studentCount = enrollmentQueryPort.getStudentCount(courseId);
 
-        return CourseDetailResponse.of(course, categoryNames, instructorResponse, isPurchased, studentCount, totalDuration);
+        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration);
     }
 
     private int calculateTotalDuration(Course course) {

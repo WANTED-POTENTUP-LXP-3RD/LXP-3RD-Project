@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseJpaRepository extends JpaRepository<Course, Long> {
+    Optional<Course> findByIdAndCourseStatusNot(Long id, CourseStatus courseStatus);
+
     Page<Course> findAllByInstructorIdAndCourseStatusNot(Long instructorId, CourseStatus courseStatus, Pageable pageable);
 
     Page<Course> findAllByCourseStatus(CourseStatus courseStatus, Pageable pageable);

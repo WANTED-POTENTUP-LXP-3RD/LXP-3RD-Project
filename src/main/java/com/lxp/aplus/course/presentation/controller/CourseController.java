@@ -7,6 +7,10 @@ import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.CurrentUser;
 import com.lxp.aplus.common.security.InstructorOnly;
 import com.lxp.aplus.common.security.UserInfo;
+import com.lxp.aplus.course.application.result.CourseDetailResult;
+import com.lxp.aplus.course.application.result.CoursePublishResult;
+import com.lxp.aplus.course.application.result.CourseResult;
+import com.lxp.aplus.course.application.result.CourseUpsertResult;
 import com.lxp.aplus.course.application.usecase.CourseCommandUseCase;
 import com.lxp.aplus.course.application.usecase.CourseQueryUseCase;
 import com.lxp.aplus.course.presentation.request.CourseCreateRequest;
@@ -46,11 +50,11 @@ public class CourseController {
             @RequestPart("request") @Valid CourseCreateRequest request,
             @RequestPart("thumbnail") MultipartFile thumbnail
     ) {
-        CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.createCourse(instructorId, request.toCommand(thumbnail));
+        CourseUpsertResult result = courseCommandUseCase.createCourse(instructorId, request.toCommand(thumbnail));
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_REGISTER_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_REGISTER_SUCCESS, courseUpsertResponse));
+                .body(ResultResponse.of(CourseResultCode.COURSE_REGISTER_SUCCESS, CourseUpsertResponse.from(result)));
     }
 
     @InstructorOnly
@@ -60,11 +64,11 @@ public class CourseController {
             @PathVariable("courseId") Long courseId,
             @RequestBody CourseUpdateRequest request
     ) {
-        CourseUpsertResponse courseUpsertResponse = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());
+        CourseUpsertResult result = courseCommandUseCase.updateCourse(courseId, instructorId, request.toCommand());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_UPDATE_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_UPDATE_SUCCESS, courseUpsertResponse));
+                .body(ResultResponse.of(CourseResultCode.COURSE_UPDATE_SUCCESS, CourseUpsertResponse.from(result)));
     }
 
     @InstructorOnly
@@ -73,11 +77,11 @@ public class CourseController {
             @Authenticated Long instructorId,
             @PathVariable("courseId") Long courseId
     ) {
-        CourseDetailResponse courseDetailResponse = courseQueryUseCase.getInstructorCourseDetail(courseId, instructorId);
+        CourseDetailResult result = courseQueryUseCase.getInstructorCourseDetail(courseId, instructorId);
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_READ_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_READ_SUCCESS, courseDetailResponse));
+                .body(ResultResponse.of(CourseResultCode.COURSE_READ_SUCCESS, CourseDetailResponse.from(result)));
     }
 
     @GetMapping("/api/courses/{courseId}")
@@ -85,11 +89,11 @@ public class CourseController {
             @CurrentUser UserInfo userInfo,
             @PathVariable("courseId") Long courseId
     ) {
-        CourseDetailResponse courseDetailResponse = courseQueryUseCase.getPublishedCourseDetail(courseId, userInfo.id());
+        CourseDetailResult result = courseQueryUseCase.getPublishedCourseDetail(courseId, userInfo.id());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_READ_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_READ_SUCCESS, courseDetailResponse));
+                .body(ResultResponse.of(CourseResultCode.COURSE_READ_SUCCESS, CourseDetailResponse.from(result)));
     }
 
     @InstructorOnly
@@ -98,22 +102,24 @@ public class CourseController {
             @Authenticated Long instructorId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<CourseResponse> result = courseQueryUseCase.getInstructorCourses(instructorId, pageable);
+        Page<CourseResult> result = courseQueryUseCase.getInstructorCourses(instructorId, pageable);
+        Page<CourseResponse> responsePage = result.map(CourseResponse::from);
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_LIST_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, PageResponse.from(result)));
+                .body(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, PageResponse.from(responsePage)));
     }
 
     @GetMapping("/api/courses")
     public ResponseEntity<ResultResponse<PageResponse<CourseResponse>>> getPublishedCourses(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<CourseResponse> result = courseQueryUseCase.getPublishedCourses(pageable);
+        Page<CourseResult> result = courseQueryUseCase.getPublishedCourses(pageable);
+        Page<CourseResponse> responsePage = result.map(CourseResponse::from);
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_LIST_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, PageResponse.from(result)));
+                .body(ResultResponse.of(CourseResultCode.COURSE_LIST_SUCCESS, PageResponse.from(responsePage)));
     }
 
     @InstructorOnly
@@ -135,10 +141,10 @@ public class CourseController {
             @PathVariable Long courseId,
             @Authenticated Long instructorId
     ) {
-        CoursePublishResponse response = courseCommandUseCase.publishCourse(courseId, instructorId);
+        CoursePublishResult result = courseCommandUseCase.publishCourse(courseId, instructorId);
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_PUBLISH_SUCCESS.getStatus())
-                .body(ResultResponse.of(CourseResultCode.COURSE_PUBLISH_SUCCESS, response));
+                .body(ResultResponse.of(CourseResultCode.COURSE_PUBLISH_SUCCESS, CoursePublishResponse.from(result)));
     }
 }

@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.application.result.CoursePublishResult;
 import com.lxp.aplus.course.domain.CourseStatus;
 import lombok.Builder;
 
@@ -10,11 +10,11 @@ public record CoursePublishResponse(
         String title,
         CourseStatus courseState
 ) {
-    public static CoursePublishResponse from(Course course) {
+    public static CoursePublishResponse from(CoursePublishResult result) {
         return CoursePublishResponse.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .courseState(course.getCourseStatus())
+                .id(result.id())
+                .title(result.title())
+                .courseState(result.courseState())
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.domain.Section;
+import com.lxp.aplus.course.application.result.SectionUpsertResult;
 import lombok.Builder;
 
 @Builder
@@ -9,11 +9,11 @@ public record SectionUpsertResponse(
         String title,
         int orderIndex
 ) {
-    public static SectionUpsertResponse from(Section section) {
+    public static SectionUpsertResponse from(SectionUpsertResult result) {
         return SectionUpsertResponse.builder()
-                .sectionId(section.getId())
-                .title(section.getTitle())
-                .orderIndex(section.getOrderIndex())
+                .sectionId(result.sectionId())
+                .title(result.title())
+                .orderIndex(result.orderIndex())
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;
 import lombok.Builder;
@@ -23,20 +23,20 @@ public record CourseResponse(
         double rating,
         LocalDateTime lastModifiedAt
 ) {
-    public static CourseResponse of(Course course, List<String> categoryNames, String instructorName, int studentCount) {
+    public static CourseResponse from(CourseResult result) {
         return CourseResponse.builder()
-                .courseId(course.getId())
-                .title(course.getTitle())
-                .summary(course.getSummary())
-                .instructorName(instructorName)
-                .categories(categoryNames)
-                .thumbnailUrl(course.getThumbnailUrl())
-                .status(course.getCourseStatus())
-                .price(course.getPrice())
-                .level(course.getCourseLevel())
-                .studentCount(studentCount)
-                .rating(5.0)
-                .lastModifiedAt(course.getUpdatedAt())
+                .courseId(result.courseId())
+                .title(result.title())
+                .summary(result.summary())
+                .instructorName(result.instructorName())
+                .categories(result.categories())
+                .thumbnailUrl(result.thumbnailUrl())
+                .status(result.status())
+                .price(result.price())
+                .level(result.level())
+                .studentCount(result.studentCount())
+                .rating(result.rating())
+                .lastModifiedAt(result.lastModifiedAt())
                 .build();
     }
 }
