@@ -1,14 +1,14 @@
 @host = http://localhost:8000
 @courseId = 1
 @sectionId = 1
-@lectureId = 10
+@lectureId = 19
 
 ### 로그인해서 토큰 받기
 POST {{host}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@test.com",
+  "email": "test@test11.com",
   "password": "1234"
 }
 
@@ -31,7 +31,7 @@ Content-Disposition: form-data; name="lecture"
 Content-Type: application/json
 
 {
-  "title": "1. 강의 소개",
+  "title": "1. 스프링 강의",
   "totalDurationSeconds": 480,
   "isPreview": true,
   "orderIndex": 1,
@@ -63,7 +63,7 @@ Content-Disposition: form-data; name="lecture"
 Content-Type: application/json
 
 {
-  "title": "1. 강의 소개(메타만 수정)",
+  "title": "1. ㄴㄷㄷㄷ",
   "totalDurationSeconds": 480,
   "isPreview": true,
   "orderIndex": 1,
@@ -104,7 +104,3 @@ DELETE {{host}}/api/instructor/courses/{{courseId}}/lectures/{{lectureId}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 Accept: application/json
-
-
-
-
