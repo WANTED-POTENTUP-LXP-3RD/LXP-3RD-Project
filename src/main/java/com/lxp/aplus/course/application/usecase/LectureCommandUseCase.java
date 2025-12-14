@@ -45,7 +45,6 @@ public class LectureCommandUseCase {
                 file.originalFileName()
         );
 
-        //Course saved = courseRepository.save(course);
         courseRepository.flush();
 
         return LectureResult.from(lecture);

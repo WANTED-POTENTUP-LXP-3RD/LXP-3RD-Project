@@ -46,7 +46,6 @@ public class LectureController {
         CreateLectureCommand command = request.toCommand(uploadFile);
 
         LectureResult result = lectureCommandUseCase.createLecture(courseId, sectionId, command);
-        System.out.println("lecruerId>>"+result.id());
 
         return ResponseEntity
                 .status(LectureResultCode.LECTURE_REGISTER_SUCCESS.getStatus())

@@ -31,7 +31,7 @@ Content-Disposition: form-data; name="lecture"
 Content-Type: application/json
 
 {
-  "title": "1. >ㄷㄷㄷㄷㄷ",
+  "title": "1. 스프링 강의",
   "totalDurationSeconds": 480,
   "isPreview": true,
   "orderIndex": 1,
@@ -63,7 +63,7 @@ Content-Disposition: form-data; name="lecture"
 Content-Type: application/json
 
 {
-  "title": "1. ㄷㄷㄷ",
+  "title": "1. ㄴㄷㄷㄷ",
   "totalDurationSeconds": 480,
   "isPreview": true,
   "orderIndex": 1,
