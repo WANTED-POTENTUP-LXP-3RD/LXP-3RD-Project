@@ -43,9 +43,9 @@ class UserQueryUseCaseTest {
         // then
         assertThat(response).isPresent();
         assertThat(response.get().name()).isEqualTo("홍길동");
-        assertThat(response.get().nickName()).isEqualTo("hong");
+        assertThat(response.get().nickname()).isEqualTo("hong");
         assertThat(response.get().email()).isEqualTo("hong@example.com");
-        assertThat(response.get().phoneNumber()).isEqualTo("010-1234-5678");
+        assertThat(response.get().phonenumber()).isEqualTo("010-1234-5678");
         assertThat(response.get().status()).isEqualTo(UserStatus.PENDING);
         assertThat(response.get().roles()).hasSize(1);
         assertThat(response.get().roles().get(0)).isEqualTo(RoleType.STUDENT);
