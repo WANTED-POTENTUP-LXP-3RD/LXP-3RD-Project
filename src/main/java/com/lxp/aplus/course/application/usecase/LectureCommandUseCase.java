@@ -24,6 +24,7 @@ public class LectureCommandUseCase {
     private final LectureFileStore lectureFileStore;
 
     public LectureResult createLecture(Long courseId, Long sectionId, CreateLectureCommand command) {
+
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
@@ -44,7 +45,9 @@ public class LectureCommandUseCase {
                 file.originalFileName()
         );
 
-        courseRepository.save(course);
+        //Course saved = courseRepository.save(course);
+        courseRepository.flush();
+
         return LectureResult.from(lecture);
     }
 
