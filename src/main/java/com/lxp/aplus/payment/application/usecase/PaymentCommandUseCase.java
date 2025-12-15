@@ -4,6 +4,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.PaymentErrorCode;
 import com.lxp.aplus.payment.application.port.out.EnrollmentCommandPort;
 import com.lxp.aplus.payment.application.port.out.OrderQueryPort;
+import com.lxp.aplus.payment.application.port.out.PaymentGatewayPort;
 import com.lxp.aplus.payment.application.result.OrderCreateResult;
 import com.lxp.aplus.payment.application.command.PaymentConfirmCommand;
 import com.lxp.aplus.payment.application.command.PaymentPrepareCommand;
@@ -26,6 +27,7 @@ public class PaymentCommandUseCase {
     private final OrderCommandPort orderCommandPort;
     private final OrderQueryPort orderQueryPort;
     private final EnrollmentCommandPort enrollmentCommandPort;
+    private final PaymentGatewayPort paymentGatewayPort;
 
     public PaymentPrepareResponse prepare(PaymentPrepareCommand command) {
 
@@ -53,7 +55,7 @@ public class PaymentCommandUseCase {
                 .orElseThrow(() -> new BusinessException(PaymentErrorCode.PAYMENT_NOT_FOUND));
 
         // 2. PG사에 최종 승인 요청
-        // TODO: 추후 구현. 성공했다고 가정함
+        paymentGatewayPort.confirmPayment(command.orderId(), command.paymentKey(), command.amount());
 
         // 3. 도메인 불변성 검증 -> 상태 변경
         payment.approve(command.paymentKey(), command.amount());
