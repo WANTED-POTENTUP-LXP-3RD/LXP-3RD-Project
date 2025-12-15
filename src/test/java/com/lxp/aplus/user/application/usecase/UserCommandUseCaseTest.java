@@ -54,9 +54,9 @@ class UserCommandUseCaseTest {
 
         // then
         assertThat(response.name()).isEqualTo("홍길동");
-        assertThat(response.nickName()).isEqualTo("hong");
+        assertThat(response.nickname()).isEqualTo("hong");
         assertThat(response.email()).isEqualTo("hong@example.com");
-        assertThat(response.phoneNumber()).isEqualTo("010-1234-5678");
+        assertThat(response.phonenumber()).isEqualTo("010-1234-5678");
         assertThat(response.status()).isEqualTo(UserStatus.PENDING);
         assertThat(response.roles()).hasSize(1);
         assertThat(response.roles().get(0)).isEqualTo(RoleType.STUDENT);
@@ -82,7 +82,7 @@ class UserCommandUseCaseTest {
         UserResponse response = userCommandUseCase.updateUserInfo(request);
 
         // then
-        assertThat(response.nickName()).isEqualTo("hongUpdated");
+        assertThat(response.nickname()).isEqualTo("hongUpdated");
         assertThat(response.email()).isEqualTo("hong.updated@example.com");
         assertThat(response.name()).isEqualTo("홍길동"); // 변경되지 않음
         verify(userQueryUseCase, times(1)).findByIdWithRoles(userId);
