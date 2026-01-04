@@ -4,10 +4,10 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.ReviewErrorCode;
 import com.lxp.aplus.course.domain.Course;
-import com.lxp.aplus.course.domain.CourseRepository;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import com.lxp.aplus.review.application.command.BaseReviewCommand;
 import com.lxp.aplus.review.application.command.ReviewCreateCommand;
+import com.lxp.aplus.review.application.port.out.CourseFinder;
+import com.lxp.aplus.review.application.port.out.EnrollmentFinder;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
 import com.lxp.aplus.review.domain.Review;
 import com.lxp.aplus.review.domain.ReviewRepository;
@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReviewCommandUseCase {
     private final ReviewRepository reviewRepository;
-    private final CourseRepository courseRepository;
-    private final EnrollmentRepository enrollmentRepository;
+    private final EnrollmentFinder enrollmentFinder;
+    private final CourseFinder courseFinder;
 
     /**
      * 새로운 리뷰를 등록합니다.
@@ -45,7 +45,7 @@ public class ReviewCommandUseCase {
     }
 
     private void validateOwnCourse(BaseReviewCommand command) {
-        Course course = courseRepository.findById(command.courseId())
+        Course course = courseFinder.findCourse(command.courseId())
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
         if (course.getInstructorId().equals(command.userId())) {
@@ -54,7 +54,7 @@ public class ReviewCommandUseCase {
     }
 
     private void validateEnrolled(BaseReviewCommand command) {
-        if(!enrollmentRepository.existsByStudentIdAndCourseId(command.userId(), command.courseId())) {
+        if(!enrollmentFinder.existsEnrollment(command.userId(), command.courseId())) {
             throw new BusinessException(ReviewErrorCode.CANT_REVIEW_IN_NOT_ENROLLED);
         }
     }

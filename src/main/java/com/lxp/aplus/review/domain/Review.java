@@ -3,11 +3,8 @@ package com.lxp.aplus.review.domain;
 import com.lxp.aplus.common.domain.BaseTimeEntity;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.ReviewErrorCode;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.GenerationType;
+import com.lxp.aplus.review.domain.constant.ReviewStatus;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,18 +30,24 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer rating;
 
-    @Column(nullable = false, length = 1000)
+    @Lob
+    @Column(nullable = false)
     private String content;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReviewStatus status = ReviewStatus.DISPLAY;
 
     private LocalDateTime deletedAt;
 
     @Builder
-    public Review(Long courseId, Long userId, Integer rating, String content) {
+    public Review(Long courseId, Long userId, Integer rating, String content, ReviewStatus status) {
         validateRating(rating);
         this.courseId = courseId;
         this.userId = userId;
         this.rating = rating;
         this.content = content;
+        this.status = status;
     }
 
     public void update(Integer rating, String content) {
@@ -53,7 +56,16 @@ public class Review extends BaseTimeEntity {
         this.content = content;
     }
 
+    public void blind(){
+        this.status = ReviewStatus.BLINDED;
+    }
+
+    public void archived(){
+        this.status = ReviewStatus.ARCHIVED;
+    }
+
     public void delete(LocalDateTime deletedAt) {
+        this.status = ReviewStatus.DELETED;
         this.deletedAt = deletedAt;
     }
 
