@@ -52,7 +52,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_API_CORS_ALLOW_ORIGIN: "http://localhost:3000,http://127.0.0.1:3000"
     volumes:
-      - ./minio/data:/data
+      - minio_data:/data
   minio-init:
     image: minio/mc:latest
     depends_on:
@@ -72,3 +72,4 @@ services:
 
 volumes:
   mysql_data:
+  minio_data:
