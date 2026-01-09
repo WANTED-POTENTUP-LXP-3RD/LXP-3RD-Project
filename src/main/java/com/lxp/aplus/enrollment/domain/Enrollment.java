@@ -6,7 +6,6 @@ import com.lxp.aplus.common.domain.BaseAggregateRoot;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -35,6 +34,9 @@ public class Enrollment extends BaseAggregateRoot {
     @Column(nullable = false)
     private Long courseId;
 
+    @Column(name = "order_item_id")
+    private Long orderItemId;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private EnrollmentStatus status = EnrollmentStatus.ENROLLED;
@@ -42,15 +44,16 @@ public class Enrollment extends BaseAggregateRoot {
     @Column(nullable = false)
     private LocalDateTime expiredAt;
 
-    public static Enrollment of(Long studentId, Long courseId, LocalDateTime expiredAt) {
-        if (Objects.isNull(studentId) || Objects.isNull(courseId) || Objects.isNull(expiredAt)) {
+    public static Enrollment of(Long studentId, Long courseId, Long orderItemId) {
+        if (Objects.isNull(studentId) || Objects.isNull(courseId)) {
             throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
         }
 
         return Enrollment.builder()
                 .studentId(studentId)
                 .courseId(courseId)
-                .expiredAt(expiredAt)
+                .orderItemId(orderItemId)
+                .expiredAt(LocalDateTime.now().plusYears(2))
                 .build();
     }
 

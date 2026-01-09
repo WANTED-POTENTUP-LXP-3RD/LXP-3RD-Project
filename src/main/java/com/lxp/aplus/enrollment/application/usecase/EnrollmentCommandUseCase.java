@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -45,9 +43,7 @@ public class EnrollmentCommandUseCase{
             throw new BusinessException(EnrollmentErrorCode.ALREADY_ENROLLED_COURSE);
         }
 
-        LocalDateTime expiredAt = LocalDateTime.now().plusYears(2);
-
-        Enrollment enrollmentToSave = Enrollment.of(command.studentId(), courseId, expiredAt);
+        Enrollment enrollmentToSave = Enrollment.of(command.studentId(), courseId, command.orderItemId());
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollmentToSave);
 

@@ -9,6 +9,6 @@ public record EnrollmentRequest(
         @NotNull(message = "courseId는 필수입니다.") Long courseId
 ) {
     public EnrollmentCommand toCommand(Long studentId) {
-        return new EnrollmentCommand(this.impUid, this.merchantUid, studentId, this.courseId);
+        return new EnrollmentCommand(this.impUid, this.merchantUid, studentId, this.courseId, null);
     }
 }

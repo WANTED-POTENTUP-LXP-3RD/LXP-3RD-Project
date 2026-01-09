@@ -16,7 +16,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -48,8 +47,8 @@ class EnrollmentCommandUseCaseTest {
     @DisplayName("수강 신청이 정상적으로 완료되어야 한다.")
     void enroll_success() {
         // given
-        EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
-        Enrollment createdEnrollment = Enrollment.of(STUDENT_ID, COURSE_ID_1, LocalDateTime.now().plusYears(2));
+        EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1, 1L);
+        Enrollment createdEnrollment = Enrollment.of(STUDENT_ID, COURSE_ID_1, 1L);
 
         given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(false);
@@ -75,7 +74,7 @@ class EnrollmentCommandUseCaseTest {
     @DisplayName("존재하지 않는 강의를 수강 신청하면 에러가 발생해야 한다.")
     void enroll_fail_course_not_found() {
         // given
-        EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
+        EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1, 1L);
 
         given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.empty());
 
@@ -90,7 +89,7 @@ class EnrollmentCommandUseCaseTest {
     @DisplayName("이미 수강 중인 강의라면 에러가 발생해야 한다.")
     void enroll_fail_duplicate() {
         // given
-        EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1);
+        EnrollmentCommand command = new EnrollmentCommand(IMP_UID, MERCHANT_UID, STUDENT_ID, COURSE_ID_1, 1L);
 
         given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(true);

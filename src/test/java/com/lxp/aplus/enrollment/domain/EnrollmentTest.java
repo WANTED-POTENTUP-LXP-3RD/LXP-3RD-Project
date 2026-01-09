@@ -5,8 +5,7 @@ import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 
@@ -27,12 +26,10 @@ class EnrollmentTest {
         LocalDateTime expiredAt = LocalDateTime.now().plusYears(1);
 
         // when
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, expiredAt);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, 1L);
 
         // then
         assertThat(enrollment.getStatus()).isEqualTo(EnrollmentStatus.ENROLLED);
-        // assertThat(enrollment.getProgressRate()).isEqualTo(0);
-        assertThat(enrollment.getExpiredAt()).isEqualTo(expiredAt);
     }
 
     @Test
@@ -42,15 +39,11 @@ class EnrollmentTest {
         LocalDateTime expiredAt = LocalDateTime.now().plusYears(1);
 
         // when & then
-        assertThatThrownBy(() -> Enrollment.of(null, COURSE_ID, expiredAt))
+        assertThatThrownBy(() -> Enrollment.of(null, COURSE_ID, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.INVALID_ARGUMENT);
 
-        assertThatThrownBy(() -> Enrollment.of(STUDENT_ID, null, expiredAt))
-                .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.INVALID_ARGUMENT);
-
-        assertThatThrownBy(() -> Enrollment.of(STUDENT_ID, COURSE_ID, null))
+        assertThatThrownBy(() -> Enrollment.of(STUDENT_ID, null, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.INVALID_ARGUMENT);
     }
@@ -59,7 +52,7 @@ class EnrollmentTest {
     @DisplayName("수강 신청을 취소하면 상태가 CANCELED로 변경된다.")
     void cancel() {
         // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, 1L);
 
         // when
         enrollment.cancel();
@@ -72,7 +65,7 @@ class EnrollmentTest {
     @DisplayName("이미 취소된 강의는 다시 취소할 수 없다.")
     void cancel_fail_if_already_cancelled() {
         // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, 1L);
         enrollment.cancel();
 
         // when & then
@@ -85,7 +78,8 @@ class EnrollmentTest {
     @DisplayName("만료된 강의는 취소할 수 없다.")
     void cancel_fail_if_expired() {
         // given
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, LocalDateTime.now().minusDays(1));
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, 1L);
+        ReflectionTestUtils.setField(enrollment, "expiredAt", LocalDateTime.now().minusDays(1));
 
         // when & then
         assertThatThrownBy(enrollment::cancel)
@@ -99,7 +93,8 @@ class EnrollmentTest {
     void isExpired() {
         // given: 어제 날짜로 만료일 설정
         LocalDateTime pastDate = LocalDateTime.now().minusDays(1);
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, pastDate);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, 1L);
+        ReflectionTestUtils.setField(enrollment, "expiredAt", LocalDateTime.now().minusDays(1));
 
         // when
         boolean expired = enrollment.isExpired();
@@ -113,7 +108,7 @@ class EnrollmentTest {
     void isNotExpired() {
         // given: 내일 날짜로 만료일 설정
         LocalDateTime futureDate = LocalDateTime.now().plusDays(1);
-        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, futureDate);
+        Enrollment enrollment = Enrollment.of(STUDENT_ID, COURSE_ID, 1L);
 
         // when
         boolean expired = enrollment.isExpired();
