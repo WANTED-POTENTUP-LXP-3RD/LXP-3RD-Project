@@ -4,6 +4,6 @@ import com.lxp.aplus.course.domain.Course;
 
 import java.util.Optional;
 
-public interface CourseFinder {
+public interface CourseQueryPort {
     Optional<Course> findCourse(long courseId);
 }

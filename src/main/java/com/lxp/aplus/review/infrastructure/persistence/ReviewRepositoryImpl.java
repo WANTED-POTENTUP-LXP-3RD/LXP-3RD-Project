@@ -14,4 +14,9 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     public Review save(Review review) {
         return reviewJpaRepository.save(review);
     }
+
+    @Override
+    public Boolean existsOwnReviewInCourse(Long userId, Long courseId) {
+        return reviewJpaRepository.existsByUserIdAndCourseId(userId, courseId);
+    }
 }

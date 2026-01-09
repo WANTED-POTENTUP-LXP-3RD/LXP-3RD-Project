@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseTimeEntity {
+    private static final int RATING_SCALE_FACTOR = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,19 +31,20 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer rating;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2000)
     private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReviewStatus status = ReviewStatus.DISPLAY;
 
+    private int reported = 0;
+
     private LocalDateTime deletedAt;
 
     @Builder
     public Review(Long courseId, Long userId, Integer rating, String content, ReviewStatus status) {
-        validateRating(rating);
+        validateRatingRange(rating);
         this.courseId = courseId;
         this.userId = userId;
         this.rating = rating;
@@ -50,8 +52,19 @@ public class Review extends BaseTimeEntity {
         this.status = status;
     }
 
+    public static Review create(Long courseId, Long userId, Integer rawRating, String content) {
+        int internalRating = rawRating * RATING_SCALE_FACTOR;
+
+        return Review.builder()
+                .courseId(courseId)
+                .userId(userId)
+                .rating(internalRating)
+                .content(content)
+                .build();
+    }
+
     public void update(Integer rating, String content) {
-        validateRating(rating);
+        validateRatingRange(rating);
         this.rating = rating;
         this.content = content;
     }
@@ -69,9 +82,9 @@ public class Review extends BaseTimeEntity {
         this.deletedAt = deletedAt;
     }
 
-    private void validateRating(Integer rating) {
+    private void validateRatingRange(Integer rating) {
         if (rating < 1 || rating > 10) {
-            throw new BusinessException(ReviewErrorCode.INVALID_RATING);
+            throw new BusinessException(ReviewErrorCode.INVALID_RATING_RANGE);
         }
     }
 }
