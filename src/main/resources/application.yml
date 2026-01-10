@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: LXP-Project
+  profiles:
+    active: local
+
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
+  access-token-expiration: 3600000 # 1시간 (밀리초)
+  refresh-token-expiration: 604800000 # 7일 (밀리초)
+  header: Authorization
+  prefix: Bearer

@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: lernix-server
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        jdbc:
+          time_zone: Asia/Seoul
+
+app:
+  cdn:
+    base-url: ${APP_CDN_BASE_URL}
+file:
+  storage:
+    base-path: ${FILE_STORAGE_BASE_PATH}
+    public-url-prefix: ${FILE_STORAGE_PUBLIC_URL_PREFIX}
