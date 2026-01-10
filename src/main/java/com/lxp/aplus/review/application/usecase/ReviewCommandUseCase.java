@@ -44,7 +44,7 @@ public class ReviewCommandUseCase {
     }
 
     //강좌 소유자 검증
-    private void validateOwnCourse(Long courseId, Long userId) {
+    private void validateOwnCourse(Long userId, Long courseId) {
         Course course = courseQueryPort.findCourse(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
@@ -61,7 +61,7 @@ public class ReviewCommandUseCase {
     }
 
     //수강중인 강좌 검증
-    private void validateEnrolled(Long courseId, Long userId) {
+    private void validateEnrolled(Long userId, Long courseId) {
         if (!enrollmentQueryPort.existsEnrollment(userId, courseId)) {
             throw new BusinessException(ReviewErrorCode.CANT_REVIEW_IN_NOT_ENROLLED);
         }

@@ -5,11 +5,13 @@ import lombok.Builder;
 
 @Builder
 public record ReviewUpsertResult(
-        Long reviewId
+        Long reviewId,
+        int rating
 ) {
     public static ReviewUpsertResult from(Review review) {
         return ReviewUpsertResult.builder()
                 .reviewId(review.getId())
+                .rating(review.getRating()/2)
                 .build();
     }
 }
