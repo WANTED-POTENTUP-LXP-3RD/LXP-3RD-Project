@@ -38,7 +38,8 @@ public class ReviewCommandUseCase {
                 .orElseThrow(() -> new BusinessException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
         policy.validateUpdateReview(command.userId(), review);
-        review.update(command.rating(), command.content());
+
+        review.update(command.rating(), command.content(), command.userId());
 
         Reviews result = reviewRepository.save(review);
 

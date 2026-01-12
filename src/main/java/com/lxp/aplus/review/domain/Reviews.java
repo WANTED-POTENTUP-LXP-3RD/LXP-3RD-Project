@@ -70,7 +70,8 @@ public class Reviews extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(Integer rating, String content) {
+    public void update(Integer rating, String content, Long writerId) {
+        validateOwnReview(isOwnReview(writerId));
         updateRating(rating);
         updateContent(content);
     }
@@ -100,6 +101,18 @@ public class Reviews extends BaseTimeEntity {
     public void delete(LocalDateTime deletedAt) {
         this.status = ReviewStatus.DELETED;
         this.deletedAt = deletedAt;
+    }
+
+    //자신이 작성한 리뷰
+    public boolean isOwnReview(Long userId) {
+        return userId.equals(this.userId);
+    }
+
+    //리뷰 소유자 검증
+    public void validateOwnReview(Boolean isOwnReview) {
+        if (!isOwnReview) {
+            throw new BusinessException(ReviewErrorCode.NOT_OWN_REVIEW);
+        }
     }
 
     private void validateRatingRange(Integer rating) {

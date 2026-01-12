@@ -28,7 +28,6 @@ public class ReviewBusinessPolicy {
 
     //업데이트 검증
     public void validateUpdateReview(long userId, Reviews review) {
-        validateOwnReview(isOwnReview(userId, review.getUserId()));
         validateCourse(userId, review.getCourseId());
         validateEnrolled(userId, review.getCourseId());
     }
@@ -44,18 +43,6 @@ public class ReviewBusinessPolicy {
     public void validateEnrolled(Long userId, Long courseId) {
         if (!enrollmentQueryPort.existsEnrollment(userId, courseId)) {
             throw new BusinessException(ReviewErrorCode.CANT_REVIEW_IN_NOT_ENROLLED);
-        }
-    }
-
-    //자신이 작성한 리뷰
-    public boolean isOwnReview(Long userId, Long writerId) {
-        return userId.equals(writerId);
-    }
-
-    //리뷰 소유자 검증
-    public void validateOwnReview(Boolean isOwnReview) {
-        if (!isOwnReview) {
-            throw new BusinessException(ReviewErrorCode.NOT_OWN_REVIEW);
         }
     }
 
