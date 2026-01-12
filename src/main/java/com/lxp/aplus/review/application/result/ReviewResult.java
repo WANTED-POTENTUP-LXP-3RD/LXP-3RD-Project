@@ -14,6 +14,8 @@ public record ReviewResult(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
+    public static final double RATING_SCALE_FACTOR = 2.0;
+
     @Builder
     public ReviewResult {
     }
@@ -27,7 +29,7 @@ public record ReviewResult(
                 .courseId(review.getCourseId())
                 .userId(review.getUserId())
                 .rating(review.getRating())
-                .displayRating(review.getRating() / 2.0)
+                .displayRating(review.getRating() / RATING_SCALE_FACTOR)
                 .content(review.getContent())
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
