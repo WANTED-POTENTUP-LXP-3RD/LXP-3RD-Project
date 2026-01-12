@@ -16,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,12 +46,12 @@ public class EnrollmentIntegrationTest {
     @BeforeEach
     void setUp() {
         String uniqueId = String.valueOf(System.nanoTime());
-        // Given: 테스트용 강사, 학생, 강의 데이터 생성
+        // Given
         User testInstructor = userRepository.save(User.of("강사님_" + uniqueId, "강사님닉네임_" + uniqueId, "instructor_" + uniqueId + "@example.com", "password123", "01000000000"));
         testStudent = userRepository.save(User.of("테스트학생_" + uniqueId, "테스트학생닉네임_" + uniqueId, "student_" + uniqueId + "@example.com", "password123", "01011112222"));
         testCourse = courseRepository.save(Course.builder()
                 .instructorId(testInstructor.getId())
-                .categoryId(1L) // 테스트용 카테고리 ID
+                .categoryId(1L)
                 .title("테스트 강의_" + uniqueId)
                 .summary("강의 요약")
                 .description("강의 설명입니다.")

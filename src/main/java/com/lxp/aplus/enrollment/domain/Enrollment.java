@@ -24,6 +24,9 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Enrollment extends BaseAggregateRoot {
 
+    private static final long DEFAULT_EXPIRATION_YEARS = 2L;
+    private static final int PERCENTAGE_MULTIPLIER = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -53,7 +56,7 @@ public class Enrollment extends BaseAggregateRoot {
                 .studentId(studentId)
                 .courseId(courseId)
                 .orderItemId(orderItemId)
-                .expiredAt(LocalDateTime.now().plusYears(2))
+                .expiredAt(LocalDateTime.now().plusYears(DEFAULT_EXPIRATION_YEARS))
                 .build();
     }
 
@@ -68,6 +71,19 @@ public class Enrollment extends BaseAggregateRoot {
             throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_EXPIRED_ENROLLMENT);
         }
         this.status = EnrollmentStatus.CANCELED;
+    }
+
+    /**
+     * 진도율을 계산하는 도메인 정책입니다.
+     * @param completedResourceCount 완료된 리소스 수
+     * @param totalResourceCount 전체 리소스 수
+     * @return 진도율 (0-100)
+     */
+    public int calculateProgressRate(long completedResourceCount, long totalResourceCount) {
+        if (totalResourceCount == 0) {
+            return 0;
+        }
+        return (int) ((double) completedResourceCount / totalResourceCount * PERCENTAGE_MULTIPLIER);
     }
 
     public boolean isExpired(LocalDateTime currentTime) {
