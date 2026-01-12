@@ -6,15 +6,13 @@ import com.lxp.aplus.order.domain.Cart;
 import com.lxp.aplus.order.domain.CartItem;
 import lombok.Builder;
 
-import java.math.BigDecimal;
-
 @Builder
 public record CartAddItemResponse(
         Long cartId,
         Long cartItemId,
-        BigDecimal amount
+        int amount
 ) {
-    public static CartAddItemResponse of(Cart cart, Long addedCourseId) {
+    public static CartAddItemResponse of(Cart cart, Long addedCourseId, int amount) {
 
         // 리스트에서 해당 courseId를 가진 항목을 찾음
         CartItem addedCartItem = cart.getCartItems().stream()
@@ -25,7 +23,7 @@ public record CartAddItemResponse(
         return CartAddItemResponse.builder()
                 .cartId(cart.getId())
                 .cartItemId(addedCartItem.getId())  // DB에서 받아온 ID
-                .amount(cart.calculateTotalAmount())
+                .amount(amount)
                 .build();
     }
 
