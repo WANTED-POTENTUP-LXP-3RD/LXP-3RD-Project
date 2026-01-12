@@ -2,6 +2,7 @@ package com.lxp.aplus.review.infrastructure.persistence;
 
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +19,10 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     @Override
     public Boolean existsOwnReviewInCourse(Long userId, Long courseId) {
         return reviewJpaRepository.existsByUserIdAndCourseId(userId, courseId);
+    }
+
+    @Override
+    public Optional<Reviews> getReview(Long reviewId){
+        return reviewJpaRepository.findById(reviewId);
     }
 }
