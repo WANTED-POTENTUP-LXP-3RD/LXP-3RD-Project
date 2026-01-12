@@ -26,5 +26,4 @@ public record CartAddItemResponse(
                 .amount(amount)
                 .build();
     }
-
 }

@@ -29,6 +29,10 @@ public class Cart extends BaseAggregateRoot {
     @OneToMany(
             mappedBy = "cart",
             cascade = CascadeType.ALL,
+            /*
+             * - orphanRemoval = true: cartItems 리스트에서 요소가 제거되면, DB에서도 해당 행을 자동으로 삭제
+             *   (즉, CartItem은 오직 Cart에 의해서만 생명주기가 관리되는 종속적인 존재임을 명시)
+            */
             orphanRemoval = true
     )
     private final List<CartItem> cartItems = new ArrayList<>();
@@ -62,8 +66,12 @@ public class Cart extends BaseAggregateRoot {
         cartItems.add(CartItem.create(this, courseId));
     }
 
-    public void removeCartItem(Long courseId) {
-        cartItems.removeIf(cartItem -> cartItem.has(courseId));
+    public void removeCartItem(Long cartItemId) {
+        boolean removed = cartItems.removeIf(cartItem -> cartItem.getId().equals(cartItemId));
+
+        if (!removed) {
+            throw new BusinessException(CartErrorCode.CART_ITEM_NOT_FOUND);
+        }
     }
 
     public int calculateAmount(Map<Long, Integer> coursePriceMap) {
