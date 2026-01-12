@@ -1,0 +1,26 @@
+    ### API HTTP Client
+### IntelliJ에서 직접 실행 가능 (▶ 버튼 클릭)
+### 변수 설정: baseUrl, accessToken, refreshToken 등
+
+### 변수 설정 (실행 전에 수정 가능)
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 테스트용 사용자 정보 (통일)
+@testEmail = test@example.com
+@testPassword = password123
+@testName = 테스트 사용자
+@testNickName = testuser
+@testPhoneNumber = 010-1234-5678
+@accessToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzY4MjAwODIxLCJleHAiOjE3NjgyMDQ0MjF9.Loqxbf0YTziCfFfC8zaYsOS5kyvrwfc3AhpqtkHiDYGajQ1e8d4cbo9veN3GRxFWrzf93WlR8NhlPfIix1wfwg
+@courseId = 1
+
+### 리뷰 작성
+POST {{baseUrl}}/api/courses/{{courseId}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "rating": 4,
+  "content": "강사님 잘생김"
+}
