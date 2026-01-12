@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum CartErrorCode implements ErrorCode {
 
-    CART_DUPLICATED_CART_ITEM(HttpStatus.CONFLICT, "EO001", "이미 담긴 아이템입니다.");
+    CART_DUPLICATED_CART_ITEM(HttpStatus.CONFLICT, "EO001", "이미 담긴 항목입니다."),
+    CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "EO002", "장바구니 항목이 존재하지 않습니다.");
 
     private final HttpStatus status;
     private final String code;
