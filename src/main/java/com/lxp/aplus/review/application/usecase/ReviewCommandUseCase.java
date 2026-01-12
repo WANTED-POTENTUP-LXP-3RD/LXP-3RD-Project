@@ -1,12 +1,10 @@
 package com.lxp.aplus.review.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.ReviewErrorCode;
-import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.review.application.command.ReviewCreateCommand;
-import com.lxp.aplus.review.application.port.out.CourseQueryPort;
-import com.lxp.aplus.review.application.port.out.EnrollmentQueryPort;
+import com.lxp.aplus.review.application.command.ReviewUpdateCommand;
+import com.lxp.aplus.review.application.policy.ReviewBusinessPolicy;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
@@ -18,9 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class ReviewCommandUseCase {
+    private final ReviewBusinessPolicy policy;
     private final ReviewsRepository reviewRepository;
-    private final EnrollmentQueryPort enrollmentQueryPort;
-    private final CourseQueryPort courseQueryPort;
 
     /**
      * 새로운 리뷰를 등록합니다.
@@ -29,41 +26,22 @@ public class ReviewCommandUseCase {
      * @return 등록된 리뷰 결과 DTO
      */
     public ReviewUpsertResult createReview(ReviewCreateCommand command) {
-        validateCreateReview(command.userId(), command.courseId());
+        policy.validateCreateReview(command.userId(), command.courseId());
 
         Reviews savedReview = reviewRepository.save(command.toEntity());
 
         return ReviewUpsertResult.from(savedReview);
     }
 
-    //생성시 검증
-    private void validateCreateReview(long userId, long courseId) {
-        validateOwnCourse(userId, courseId);
-        validateEnrolled(userId, courseId);
-        validateAlreadyReviewed(userId, courseId);
-    }
+    public ReviewUpsertResult updateReview(ReviewUpdateCommand command) {
+        Reviews review = reviewRepository.getReview(command.reviewId())
+                .orElseThrow(() -> new BusinessException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-    //강좌 소유자 검증
-    private void validateOwnCourse(Long userId, Long courseId) {
-        Course course = courseQueryPort.findCourse(courseId)
-                .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+        policy.validateUpdateReview(command.userId(), review);
+        review.update(command.rating(), command.content());
 
-        if (course.getInstructorId().equals(userId)) {
-            throw new BusinessException(ReviewErrorCode.CANT_REVIEW_IN_OWN_COURSE);
-        }
-    }
+        Reviews result = reviewRepository.save(review);
 
-    //중복 리뷰 검증
-    private void validateAlreadyReviewed(Long userId, Long courseId) {
-        if (reviewRepository.existsOwnReviewInCourse(userId, courseId)) {
-            throw new BusinessException(ReviewErrorCode.ALREADY_REGISTER_IN_COURSE);
-        }
-    }
-
-    //수강중인 강좌 검증
-    private void validateEnrolled(Long userId, Long courseId) {
-        if (!enrollmentQueryPort.existsEnrollment(userId, courseId)) {
-            throw new BusinessException(ReviewErrorCode.CANT_REVIEW_IN_NOT_ENROLLED);
-        }
+        return ReviewUpsertResult.from(result);
     }
 }

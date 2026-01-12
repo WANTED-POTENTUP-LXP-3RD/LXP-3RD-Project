@@ -4,20 +4,28 @@ import com.lxp.aplus.common.domain.BaseTimeEntity;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.ReviewErrorCode;
 import com.lxp.aplus.review.domain.constant.ReviewStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reviews extends BaseTimeEntity {
     private static final int RATING_SCALE_FACTOR = 2;
+    private static final int MIN_RATING_VALUE = 1;
+    private static final int MAX_RATING_VALUE = 10;
     private static final String TINY_INT_UNSIGNED = "TINYINT UNSIGNED";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,16 +71,29 @@ public class Reviews extends BaseTimeEntity {
     }
 
     public void update(Integer rating, String content) {
-        validateRatingRange(rating);
-        this.rating = rating;
-        this.content = content;
+        updateRating(rating);
+        updateContent(content);
     }
 
-    public void blind(){
+    private void updateRating(Integer rating) {
+        if (rating != null) {
+            int internalRating = rating * RATING_SCALE_FACTOR;
+            validateRatingRange(internalRating);
+            this.rating = internalRating;
+        }
+    }
+
+    private void updateContent(String content) {
+        if (content != null) {
+            this.content = content;
+        }
+    }
+
+    public void blind() {
         this.status = ReviewStatus.BLINDED;
     }
 
-    public void archived(){
+    public void archived() {
         this.status = ReviewStatus.ARCHIVED;
     }
 
@@ -82,7 +103,7 @@ public class Reviews extends BaseTimeEntity {
     }
 
     private void validateRatingRange(Integer rating) {
-        if (rating < 1 || rating > 10) {
+        if (rating < MIN_RATING_VALUE || rating > MAX_RATING_VALUE) {
             throw new BusinessException(ReviewErrorCode.INVALID_RATING_RANGE);
         }
     }
