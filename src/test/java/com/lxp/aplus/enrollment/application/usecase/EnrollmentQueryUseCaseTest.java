@@ -57,14 +57,14 @@ class EnrollmentQueryUseCaseTest {
         EnrollmentStatus status = EnrollmentStatus.ENROLLED;
         Pageable pageable = PageRequest.of(0, 10);
 
-        Enrollment enrollment1 = Enrollment.of(STUDENT_ID, COURSE_ID_1, 1L);
+        Enrollment enrollment1 = Enrollment.create(STUDENT_ID, COURSE_ID_1, 1L);
         ReflectionTestUtils.setField(enrollment1, "id", 5001L);
         List<String> categories1 = List.of("프로그래밍", "백엔드");
 
         List<Long> resourceIds1 = LongStream.rangeClosed(1, 10).boxed().toList();
         Map<Long, Boolean> completionMap1 = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
 
-        Enrollment enrollment2 = Enrollment.of(STUDENT_ID, COURSE_ID_2, 1L);
+        Enrollment enrollment2 = Enrollment.create(STUDENT_ID, COURSE_ID_2, 1L);
         ReflectionTestUtils.setField(enrollment2, "id", 5002L);
         List<String> categories2 = List.of("프로그래밍", "프론트엔드");
         
@@ -148,7 +148,7 @@ class EnrollmentQueryUseCaseTest {
         Long enrollmentId = 5001L;
         Long courseId = COURSE_ID_1;
 
-        Enrollment enrollment = Enrollment.of(studentId, courseId, 1L);
+        Enrollment enrollment = Enrollment.create(studentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();
@@ -194,7 +194,7 @@ class EnrollmentQueryUseCaseTest {
         Long enrollmentId = 5002L;
         Long courseId = COURSE_ID_2;
 
-        Enrollment enrollment = Enrollment.of(actualEnrollmentStudentId, courseId, 1L);
+        Enrollment enrollment = Enrollment.create(actualEnrollmentStudentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
@@ -212,8 +212,7 @@ class EnrollmentQueryUseCaseTest {
         Long studentId = STUDENT_ID;
         Long courseId = COURSE_ID_1;
         Long enrollmentId = 5001L;
-
-        Enrollment enrollment = Enrollment.of(studentId, courseId, 1L);
+        Enrollment enrollment = Enrollment.create(studentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();

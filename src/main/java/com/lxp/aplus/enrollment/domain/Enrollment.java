@@ -44,7 +44,7 @@ public class Enrollment extends BaseAggregateRoot {
     @Column(nullable = false)
     private LocalDateTime expiredAt;
 
-    public static Enrollment of(Long studentId, Long courseId, Long orderItemId) {
+    public static Enrollment create(Long studentId, Long courseId, Long orderItemId) {
         if (Objects.isNull(studentId) || Objects.isNull(courseId)) {
             throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
         }
@@ -57,21 +57,21 @@ public class Enrollment extends BaseAggregateRoot {
                 .build();
     }
 
-    public void cancel() {
+    public void cancel(LocalDateTime currentTime) {
         if (this.status == EnrollmentStatus.COMPLETED) {
             throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_COMPLETED_ENROLLMENT);
         }
         if (this.status == EnrollmentStatus.CANCELED) {
             throw new BusinessException(EnrollmentErrorCode.ALREADY_CANCELLED_ENROLLMENT);
         }
-        if (isExpired()) {
+        if (isExpired(currentTime)) {
             throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_EXPIRED_ENROLLMENT);
         }
         this.status = EnrollmentStatus.CANCELED;
     }
 
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(this.expiredAt);
+    public boolean isExpired(LocalDateTime currentTime) {
+        return currentTime.isAfter(this.expiredAt);
     }
     public void completeEnrollment() {
         if (this.status == EnrollmentStatus.ENROLLED) {
