@@ -5,9 +5,13 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Entity
+@Getter
 @Table(name = "lecture_resources_v2")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LectureResourceV2 extends BaseTimeEntity {
@@ -45,18 +49,26 @@ public class LectureResourceV2 extends BaseTimeEntity {
         this.isDownloadable = isDownloadable;
     }
 
+    private static final Map<ResourceType, Long> MAX_FILE_SIZE = Map.of(
+            ResourceType.VIDEO, 1000000L,
+            ResourceType.ZIP, 1000000L,
+            ResourceType.PDF, 50000L,
+            ResourceType.DOC, 50000L
+    );
+
     public static LectureResourceV2 create(
             String originalFileName,
             String fileKey,
             Integer videoDuration,
-            boolean isDownloadable
+            boolean isDownloadable,
+            long fileSize
     ) {
+
         ExtensionType extensionType = ExtensionType.fromFileName(originalFileName);
         ResourceType resourceType = ResourceType.fromExtension(extensionType.getExtension());
 
-        if ((resourceType == ResourceType.VIDEO) && (videoDuration == null || videoDuration <= 0)) {
-            throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_VIDEO_DURATION_NOT_FOUND);
-        }
+        validateVideoDuration(resourceType, videoDuration);
+        validateFileSize(resourceType, fileSize);
 
         return new LectureResourceV2(
                 originalFileName,
@@ -65,5 +77,18 @@ public class LectureResourceV2 extends BaseTimeEntity {
                 videoDuration,
                 isDownloadable
         );
+    }
+
+    private static void validateVideoDuration(ResourceType resourceType, Integer videoDuration) {
+        if (resourceType == ResourceType.VIDEO && (videoDuration == null || videoDuration <= 0)) {
+            throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_VIDEO_DURATION_NOT_FOUND);
+        }
+    }
+
+    private static void validateFileSize(ResourceType resourceType, long fileSize) {
+        Long maxSize = MAX_FILE_SIZE.get(resourceType);
+        if (maxSize != null && fileSize > maxSize) {
+            throw new BusinessException(LectureResourceErrorCode.FILE_SIZE_EXCEEDED);
+        }
     }
 }

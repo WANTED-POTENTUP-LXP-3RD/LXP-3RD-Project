@@ -26,7 +26,8 @@ public class LectureResourceCommandUseCase {
                 command.fileName(),
                 presignedUrlResult.key(),
                 command.duration(),
-                command.isDownloadable()
+                command.isDownloadable(),
+                command.size()
         );
 
         lectureResourceRepository.save(lectureResource);
