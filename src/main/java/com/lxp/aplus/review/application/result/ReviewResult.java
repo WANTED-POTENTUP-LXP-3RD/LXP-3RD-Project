@@ -1,6 +1,7 @@
 package com.lxp.aplus.review.application.result;
 
 import com.lxp.aplus.review.domain.Reviews;
+import com.lxp.aplus.review.domain.constant.ReviewStatus;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
@@ -8,13 +9,14 @@ public record ReviewResult(
         Long id,
         Long courseId,
         Long userId,
-        Integer rating,
-        Double displayRating,
+        Integer displayRating,
         String content,
+        ReviewStatus status,
+        Integer reported,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static final double RATING_SCALE_FACTOR = 2.0;
+    public static final Integer RATING_SCALE_FACTOR = 2;
 
     @Builder
     public ReviewResult {
@@ -28,9 +30,10 @@ public record ReviewResult(
                 .id(review.getId())
                 .courseId(review.getCourseId())
                 .userId(review.getUserId())
-                .rating(review.getRating())
                 .displayRating(review.getRating() / RATING_SCALE_FACTOR)
                 .content(review.getContent())
+                .status(review.getStatus())
+                .reported(review.getReported())
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
                 .build();

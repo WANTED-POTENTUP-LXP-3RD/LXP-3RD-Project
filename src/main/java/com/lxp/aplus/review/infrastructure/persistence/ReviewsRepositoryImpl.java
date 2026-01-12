@@ -2,6 +2,7 @@ package com.lxp.aplus.review.infrastructure.persistence;
 
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,12 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     }
 
     @Override
-    public Optional<Reviews> getReview(Long reviewId){
-        return reviewJpaRepository.findById(reviewId);
+    public Optional<Reviews> getReview(Long userId, Long courseId) {
+        return reviewJpaRepository.findByUserIdAndCourseId(userId, courseId);
+    }
+
+    @Override
+    public List<Reviews> getCourseReviews(Long courseId) {
+        return reviewJpaRepository.findByCourseId(courseId);
     }
 }

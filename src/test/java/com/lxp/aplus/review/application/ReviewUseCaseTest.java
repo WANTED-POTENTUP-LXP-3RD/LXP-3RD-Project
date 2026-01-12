@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -108,14 +105,12 @@ class ReviewUseCaseTest {
         ReviewUpdateCommand command = ReviewUpdateCommand.builder()
                 .userId(userId)
                 .courseId(courseId)
-                .reviewId(reviewId)
                 .rating(updatedRating)
                 .content(updatedContent)
                 .build();
 
         Reviews existingReview = Reviews.create(courseId, userId, initialRating, initialContent);
         
-        when(reviewRepository.getReview(reviewId)).thenReturn(Optional.of(existingReview));
         doNothing().when(policy).validateUpdateReview(userId, existingReview);
         when(reviewRepository.save(existingReview)).thenReturn(existingReview);
 
@@ -125,7 +120,6 @@ class ReviewUseCaseTest {
         // then
         assertThat(result.rating()).isEqualTo(updatedRating);
 
-        verify(reviewRepository, times(1)).getReview(reviewId);
         verify(policy, times(1)).validateUpdateReview(userId, existingReview);
         verify(reviewRepository, times(1)).save(existingReview);
     }
@@ -136,11 +130,8 @@ class ReviewUseCaseTest {
         // given
         Long reviewId = 999L;
         ReviewUpdateCommand command = ReviewUpdateCommand.builder()
-                .reviewId(reviewId)
                 .userId(1L)
                 .build();
-
-        when(reviewRepository.getReview(reviewId)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> reviewCommandUseCase.updateReview(command))
@@ -160,14 +151,12 @@ class ReviewUseCaseTest {
         Long reviewId = 100L;
         ReviewUpdateCommand command = ReviewUpdateCommand.builder()
                 .userId(userId)
-                .reviewId(reviewId)
                 .rating(5)
                 .content("내용")
                 .build();
 
         Reviews existingReview = Reviews.create(1L, userId, 3, "이전 내용");
         
-        when(reviewRepository.getReview(reviewId)).thenReturn(Optional.of(existingReview));
         doThrow(new BusinessException(ReviewErrorCode.NOT_OWN_REVIEW))
                 .when(policy).validateUpdateReview(userId, existingReview);
 

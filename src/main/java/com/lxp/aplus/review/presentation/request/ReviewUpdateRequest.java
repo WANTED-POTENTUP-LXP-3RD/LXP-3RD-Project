@@ -12,11 +12,10 @@ public record ReviewUpdateRequest(
         String content
 ) {
     @Builder
-    public ReviewUpdateCommand toCommand(long userId, long courseId, long reviewId) {
+    public ReviewUpdateCommand toCommand(long userId, long courseId) {
         return ReviewUpdateCommand.builder()
                 .userId(userId)
                 .courseId(courseId)
-                .reviewId(reviewId)
                 .rating(this.rating)
                 .content(this.content)
                 .build();
