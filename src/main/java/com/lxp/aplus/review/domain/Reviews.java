@@ -43,13 +43,12 @@ public class Reviews extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public Reviews(Long courseId, Long userId, Integer rating, String content, ReviewStatus status) {
+    public Reviews(Long courseId, Long userId, Integer rating, String content) {
         validateRatingRange(rating);
         this.courseId = courseId;
         this.userId = userId;
         this.rating = rating;
         this.content = content;
-        this.status = status;
     }
 
     public static Reviews create(Long courseId, Long userId, Integer rawRating, String content) {
