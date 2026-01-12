@@ -1,6 +1,6 @@
 package com.lxp.aplus.review.domain;
 
 public interface ReviewRepository {
-    Review save(Review review);
+    Reviews save(Reviews reviews);
     Boolean existsOwnReviewInCourse(Long id, Long courseId);
 }

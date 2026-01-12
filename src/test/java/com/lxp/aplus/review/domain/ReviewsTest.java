@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ReviewTest {
+class ReviewsTest {
 
     @Test
     @DisplayName("리뷰 생성 시 평점은 2배로 저장된다")
@@ -20,13 +20,13 @@ class ReviewTest {
         String content = "Great course!";
 
         // when
-        Review review = Review.create(courseId, userId, rawRating, content);
+        Reviews reviews = Reviews.create(courseId, userId, rawRating, content);
 
         // then
-        assertThat(review.getRating()).isEqualTo(10); // 5 * 2
-        assertThat(review.getCourseId()).isEqualTo(courseId);
-        assertThat(review.getUserId()).isEqualTo(userId);
-        assertThat(review.getContent()).isEqualTo(content);
+        assertThat(reviews.getRating()).isEqualTo(10); // 5 * 2
+        assertThat(reviews.getCourseId()).isEqualTo(courseId);
+        assertThat(reviews.getUserId()).isEqualTo(userId);
+        assertThat(reviews.getContent()).isEqualTo(content);
     }
 
     @Test
@@ -39,7 +39,7 @@ class ReviewTest {
         String content = "Bad course!";
 
         // when & then
-        assertThatThrownBy(() -> Review.create(courseId, userId, rawRating, content))
+        assertThatThrownBy(() -> Reviews.create(courseId, userId, rawRating, content))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ReviewErrorCode.INVALID_RATING_RANGE);
     }
@@ -54,7 +54,7 @@ class ReviewTest {
         String content = "Super course!";
 
         // when & then
-        assertThatThrownBy(() -> Review.create(courseId, userId, rawRating, content))
+        assertThatThrownBy(() -> Reviews.create(courseId, userId, rawRating, content))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ReviewErrorCode.INVALID_RATING_RANGE);
     }

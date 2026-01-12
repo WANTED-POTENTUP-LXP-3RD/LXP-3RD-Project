@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review extends BaseTimeEntity {
+public class Reviews extends BaseTimeEntity {
     private static final int RATING_SCALE_FACTOR = 2;
-
+    private static final String TINY_INT_UNSIGNED = "TINYINT UNSIGNED";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +28,7 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = TINY_INT_UNSIGNED)
     private Integer rating;
 
     @Column(nullable = false, length = 2000)
@@ -43,7 +43,7 @@ public class Review extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public Review(Long courseId, Long userId, Integer rating, String content, ReviewStatus status) {
+    public Reviews(Long courseId, Long userId, Integer rating, String content, ReviewStatus status) {
         validateRatingRange(rating);
         this.courseId = courseId;
         this.userId = userId;
@@ -52,10 +52,10 @@ public class Review extends BaseTimeEntity {
         this.status = status;
     }
 
-    public static Review create(Long courseId, Long userId, Integer rawRating, String content) {
+    public static Reviews create(Long courseId, Long userId, Integer rawRating, String content) {
         int internalRating = rawRating * RATING_SCALE_FACTOR;
 
-        return Review.builder()
+        return Reviews.builder()
                 .courseId(courseId)
                 .userId(userId)
                 .rating(internalRating)
