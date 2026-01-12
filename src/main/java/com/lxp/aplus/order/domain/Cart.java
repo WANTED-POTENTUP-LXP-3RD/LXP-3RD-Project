@@ -5,6 +5,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CartErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,17 +30,30 @@ public class Cart extends BaseAggregateRoot {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<CartItem> cartItems = new ArrayList<>();
+    private final List<CartItem> cartItems = new ArrayList<>();
 
+    @Builder(access = AccessLevel.PRIVATE)
+    public Cart(Long userId) {
+        this.userId = userId;
+    }
+
+    // === 생성 메서드 ===
+
+    public static Cart create(Long userId) {
+        return Cart.builder()
+                .userId(userId)
+                .build();
+    }
 
     // === 도메인 행위 ===
 
-    public List<CartItem> getItems() {
-        // 읽기 전용 상태로 감싸서 반환
+    public List<CartItem> getCartItems() {
+        // 읽기 전용 상태로 감싸서 반환 (도메인 무결성 보호)
+        // 같은 이름의 메서드면 Lombok은 getter를 생성하지 않음!
         return Collections.unmodifiableList(cartItems);
     }
 
-    public void addItem(Long courseId) {
+    public void addCartItem(Long courseId) {
         if (contains(courseId)) {
             throw new BusinessException(CartErrorCode.CART_DUPLICATED_CART_ITEM);
         }
@@ -47,7 +61,7 @@ public class Cart extends BaseAggregateRoot {
         cartItems.add(CartItem.create(this, courseId));
     }
 
-    public void removeItem(Long courseId) {
+    public void removeCartItem(Long courseId) {
         cartItems.removeIf(cartItem -> cartItem.has(courseId));
     }
 

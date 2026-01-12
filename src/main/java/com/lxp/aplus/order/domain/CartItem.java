@@ -35,12 +35,16 @@ public class CartItem {
         this.courseId = courseId;
     }
 
+    // === 생성 메서드 ===
+
     public static CartItem create(Cart cart, Long courseId) {
         return CartItem.builder()
                 .cart(cart)
                 .courseId(courseId)
                 .build();
     }
+
+    // === 도메인 행위 ===
 
     public boolean has(Long courseId) {
         return this.courseId.equals(courseId);
