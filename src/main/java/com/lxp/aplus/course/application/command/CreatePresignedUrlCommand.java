@@ -1,9 +1,12 @@
 package com.lxp.aplus.course.application.command;
 
+import lombok.Builder;
+
+@Builder
 public record CreatePresignedUrlCommand(
         String fileName,
         String contentType,
-        Integer size,
+        Long size,
         Integer duration,
         Boolean isDownloadable
 ) {

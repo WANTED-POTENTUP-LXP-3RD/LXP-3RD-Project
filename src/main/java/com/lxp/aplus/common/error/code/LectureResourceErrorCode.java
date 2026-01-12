@@ -13,7 +13,8 @@ public enum LectureResourceErrorCode implements ErrorCode {
     LECTURE_RESOURCE_FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "ER003", "파일 크기 제한 초과입니다."),
     LECTURE_RESOURCE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ER004", "파일 업로드 중 내부 오류가 발생했습니다."),
     LECTURE_RESOURCE_NOT_EXIST(HttpStatus.NOT_FOUND, "ER005", "존재하지 않는 리소스 입니다."),
-    STORAGE_CLIENT_INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ER006", "스토리지 서버 오류입니다.")
+    STORAGE_CLIENT_INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ER006", "스토리지 서버 오류입니다."),
+    LECTURE_RESOURCE_VIDEO_DURATION_NOT_FOUND(HttpStatus.NOT_FOUND, "ER007", "동영상 리소스는 duration 값이 필수 입니다.")
     ;
 
     private final HttpStatus status;
