@@ -10,4 +10,5 @@ public interface ReviewsJpaRepository extends JpaRepository<Reviews, Long> {
     Boolean existsByUserIdAndCourseId(Long userId, Long courseId);
     Optional<Reviews> findByUserIdAndCourseId(Long userId, Long courseId);
     Slice<Reviews> findByCourseId(Long courseId, Pageable pageable);
+    Long deleteByUserIdAndCourseId(Long userId, Long courseId);
 }
