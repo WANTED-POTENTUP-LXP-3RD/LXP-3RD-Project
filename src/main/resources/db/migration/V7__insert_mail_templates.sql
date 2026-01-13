@@ -1,7 +1,7 @@
 -- 메일 템플릿 초기 데이터 삽입
 
 -- 1. 회원가입 환영 메일
-INSERT INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
+INSERT IGNORE INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
 VALUES (
     'WELCOME_MAIL',
     '회원가입 환영 메일',
@@ -116,7 +116,7 @@ VALUES (
 );
 
 -- 2. 이메일 인증 메일
-INSERT INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
+INSERT IGNORE INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
 VALUES (
     'EMAIL_VERIFICATION',
     '이메일 인증',
@@ -266,7 +266,7 @@ VALUES (
 );
 
 -- 3. 비밀번호 재설정 메일
-INSERT INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
+INSERT IGNORE INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
 VALUES (
     'PASSWORD_RESET',
     '비밀번호 재설정',
@@ -406,7 +406,7 @@ VALUES (
 );
 
 -- 4. 주문 확인 메일
-INSERT INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
+INSERT IGNORE INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
 VALUES (
     'ORDER_CONFIRMATION',
     '주문 확인',
@@ -563,7 +563,7 @@ VALUES (
 );
 
 -- 5. 결제 완료 메일
-INSERT INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
+INSERT IGNORE INTO mail_templates (template_code, template_name, subject, html_content, created_at, updated_at)
 VALUES (
     'PAYMENT_COMPLETED',
     '결제 완료',
