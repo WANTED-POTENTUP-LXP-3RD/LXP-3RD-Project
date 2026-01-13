@@ -6,7 +6,6 @@ import lombok.Builder;
 public record ReviewUpdateCommand(
         long userId,
         long courseId,
-        long reviewId,
         Integer rating,
         String content
 ) {

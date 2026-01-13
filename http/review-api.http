@@ -7,11 +7,11 @@
 @contentType = application/json
 
 ### 테스트용 사용자 정보 (통일)
-@testEmail = test@example.com
+@testEmail = test2@example.com
 @testPassword = password123
-@testName = 테스트 사용자2
-@testNickName = testuser2
-@testPhoneNumber = 010-1234-5673
+@testName = 테스트 사용자3
+@testNickName = testuser3
+@testPhoneNumber = 010-1233-5673
 @courseId = 1
 @reviewId = 1
 
@@ -84,6 +84,11 @@ Content-Type: {{contentType}}
     client.log("New Refresh Token: " + response.body.data.refreshToken);
 %}
 
+### 4. 로그아웃 (Access Token과 Refresh Token 모두 사용)
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+X-Refresh-Token: {{refreshToken}}
+
 ##########################################
 ### 리뷰 API
 ##########################################
@@ -107,3 +112,13 @@ Authorization: Bearer {{accessToken}}
   "rating" : 5,
   "content": "ddd"
 }
+
+### 리뷰 단건 조회
+GET {{baseUrl}}/api/courses/{{courseId}}/review
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 리뷰 다건 조회
+GET {{baseUrl}}/api/courses/{{courseId}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}

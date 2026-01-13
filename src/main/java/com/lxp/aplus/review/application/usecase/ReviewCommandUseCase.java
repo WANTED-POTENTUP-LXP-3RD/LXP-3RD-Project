@@ -3,11 +3,15 @@ package com.lxp.aplus.review.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.ReviewErrorCode;
 import com.lxp.aplus.review.application.command.ReviewCreateCommand;
+import com.lxp.aplus.review.application.command.ReviewQueryCommand;
 import com.lxp.aplus.review.application.command.ReviewUpdateCommand;
 import com.lxp.aplus.review.application.policy.ReviewBusinessPolicy;
+import com.lxp.aplus.review.application.result.ReviewResult;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
+import com.lxp.aplus.review.presentation.response.ReviewResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +38,7 @@ public class ReviewCommandUseCase {
     }
 
     public ReviewUpsertResult updateReview(ReviewUpdateCommand command) {
-        Reviews review = reviewRepository.getReview(command.reviewId())
+        Reviews review = reviewRepository.getReview(command.userId(), command.courseId())
                 .orElseThrow(() -> new BusinessException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
         policy.validateUpdateReview(command.userId(), review);
