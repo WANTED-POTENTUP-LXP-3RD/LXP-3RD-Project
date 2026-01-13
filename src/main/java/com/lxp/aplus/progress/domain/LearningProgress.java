@@ -19,7 +19,7 @@ public class LearningProgress {
     public LearningProgress(List<Progress> progresses) {
         this.progresses = progresses;
     }
-
+//TODO  진도율 계산 방법 통일해야함
     public int calculateOverallProgressRate(long totalLectureCount) {
         if (totalLectureCount == 0) {
             return 0;

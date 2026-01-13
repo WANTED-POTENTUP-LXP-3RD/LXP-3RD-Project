@@ -28,7 +28,6 @@ public class ProgressQueryUseCase {
     private final LectureProvider lectureProvider;
 
     public CourseProgressResponse getCourseProgress(Long userId, Long courseId) {
-        // 1. Get Enrollment Info (Orchestration)
         EnrollmentStatusDto enrollmentStatusDto = enrollmentReader.findEnrollment(userId, courseId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
@@ -36,17 +35,14 @@ public class ProgressQueryUseCase {
             throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_EXPIRED_HISTORY_ACCESS_DENIED);
         }
 
-        // 2. Get Data from Repositories and Ports (Orchestration)
         List<Progress> progresses = progressRepository.findByEnrollmentId(enrollmentStatusDto.enrollmentId());
         List<LectureSummaryDto> lectureDetails = lectureProvider.getLectureDetailsByCourseId(courseId);
 
-        // 3. Delegate to Domain Object for Logic (Domain Logic)
         LearningProgress learningProgress = new LearningProgress(progresses);
         int overallProgressRate = learningProgress.calculateOverallProgressRate(lectureDetails.size());
         Optional<Progress> lastWatchedProgressOpt = learningProgress.findLastWatchedProgress();
         List<LectureProgressResponse> lectureProgressResponses = learningProgress.mapToLectureProgressResponses(lectureDetails);
 
-        // 4. Assemble Response DTO (Orchestration)
         return new CourseProgressResponse(
                 enrollmentStatusDto.enrollmentId(),
                 overallProgressRate,
