@@ -32,4 +32,9 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     public Slice<Reviews> getCourseReviews(Long courseId, Pageable pageable) {
         return reviewJpaRepository.findByCourseId(courseId, pageable);
     }
+
+    @Override
+    public Long deleteReview(Long userId, Long courseId) {
+        return reviewJpaRepository.deleteByUserIdAndCourseId(userId, courseId);
+    }
 }

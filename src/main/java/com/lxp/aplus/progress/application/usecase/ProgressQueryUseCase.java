@@ -13,6 +13,8 @@ import com.lxp.aplus.progress.domain.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +37,7 @@ public class ProgressQueryUseCase {
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
         enrollment.validateOwner(studentId);
 
-        if (enrollment.isExpired()) {
+        if (enrollment.isExpired(LocalDateTime.now())) {
             throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_EXPIRED_HISTORY_ACCESS_DENIED);
         }
 
