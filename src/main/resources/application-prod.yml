@@ -26,3 +26,9 @@ file:
   storage:
     base-path: ${FILE_STORAGE_BASE_PATH}
     public-url-prefix: ${FILE_STORAGE_PUBLIC_URL_PREFIX}
+
+minio:
+  bucket: ${MINIO_BUCKET}
+  endpoint: "http://${MINIO_HOST}:${MINIO_PORT}"
+  access-key: ${MINIO_ROOT_USER}
+  secret-key: ${MINIO_ROOT_PASSWORD}
