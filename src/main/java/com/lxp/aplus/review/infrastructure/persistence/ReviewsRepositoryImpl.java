@@ -2,9 +2,10 @@ package com.lxp.aplus.review.infrastructure.persistence;
 
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,7 +29,7 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     }
 
     @Override
-    public List<Reviews> getCourseReviews(Long courseId) {
-        return reviewJpaRepository.findByCourseId(courseId);
+    public Slice<Reviews> getCourseReviews(Long courseId, Pageable pageable) {
+        return reviewJpaRepository.findByCourseId(courseId, pageable);
     }
 }

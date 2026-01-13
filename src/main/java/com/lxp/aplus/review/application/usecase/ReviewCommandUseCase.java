@@ -10,6 +10,7 @@ import com.lxp.aplus.review.application.result.ReviewResult;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
+import com.lxp.aplus.review.presentation.response.ReviewResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,16 +48,5 @@ public class ReviewCommandUseCase {
         Reviews result = reviewRepository.save(review);
 
         return ReviewUpsertResult.from(result);
-    }
-
-    public ReviewResult findReviewWithCourseId(ReviewQueryCommand command) {
-        Reviews review = reviewRepository.getReview(command.userId(), command.courseId())
-                .orElseThrow(() -> new BusinessException(ReviewErrorCode.REVIEW_NOT_FOUND));
-        return ReviewResult.from(review);
-    }
-
-    public List<ReviewResult> findReviewsInCourse(Long courseId) {
-        List<Reviews> reviews = reviewRepository.getCourseReviews(courseId);
-        return reviews.stream().map(ReviewResult::from).toList();
     }
 }

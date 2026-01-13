@@ -14,7 +14,8 @@ public record ReviewResult(
         ReviewStatus status,
         Integer reported,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        boolean isMine
 ) {
     public static final Integer RATING_SCALE_FACTOR = 2;
 
@@ -25,7 +26,8 @@ public record ReviewResult(
     /**
      * Entity를 Result DTO로 변환하는 정적 팩토리 메서드
      */
-    public static ReviewResult from(Reviews review) {
+    public static ReviewResult of(Long userId, Reviews review) {
+
         return ReviewResult.builder()
                 .id(review.getId())
                 .courseId(review.getCourseId())
@@ -34,8 +36,16 @@ public record ReviewResult(
                 .content(review.getContent())
                 .status(review.getStatus())
                 .reported(review.getReported())
+                .isMine(isMine(userId, review.getUserId()))
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
                 .build();
+    }
+
+    private static boolean isMine(Long userId, Long writerId) {
+        if(userId == null) {
+            return false;
+        }
+        return userId.equals(writerId);
     }
 }

@@ -14,7 +14,8 @@ public record ReviewResponse(
         ReviewStatus status,
         Integer reported,
         LocalDateTime createAt,
-        LocalDateTime updateAt
+        LocalDateTime updateAt,
+        boolean isMine
 ) {
     @Builder
     public ReviewResponse{
@@ -30,6 +31,7 @@ public record ReviewResponse(
                 .content(reviewResult.content())
                 .status(reviewResult.status())
                 .reported(reviewResult.reported())
+                .isMine(reviewResult.isMine())
                 .createAt(reviewResult.createdAt())
                 .updateAt(reviewResult.updatedAt())
                 .build();
