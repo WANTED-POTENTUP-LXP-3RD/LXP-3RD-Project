@@ -75,12 +75,6 @@ public class Cart extends BaseAggregateRoot {
         }
     }
 
-    public int calculateAmount(Map<Long, Integer> coursePriceMap) {
-        return cartItems.stream()
-                .map(cartItem -> coursePriceMap.getOrDefault(cartItem.getCourseId(), 0))
-                .reduce(0, Integer::sum);
-    }
-
     public List<Long> getCourseIds() {
         return cartItems.stream()
                 .map(CartItem::getCourseId)

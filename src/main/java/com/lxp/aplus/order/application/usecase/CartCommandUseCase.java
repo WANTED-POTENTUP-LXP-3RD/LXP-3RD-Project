@@ -1,8 +1,12 @@
 package com.lxp.aplus.order.application.usecase;
 
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.CartErrorCode;
+import com.lxp.aplus.course.domain.CourseStatus;
 import com.lxp.aplus.order.application.command.CartAddItemCommand;
 import com.lxp.aplus.order.application.command.CartRemoveItemCommand;
 import com.lxp.aplus.order.application.port.out.CourseQueryPort;
+import com.lxp.aplus.order.application.port.out.CourseSalesStatus;
 import com.lxp.aplus.order.domain.Cart;
 import com.lxp.aplus.order.domain.CartRepository;
 import com.lxp.aplus.order.presentation.response.CartAddItemResponse;
@@ -29,20 +33,22 @@ public class CartCommandUseCase {
      */
     public CartAddItemResponse addCartItemToCart(CartAddItemCommand command) {
 
-        // 1. cart 조회 (없으면 생성)
+        // 1. 요청된 강좌가 발행된 상태인지 검사
+        if (!courseQueryPort.isCoursePublished(command.courseId())) {
+            throw new BusinessException(CartErrorCode.CART_CANNOT_ADD_UNPUBLISHED_COURSE);
+        }
+
+        // 2. cart 조회 (없으면 생성)
         Cart cart = getCart(command.userId());
 
-        // 2. cart에 새로운 cartItem 추가
+        // 3. cart에 새로운 cartItem 추가
         cart.addCartItem(command.courseId());
 
-        // 3. PK 생성을 위해 명시적으로 저장
+        // 4. PK 생성을 위해 명시적으로 저장
         cartRepository.save(cart);
 
-        // 4. Port를 통해 장바구니에 담긴 모든 강좌의 가격 조회
-        Map<Long, Integer> coursePriceMap = courseQueryPort.getCoursePriceByIds(cart.getCourseIds());
-
-        // 5. 장바구니 총액 계산
-        int amount = cart.calculateAmount(coursePriceMap);
+        // 5. 장바구니에 담긴 모든 강좌의 가격 조회
+        int amount = calculateCartAmount(cart);
 
         return CartAddItemResponse.of(cart, command.courseId(), amount);
     }
@@ -57,15 +63,8 @@ public class CartCommandUseCase {
         // 2. cart에서 항목 제거 (dirty checking)
         cart.removeCartItem(command.cartItemId());
 
-        // 3. cart에 남은 course의 id 추출
-        List<Long> remainingCourseIds = cart.getCourseIds();
-
-        // 4. 남은 course가 없다면 0, 있다면 Port를 통해 가격 조회
-        int amount = 0;
-        if (!remainingCourseIds.isEmpty()) {
-            Map<Long, Integer> priceMap = courseQueryPort.getCoursePriceByIds(remainingCourseIds);
-            amount = cart.calculateAmount(priceMap);
-        }
+        // 3. 장바구니에 담긴 모든 강좌의 가격 조회
+        int amount = calculateCartAmount(cart);
 
         return CartRemoveItemResponse.of(cart, command.cartItemId(), amount);
     }
@@ -76,5 +75,27 @@ public class CartCommandUseCase {
     private Cart getCart(Long userId) {
         return cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.create(userId)));
+    }
+
+    /*
+     * 장바구니에 담긴 강좌들의 가격 합계를 계산한다.
+     * - 장바구니에 삭제된 강좌들이 포함되어 있을 수 있으므로 PUBLISHED 강좌 가격만 계산한다.
+     */
+    private int calculateCartAmount(Cart cart) {
+        Map<Long, CourseSalesStatus> courseSalesStatusMap = courseQueryPort.getCourseSalesStatusByIds(cart.getCourseIds());
+
+        return cart.getCartItems().stream()
+                .mapToInt(cartItem -> {
+                    CourseSalesStatus courseSalesStatus = courseSalesStatusMap.get(cartItem.getCourseId());
+
+                    // PUBLISHED 강좌만 가격 반환
+                    if (courseSalesStatus != null && courseSalesStatus.status() == CourseStatus.PUBLISHED) {
+                        return courseSalesStatus.price();
+                    }
+
+                    // DELETED 강좌는 0원 처리
+                    return 0;
+                })
+                .sum();
     }
 }
