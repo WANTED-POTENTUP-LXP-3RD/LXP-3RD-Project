@@ -17,7 +17,7 @@ class LectureResourceV2Test {
     void createVideoResource_withValidInputs_success() {
         // given
         String originalFileName = "lecture.mp4";
-        String fileKey = "videos/2024/lecture.mp4";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         Integer videoDuration = 3600;
         boolean isDownloadable = true;
         long fileSize = 500000L;
@@ -44,7 +44,7 @@ class LectureResourceV2Test {
     void createPdfResource_withoutDuration_success() {
         // given
         String originalFileName = "document.pdf";
-        String fileKey = "documents/2024/document.pdf";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 30000L;
 
         // when
@@ -66,7 +66,7 @@ class LectureResourceV2Test {
     void createDocResource_success() {
         // given
         String originalFileName = "lecture.doc";
-        String fileKey = "documents/2024/lecture.doc";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 30000L;
 
         // when
@@ -87,7 +87,7 @@ class LectureResourceV2Test {
     void createZipResource_success() {
         // given
         String originalFileName = "materials.zip";
-        String fileKey = "files/2024/materials.zip";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 500000L;
 
         // when
@@ -133,7 +133,7 @@ class LectureResourceV2Test {
     void createVideoResource_withNullDuration_throwsException() {
         // given
         String originalFileName = "lecture.mp4";
-        String fileKey = "videos/2024/lecture.mp4";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 500000L;
 
         // when & then
@@ -155,7 +155,7 @@ class LectureResourceV2Test {
     void createVideoResource_withInvalidDuration_throwsException(int invalidDuration) {
         // given
         String originalFileName = "lecture.mp4";
-        String fileKey = "videos/2024/lecture.mp4";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 500000L;
 
         // when & then
@@ -176,7 +176,7 @@ class LectureResourceV2Test {
     void createVideoResource_exceedsMaxSize_throwsException() {
         // given
         String originalFileName = "lecture.mp4";
-        String fileKey = "videos/2024/lecture.mp4";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         Integer videoDuration = 3600;
         long fileSize = 1000001L; // 최대 1000000L 초과
 
@@ -198,7 +198,7 @@ class LectureResourceV2Test {
     void createZipResource_exceedsMaxSize_throwsException() {
         // given
         String originalFileName = "materials.zip";
-        String fileKey = "files/2024/materials.zip";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 1000001L;
 
         // when & then
@@ -219,7 +219,7 @@ class LectureResourceV2Test {
     void createPdfResource_exceedsMaxSize_throwsException() {
         // given
         String originalFileName = "document.pdf";
-        String fileKey = "documents/2024/document.pdf";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 50001L; // 최대 50000L 초과
 
         // when & then
@@ -240,7 +240,7 @@ class LectureResourceV2Test {
     void createDocResource_exceedsMaxSize_throwsException() {
         // given
         String originalFileName = "lecture.doc";
-        String fileKey = "documents/2024/lecture.doc";
+        String fileKey = "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7";
         long fileSize = 50001L;
 
         // when & then
@@ -280,5 +280,55 @@ class LectureResourceV2Test {
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode",
                         LectureResourceErrorCode.FILE_SIZE_EXCEEDED);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"lecture.mp4", "document.pdf", "file.doc", "archive.zip"})
+    @DisplayName("유효한 확장자면 정상적으로 생성된다")
+    void createWithValidExtension(String fileName) {
+        // given
+        Lecture lecture = createMockLecture();
+
+        // when
+        LectureResource resource = LectureResource.create(
+                lecture, true, "fileKey", "fileUrl", fileName
+        );
+
+        // then
+        assertThat(resource.getOriginalFileName()).isEqualTo(fileName);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"image.jpg", "image.png", "script.js", "style.css", "data.txt", "app.exe"})
+    @DisplayName("지원하지 않는 확장자면 예외가 발생한다")
+    void throwExceptionForUnsupportedExtension(String fileName) {
+        // given
+        Lecture lecture = createMockLecture();
+
+        // when & then
+        assertThatThrownBy(() ->
+                LectureResource.create(lecture, true, "fileKey", "fileUrl", fileName)
+        )
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", LectureResourceErrorCode.LECTURE_RESOURCE_UNSUPPORTED_EXTENSION);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"noextension", "file.", ".hiddenfile"})
+    @DisplayName("확장자가 없거나 잘못된 형식이면 예외가 발생한다")
+    void throwExceptionForMissingExtension(String fileName) {
+        // given
+        Lecture lecture = createMockLecture();
+
+        // when & then
+        assertThatThrownBy(() ->
+                LectureResource.create(lecture, true, "fileKey", "fileUrl", fileName)
+        )
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", LectureResourceErrorCode.LECTURE_RESOURCE_UNSUPPORTED_EXTENSION);
+    }
+
+    private Lecture createMockLecture() {
+        return Lecture.builder().build();
     }
 }

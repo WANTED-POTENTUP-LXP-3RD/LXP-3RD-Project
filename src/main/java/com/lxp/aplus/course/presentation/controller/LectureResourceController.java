@@ -11,20 +11,17 @@ import com.lxp.aplus.course.presentation.response.PresignedUrlResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/instructor/resources")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class LectureResourceController {
     private final LectureResourceCommandUseCase useCase;
 
     /** 강의 리소스 presigned url **/
     @InstructorOnly
-    @PostMapping
+    @PostMapping("/instructor/resources")
     public ResponseEntity<ResultResponse<PresignedUrlResponse>> generatePresignedUrl(
             @Authenticated Long instructorId,
             @Valid @RequestBody PresignedUrlRequest request

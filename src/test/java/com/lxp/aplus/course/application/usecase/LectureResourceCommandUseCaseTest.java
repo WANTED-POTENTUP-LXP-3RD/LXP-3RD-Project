@@ -45,8 +45,8 @@ class LectureResourceCommandUseCaseTest {
         );
 
         PresignedUrlResult expectedResult = new PresignedUrlResult(
-                "https://s3.amazonaws.com/bucket/presigned-url",
-                "lecture/cde98e11-abb9-4a4b-907d-4a2a5e1ab00c.mp4",
+                "https://localhost:9000/bucket/presigned-url",
+                "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7",
                 "PUT",
                 120
         );
@@ -77,7 +77,7 @@ class LectureResourceCommandUseCaseTest {
 
         PresignedUrlResult presignedUrlResult = new PresignedUrlResult(
                 "https://s3.amazonaws.com/bucket/presigned-url",
-                "lecture/cde98e11-abb9-4a4b-907d-4a2a5e1ab00c.mp4",
+                "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7",
                 "PUT",
                 120
         );
@@ -100,7 +100,7 @@ class LectureResourceCommandUseCaseTest {
 
         PresignedUrlResult expectedResult = new PresignedUrlResult(
                 "https://s3.amazonaws.com/bucket/presigned-url",
-                "lecture/cde98e11-abb9-4a4b-907d-4a2a5e1ab00c.mp4",
+                "lecture/a5f76fee-ff9f-46c5-86d4-787d42950bc7",
                 "PUT",
                 120
         );
