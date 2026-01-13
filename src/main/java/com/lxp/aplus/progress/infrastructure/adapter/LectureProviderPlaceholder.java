@@ -1,7 +1,7 @@
 package com.lxp.aplus.progress.infrastructure.adapter;
 
-import com.lxp.aplus.progress.application.port.LectureDetailInfo;
-import com.lxp.aplus.progress.application.port.LectureInfo;
+import com.lxp.aplus.progress.application.port.LectureSummaryDto;
+import com.lxp.aplus.progress.application.port.LectureDurationDto;
 import com.lxp.aplus.progress.application.port.LectureProvider;
 import org.springframework.stereotype.Component;
 
@@ -14,17 +14,17 @@ public class LectureProviderPlaceholder implements LectureProvider {
 
 
     @Override
-    public LectureInfo getLectureInfo(Long lectureResourceId) {
-        return new LectureInfo(FAKE_TOTAL_DURATION_SECONDS);
+    public LectureDurationDto getLectureInfo(Long lectureResourceId) {
+        return new LectureDurationDto(FAKE_TOTAL_DURATION_SECONDS);
     }
 
 
     @Override
-    public List<LectureDetailInfo> getLectureDetailsByCourseId(Long courseId) {
+    public List<LectureSummaryDto> getLectureDetailsByCourseId(Long courseId) {
         return List.of(
-                new LectureDetailInfo(1L, "Placeholder Lecture 1", FAKE_TOTAL_DURATION_SECONDS),
-                new LectureDetailInfo(2L, "Placeholder Lecture 2", FAKE_TOTAL_DURATION_SECONDS + 120),
-                new LectureDetailInfo(3L, "Placeholder Lecture 3", FAKE_TOTAL_DURATION_SECONDS - 60)
+                new LectureSummaryDto(1L, "Placeholder Lecture 1", FAKE_TOTAL_DURATION_SECONDS),
+                new LectureSummaryDto(2L, "Placeholder Lecture 2", FAKE_TOTAL_DURATION_SECONDS + 120),
+                new LectureSummaryDto(3L, "Placeholder Lecture 3", FAKE_TOTAL_DURATION_SECONDS - 60)
         );
     }
 }

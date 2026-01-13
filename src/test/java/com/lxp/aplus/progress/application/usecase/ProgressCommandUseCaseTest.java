@@ -3,10 +3,10 @@ package com.lxp.aplus.progress.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.common.error.code.ProgressErrorCode;
-import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import com.lxp.aplus.progress.application.command.ProgressUpdateCommand;
-import com.lxp.aplus.progress.application.port.LectureInfo;
+import com.lxp.aplus.progress.application.port.EnrollmentStatusDto;
+import com.lxp.aplus.progress.application.port.EnrollmentReader;
+import com.lxp.aplus.progress.application.port.LectureDurationDto;
 import com.lxp.aplus.progress.application.port.LectureProvider;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
@@ -18,8 +18,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDateTime;
+
 import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +36,7 @@ class ProgressCommandUseCaseTest {
     @Mock
     private ProgressRepository progressRepository;
     @Mock
-    private EnrollmentRepository enrollmentRepository;
+    private EnrollmentReader enrollmentReader;
     @Mock
     private LectureProvider lectureProvider;
 
@@ -50,17 +51,14 @@ class ProgressCommandUseCaseTest {
         int watchedDuration = 60;
         int totalDuration = 300;
 
-        Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(userId).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId, watchedDuration);
-        LectureInfo lectureInfo = new LectureInfo(totalDuration);
+        LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
 
-        given(enrollmentRepository.findByStudentIdAndCourseId(userId, courseId)).willReturn(Optional.of(enrollment));
-        given(lectureProvider.getLectureInfo(resourceId)).willReturn(lectureInfo);
+        given(enrollmentReader.findEnrollment(userId, courseId)).willReturn(Optional.of(enrollmentStatusDto));
+        given(lectureProvider.getLectureInfo(resourceId)).willReturn(lectureDurationDto);
         given(progressRepository.findByEnrollmentIdAndLectureResourceId(enrollmentId, resourceId)).willReturn(Optional.empty());
-        given(progressRepository.save(any(Progress.class))).willAnswer(invocation -> {
-            Progress progressToSave = invocation.getArgument(0);
-            return progressToSave;
-        });
+        given(progressRepository.save(any(Progress.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         ProgressUpdateResponse response = progressCommandUseCase.updateProgress(userId, courseId, command);
@@ -88,13 +86,13 @@ class ProgressCommandUseCaseTest {
         int watchedDuration = 300;
         int totalDuration = 300;
 
-        Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(userId).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
         Progress existingProgress = Progress.of(enrollmentId, resourceId);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId, watchedDuration);
-        LectureInfo lectureInfo = new LectureInfo(totalDuration);
+        LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
 
-        given(enrollmentRepository.findByStudentIdAndCourseId(userId, courseId)).willReturn(Optional.of(enrollment));
-        given(lectureProvider.getLectureInfo(resourceId)).willReturn(lectureInfo);
+        given(enrollmentReader.findEnrollment(userId, courseId)).willReturn(Optional.of(enrollmentStatusDto));
+        given(lectureProvider.getLectureInfo(resourceId)).willReturn(lectureDurationDto);
         given(progressRepository.findByEnrollmentIdAndLectureResourceId(enrollmentId, resourceId)).willReturn(Optional.of(existingProgress));
         given(progressRepository.save(any(Progress.class))).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -118,7 +116,7 @@ class ProgressCommandUseCaseTest {
         Long courseId = 100L;
         ProgressUpdateCommand command = new ProgressUpdateCommand(300L, 150);
 
-        given(enrollmentRepository.findByStudentIdAndCourseId(userId, courseId)).willReturn(Optional.empty());
+        given(enrollmentReader.findEnrollment(userId, courseId)).willReturn(Optional.empty());
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
@@ -134,9 +132,9 @@ class ProgressCommandUseCaseTest {
         Long courseId = 100L;
         Long enrollmentId = 200L;
         ProgressUpdateCommand command = new ProgressUpdateCommand(300L, 150);
-        Enrollment expiredEnrollment = Enrollment.builder().id(enrollmentId).studentId(userId).courseId(courseId).expiredAt(LocalDateTime.now().minusDays(1)).build();
+        EnrollmentStatusDto expiredEnrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, true);
 
-        given(enrollmentRepository.findByStudentIdAndCourseId(userId, courseId)).willReturn(Optional.of(expiredEnrollment));
+        given(enrollmentReader.findEnrollment(userId, courseId)).willReturn(Optional.of(expiredEnrollmentStatusDto));
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
@@ -155,13 +153,13 @@ class ProgressCommandUseCaseTest {
         int watchedDuration = 301;
         int totalDuration = 300;
 
-        Enrollment enrollment = Enrollment.builder().id(enrollmentId).studentId(userId).courseId(courseId).expiredAt(LocalDateTime.now().plusDays(1)).build();
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
         Progress existingProgress = Progress.of(enrollmentId, resourceId);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId, watchedDuration);
-        LectureInfo lectureInfo = new LectureInfo(totalDuration);
+        LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
 
-        given(enrollmentRepository.findByStudentIdAndCourseId(userId, courseId)).willReturn(Optional.of(enrollment));
-        given(lectureProvider.getLectureInfo(resourceId)).willReturn(lectureInfo);
+        given(enrollmentReader.findEnrollment(userId, courseId)).willReturn(Optional.of(enrollmentStatusDto));
+        given(lectureProvider.getLectureInfo(resourceId)).willReturn(lectureDurationDto);
         given(progressRepository.findByEnrollmentIdAndLectureResourceId(enrollmentId, resourceId)).willReturn(Optional.of(existingProgress));
 
         // when & then

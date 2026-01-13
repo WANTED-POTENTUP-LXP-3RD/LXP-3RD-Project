@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 
 @Getter
 public class LectureProgressResponse {
+    private static final int MAX_PROGRESS_RATE = 100;
+    private static final int MIN_PROGRESS_RATE = 0;
+
     private final Long resourceId;
     private final String title;
     private final int watchedDuration;
@@ -26,8 +29,8 @@ public class LectureProgressResponse {
 
     private int calculateProgressRate(int watched, int total, boolean isCompleted) {
         if (total == 0) {
-            return isCompleted ? 100 : 0;
+            return isCompleted ? MAX_PROGRESS_RATE : MIN_PROGRESS_RATE;
         }
-        return (int) (((double) watched / total) * 100);
+        return (int) (((double) watched / total) * MAX_PROGRESS_RATE);
     }
 }

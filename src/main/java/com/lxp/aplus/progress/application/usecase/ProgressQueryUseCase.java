@@ -2,24 +2,21 @@ package com.lxp.aplus.progress.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
-import com.lxp.aplus.progress.application.port.LectureDetailInfo;
+import com.lxp.aplus.progress.application.port.EnrollmentReader;
+import com.lxp.aplus.progress.application.port.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.LectureProvider;
-import com.lxp.aplus.progress.presentation.response.CourseProgressResponse;
-import com.lxp.aplus.progress.presentation.response.LectureProgressResponse;
+import com.lxp.aplus.progress.application.port.LectureSummaryDto;
+import com.lxp.aplus.progress.domain.LearningProgress;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
+import com.lxp.aplus.progress.presentation.response.CourseProgressResponse;
+import com.lxp.aplus.progress.presentation.response.LectureProgressResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,58 +24,35 @@ import java.util.stream.Collectors;
 public class ProgressQueryUseCase {
 
     private final ProgressRepository progressRepository;
-    private final EnrollmentRepository enrollmentRepository;
+    private final EnrollmentReader enrollmentReader;
     private final LectureProvider lectureProvider;
 
     public CourseProgressResponse getCourseProgress(Long userId, Long courseId) {
-        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(userId, courseId)
+        // 1. Get Enrollment Info (Orchestration)
+        EnrollmentStatusDto enrollmentStatusDto = enrollmentReader.findEnrollment(userId, courseId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
-        if (enrollment.isExpired(LocalDateTime.now())) {
+        if (enrollmentStatusDto.isExpired()) {
             throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_EXPIRED_HISTORY_ACCESS_DENIED);
         }
 
-        List<LectureDetailInfo> lectureDetails = lectureProvider.getLectureDetailsByCourseId(courseId);
+        // 2. Get Data from Repositories and Ports (Orchestration)
+        List<Progress> progresses = progressRepository.findByEnrollmentId(enrollmentStatusDto.enrollmentId());
+        List<LectureSummaryDto> lectureDetails = lectureProvider.getLectureDetailsByCourseId(courseId);
 
-        List<Progress> progresses = progressRepository.findByEnrollmentId(enrollment.getId());
-        Map<Long, Progress> progressMap = progresses.stream()
-                .collect(Collectors.toMap(Progress::getLectureResourceId, Function.identity()));
+        // 3. Delegate to Domain Object for Logic (Domain Logic)
+        LearningProgress learningProgress = new LearningProgress(progresses);
+        int overallProgressRate = learningProgress.calculateOverallProgressRate(lectureDetails.size());
+        Optional<Progress> lastWatchedProgressOpt = learningProgress.findLastWatchedProgress();
+        List<LectureProgressResponse> lectureProgressResponses = learningProgress.mapToLectureProgressResponses(lectureDetails);
 
-        List<LectureProgressResponse> lectureProgressResponses = lectureDetails.stream()
-                .map(lecture -> {
-                    Progress progress = progressMap.get(lecture.resourceId());
-                    return new LectureProgressResponse(
-                            lecture.resourceId(),
-                            lecture.title(),
-                            progress != null ? progress.getWatchedDuration() : 0,
-                            lecture.totalDurationSeconds(),
-                            progress != null && progress.isCompleted(),
-                            progress != null ? progress.getLastWatchedAt() : null
-                    );
-                })
-                .toList();
-
-        int overallProgressRate = calculateOverallProgress(lectureProgressResponses);
-
-        Progress lastWatchedProgress = progresses.stream()
-                .filter(p -> p.getLastWatchedAt() != null)
-                .max(Comparator.comparing(Progress::getLastWatchedAt))
-                .orElse(null);
-
+        // 4. Assemble Response DTO (Orchestration)
         return new CourseProgressResponse(
-                enrollment.getId(),
+                enrollmentStatusDto.enrollmentId(),
                 overallProgressRate,
-                lastWatchedProgress != null ? lastWatchedProgress.getLectureResourceId() : null,
-                lastWatchedProgress != null ? lastWatchedProgress.getLastWatchedAt() : null,
+                lastWatchedProgressOpt.map(Progress::getLectureResourceId).orElse(null),
+                lastWatchedProgressOpt.map(Progress::getLastWatchedAt).orElse(null),
                 lectureProgressResponses
         );
-    }
-
-    private int calculateOverallProgress(List<LectureProgressResponse> lectureProgresses) {
-        if (lectureProgresses.isEmpty()) {
-            return 0;
-        }
-        long totalCompleted = lectureProgresses.stream().filter(LectureProgressResponse::isCompleted).count();
-        return (int) (totalCompleted * 100 / lectureProgresses.size());
     }
 }
