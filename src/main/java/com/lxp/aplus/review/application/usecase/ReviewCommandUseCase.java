@@ -3,9 +3,11 @@ package com.lxp.aplus.review.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.ReviewErrorCode;
 import com.lxp.aplus.review.application.command.ReviewCreateCommand;
+import com.lxp.aplus.review.application.command.ReviewDeleteCommand;
 import com.lxp.aplus.review.application.command.ReviewQueryCommand;
 import com.lxp.aplus.review.application.command.ReviewUpdateCommand;
 import com.lxp.aplus.review.application.policy.ReviewBusinessPolicy;
+import com.lxp.aplus.review.application.result.ReviewDeleteResult;
 import com.lxp.aplus.review.application.result.ReviewResult;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
 import com.lxp.aplus.review.domain.Reviews;
@@ -48,5 +50,13 @@ public class ReviewCommandUseCase {
         Reviews result = reviewRepository.save(review);
 
         return ReviewUpsertResult.from(result);
+    }
+
+    public ReviewDeleteResult deleteReview(ReviewDeleteCommand command){
+        Long result = reviewRepository.deleteReview(command.userId(),command.courseId());
+        if(result > 0){
+            return new ReviewDeleteResult(result > 0);
+        }
+        throw new BusinessException(ReviewErrorCode.REVIEW_NOT_FOUND);
     }
 }

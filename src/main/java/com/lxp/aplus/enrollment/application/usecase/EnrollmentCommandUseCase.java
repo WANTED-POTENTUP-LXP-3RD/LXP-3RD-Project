@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,18 +22,18 @@ public class EnrollmentCommandUseCase{
     private final CourseFinder courseFinder;
 
     /**
-     * 수강 신청 비즈니스 로직을 수행합니다.
+     * 수강 신청 비즈니스 로직을 수행.
      * * <p> 처리 흐름:
      * 1. [중복 검사] 이미 수강 중인 강의인지 확인 (중복 시 예외 발생)
      * 2. [엔티티 생성] 수강 기간(2년) 정책을 적용하여 Enrollment 엔티티 생성
      * 3. [저장] 생성된 수강 내역 저장 및 결과 반환
      * </p>
      *
-     * @param command 수강 신청 요청 데이터 (studentId, courseId, impUid 등)
+     * @param command 수강 신청 요청 데이터 (studentId, courseId, orderItemId 등)
      * @return EnrollmentCreationResult 생성된 수강 내역 정보
      */
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public EnrollmentCreationResult enroll(EnrollmentCommand command) {
+    public Long enroll(EnrollmentCommand command) {
         Long courseId = command.courseId();
 
         courseFinder.findCourseById(courseId)
@@ -45,14 +43,10 @@ public class EnrollmentCommandUseCase{
             throw new BusinessException(EnrollmentErrorCode.ALREADY_ENROLLED_COURSE);
         }
 
-        LocalDateTime expiredAt = LocalDateTime.now().plusYears(2);
-
-        Enrollment enrollmentToSave = Enrollment.of(command.studentId(), courseId, expiredAt);
+        Enrollment enrollmentToSave = Enrollment.create(command.studentId(), courseId, command.orderItemId());
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollmentToSave);
 
-        EnrollmentDetailResult createdEnrollment = EnrollmentDetailResult.of(savedEnrollment, 0);
-
-        return EnrollmentCreationResult.from(List.of(createdEnrollment));
+        return savedEnrollment.getId();
     }
 }

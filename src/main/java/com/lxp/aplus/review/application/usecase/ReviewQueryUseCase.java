@@ -24,10 +24,9 @@ public class ReviewQueryUseCase {
         return ReviewResult.of(command.userId(), review);
     }
 
-    public Slice<ReviewResult> findReviewsInCourse(Long userId, Long courseId, Pageable pageable) {
-        Slice<Reviews> reviews = reviewRepository.getCourseReviews(courseId,pageable);
-
-        return reviews.map(review -> ReviewResult.of(userId, review));
+    public Slice<ReviewResult> findReviewsInCourse(ReviewQueryCommand command, Pageable pageable) {
+        Slice<Reviews> reviews = reviewRepository.getCourseReviews(command.courseId(), pageable);
+        return reviews.map(review -> ReviewResult.of(command.userId(), review));
     }
 
     public Integer countReviewsInCourse(Long courseId) {

@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewsJpaRepository extends JpaRepository<Reviews, Long> {
     Boolean existsByUserIdAndCourseId(Long userId, Long courseId);
-    Optional<Reviews> findByUserIdAndCourseIdAndStatus(Long userId, Long courseId, ReviewStatus status);
     Slice<Reviews> findByCourseIdAndStatus(Long courseId, ReviewStatus status, Pageable pageable);
     Integer countByCourseId(Long courseId);
+    Optional<Reviews> findByUserIdAndCourseId(Long userId, Long courseId);
+    Long deleteByUserIdAndCourseId(Long userId, Long courseId);
 }

@@ -1,4 +1,4 @@
-package com.lxp.aplus.enrollment.infrastructure.persistence.dto;
+package com.lxp.aplus.enrollment.domain;
 
 public interface StudentCountDto {
     Long getCourseId();

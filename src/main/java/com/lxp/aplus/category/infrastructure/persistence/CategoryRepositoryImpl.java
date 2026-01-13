@@ -2,7 +2,6 @@ package com.lxp.aplus.category.infrastructure.persistence;
 
 import com.lxp.aplus.category.domain.Category;
 import com.lxp.aplus.category.domain.CategoryRepository;
-import com.lxp.aplus.enrollment.infrastructure.persistence.dto.StudentCountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

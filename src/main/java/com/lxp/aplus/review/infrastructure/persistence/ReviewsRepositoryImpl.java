@@ -38,4 +38,9 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     public Integer countCourseReviews(Long courseId) {
         return reviewJpaRepository.countByCourseId(courseId);
     }
+
+    @Override
+    public Long deleteReview(Long userId, Long courseId) {
+        return reviewJpaRepository.deleteByUserIdAndCourseId(userId, courseId);
+    }
 }

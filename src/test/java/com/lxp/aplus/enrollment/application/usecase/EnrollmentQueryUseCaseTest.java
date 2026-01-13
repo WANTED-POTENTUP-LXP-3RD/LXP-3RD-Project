@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,14 +57,14 @@ class EnrollmentQueryUseCaseTest {
         EnrollmentStatus status = EnrollmentStatus.ENROLLED;
         Pageable pageable = PageRequest.of(0, 10);
 
-        Enrollment enrollment1 = Enrollment.of(STUDENT_ID, COURSE_ID_1, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment1 = Enrollment.create(STUDENT_ID, COURSE_ID_1, 1L);
         ReflectionTestUtils.setField(enrollment1, "id", 5001L);
         List<String> categories1 = List.of("프로그래밍", "백엔드");
 
         List<Long> resourceIds1 = LongStream.rangeClosed(1, 10).boxed().toList();
         Map<Long, Boolean> completionMap1 = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
 
-        Enrollment enrollment2 = Enrollment.of(STUDENT_ID, COURSE_ID_2, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment2 = Enrollment.create(STUDENT_ID, COURSE_ID_2, 1L);
         ReflectionTestUtils.setField(enrollment2, "id", 5002L);
         List<String> categories2 = List.of("프로그래밍", "프론트엔드");
         
@@ -149,7 +148,7 @@ class EnrollmentQueryUseCaseTest {
         Long enrollmentId = 5001L;
         Long courseId = COURSE_ID_1;
 
-        Enrollment enrollment = Enrollment.of(studentId, courseId, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.create(studentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();
@@ -176,7 +175,7 @@ class EnrollmentQueryUseCaseTest {
     void getEnrollmentDetail_fail_notFound() {
         // given
         Long studentId = STUDENT_ID;
-        Long enrollmentId = 9999L; // Non-existent ID
+        Long enrollmentId = 9999L;
 
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.empty());
 
@@ -195,7 +194,7 @@ class EnrollmentQueryUseCaseTest {
         Long enrollmentId = 5002L;
         Long courseId = COURSE_ID_2;
 
-        Enrollment enrollment = Enrollment.of(actualEnrollmentStudentId, courseId, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.create(actualEnrollmentStudentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
@@ -213,8 +212,7 @@ class EnrollmentQueryUseCaseTest {
         Long studentId = STUDENT_ID;
         Long courseId = COURSE_ID_1;
         Long enrollmentId = 5001L;
-
-        Enrollment enrollment = Enrollment.of(studentId, courseId, LocalDateTime.now().plusYears(1));
+        Enrollment enrollment = Enrollment.create(studentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();
