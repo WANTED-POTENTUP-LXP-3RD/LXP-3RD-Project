@@ -2,6 +2,7 @@ package com.lxp.aplus.review.infrastructure.persistence;
 
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
+import com.lxp.aplus.review.domain.constant.ReviewStatus;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,11 +26,21 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
 
     @Override
     public Optional<Reviews> getReview(Long userId, Long courseId) {
-        return reviewJpaRepository.findByUserIdAndCourseId(userId, courseId);
+        return reviewJpaRepository.findByUserIdAndCourseIdAndStatus(userId, courseId, ReviewStatus.DISPLAY);
     }
 
     @Override
     public Slice<Reviews> getCourseReviews(Long courseId, Pageable pageable) {
-        return reviewJpaRepository.findByCourseId(courseId, pageable);
+        return reviewJpaRepository.findByCourseIdAndStatus(courseId, ReviewStatus.DISPLAY, pageable);
+    }
+
+    @Override
+    public Integer countCourseReviews(Long courseId) {
+        return reviewJpaRepository.countByCourseId(courseId);
+    }
+
+    @Override
+    public Long deleteReview(Long userId, Long courseId) {
+        return reviewJpaRepository.deleteByUserIdAndCourseId(userId, courseId);
     }
 }

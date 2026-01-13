@@ -5,13 +5,16 @@ import com.lxp.aplus.common.result.code.ReviewResultCode;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.CurrentUser;
 import com.lxp.aplus.common.security.UserInfo;
+import com.lxp.aplus.review.application.command.ReviewDeleteCommand;
 import com.lxp.aplus.review.application.command.ReviewQueryCommand;
+import com.lxp.aplus.review.application.result.ReviewDeleteResult;
 import com.lxp.aplus.review.application.result.ReviewResult;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
 import com.lxp.aplus.review.application.usecase.ReviewCommandUseCase;
 import com.lxp.aplus.review.application.usecase.ReviewQueryUseCase;
 import com.lxp.aplus.review.presentation.request.ReviewCreateRequest;
 import com.lxp.aplus.review.presentation.request.ReviewUpdateRequest;
+import com.lxp.aplus.review.presentation.response.ReviewDeleteResponse;
 import com.lxp.aplus.review.presentation.response.ReviewResponse;
 import com.lxp.aplus.review.presentation.response.ReviewUpsertResponse;
 import com.lxp.aplus.review.presentation.response.SliceResponse;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,12 +81,26 @@ public class ReviewController {
     ) {
         Long userId = (userInfo != null) ? userInfo.id() : null;
 
-        Slice<ReviewResponse> result = reviewQueryUseCase.findReviewsInCourse(userId, courseId, pageable)
+        Slice<ReviewResponse> result = reviewQueryUseCase.findReviewsInCourse(ReviewQueryCommand.of(userId, courseId),
+                        pageable)
                 .map(ReviewResponse::from);
 
-        SliceResponse<ReviewResponse> response = SliceResponse.from(result);
+        Integer totalCount = reviewQueryUseCase.countReviewsInCourse(courseId);
+
+        SliceResponse<ReviewResponse> response = SliceResponse.of(result, totalCount);
 
         return ResponseEntity.status(ReviewResultCode.REVIEW_FIND_SUCCESS.getStatus())
                 .body(ResultResponse.of(ReviewResultCode.REVIEW_FIND_SUCCESS, response));
+    }
+
+    @DeleteMapping("/courses/{courseId}/review")
+    public ResponseEntity<ResultResponse<ReviewDeleteResponse>> deleteReview(
+            @PathVariable Long courseId,
+            @Authenticated Long userId
+    ) {
+        ReviewDeleteResult result = reviewCommandUseCase.deleteReview(ReviewDeleteCommand.of(userId, courseId));
+
+        return ResponseEntity.status(ReviewResultCode.REVIEW_DELETE_SUCCESS.getStatus())
+                .body(ResultResponse.of(ReviewResultCode.REVIEW_DELETE_SUCCESS, ReviewDeleteResponse.from(result)));
     }
 }

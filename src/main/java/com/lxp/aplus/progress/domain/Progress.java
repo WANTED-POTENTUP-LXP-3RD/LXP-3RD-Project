@@ -66,7 +66,7 @@ public class Progress extends BaseTimeEntity {
     }
 
     public void updateProgress(Integer watchedDuration, boolean isCompleted) {
-        if (this.enrollment.isExpired()) {
+        if (this.enrollment.isExpired(LocalDateTime.now())) {
             throw new BusinessException(ProgressErrorCode.CANNOT_UPDATE_EXPIRED_ENROLLMENT);
         }
 

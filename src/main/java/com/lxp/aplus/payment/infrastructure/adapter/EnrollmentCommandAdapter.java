@@ -33,10 +33,10 @@ public class EnrollmentCommandAdapter implements EnrollmentCommandPort {
             boolean isEnrolled = enrollmentRepository.existsByStudentIdAndCourseId(userId, courseId);
 
             if (!isEnrolled) {
-                Enrollment enrollment = Enrollment.of(
+                Enrollment enrollment = Enrollment.create(
                         userId,
                         courseId,
-                        LocalDateTime.now().plusYears(2)
+                        null
                 );
 
                 newEnrollments.add(enrollment);

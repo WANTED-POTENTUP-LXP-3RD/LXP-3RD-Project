@@ -48,8 +48,6 @@ public class Reviews extends BaseTimeEntity {
 
     private int reported = 0;
 
-    private LocalDateTime deletedAt;
-
     @Builder
     public Reviews(Long courseId, Long userId, Integer rating, String content) {
         validateRatingRange(rating);
@@ -96,11 +94,6 @@ public class Reviews extends BaseTimeEntity {
 
     public void archived() {
         this.status = ReviewStatus.ARCHIVED;
-    }
-
-    public void delete(LocalDateTime deletedAt) {
-        this.status = ReviewStatus.DELETED;
-        this.deletedAt = deletedAt;
     }
 
     //자신이 작성한 리뷰
