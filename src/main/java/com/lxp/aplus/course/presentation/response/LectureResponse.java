@@ -37,6 +37,7 @@ public record LectureResponse(
                 .resource(resource)
                 .build();
     }
+
     public static LectureResponse from(LectureResult result) {
         return LectureResponse.builder()
                 .lectureId(result.id())
@@ -50,7 +51,7 @@ public record LectureResponse(
                         LectureResourceResponse.builder()
                                 .resourceType(result.resource().resourceType())
                                 .isDownloadable(result.resource().isDownloadable())
-                                .fileUrl(result.resource().fileUrl())
+                                .fileKey(result.resource().fileKey())
                                 .build()
                 )
                 .build();

@@ -54,8 +54,8 @@ public class Course extends BaseAggregateRoot {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private String thumbnailUrl;
+    @Column(name = "thumbnail_key")
+    private String thumbnailResourceKey;
 
     @Column(nullable = false)
     private int price;
@@ -73,14 +73,14 @@ public class Course extends BaseAggregateRoot {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    public static Course createDraftCourse(Long instructorId, String thumbnailUrl, CourseCreateCommand command) {
+    public static Course createDraftCourse(Long instructorId, CourseCreateCommand command) {
         return Course.builder()
                 .instructorId(instructorId)
                 .categoryId(command.categoryId())
                 .title(command.title())
                 .summary(command.summary())
                 .description(command.description())
-                .thumbnailUrl(thumbnailUrl)
+                .thumbnailResourceKey(command.thumbnailResourceKey())
                 .price(command.price())
                 .courseLevel(command.courseLevel())
                 .build();
@@ -116,7 +116,7 @@ public class Course extends BaseAggregateRoot {
             if (command.thumbnailUrl().isBlank()) {
                 throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
             }
-            this.thumbnailUrl = command.thumbnailUrl();
+            this.thumbnailResourceKey = command.thumbnailUrl();
         }
 
         if (command.price() != null) {
@@ -192,13 +192,13 @@ public class Course extends BaseAggregateRoot {
         }
     }
 
-    public Lecture createLecture(Long sectionId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
+    public Lecture createLecture(Long sectionId, String title, boolean isPreview, LectureResourceV2 resource, int orderIndex) {
             Section section = sections.stream()
                 .filter(s -> s.getId().equals(sectionId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(SectionErrorCode.SECTION_NOT_FOUND));
 
-        return section.addLecture(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
+        return section.addLecture(title, isPreview, resource, orderIndex);
     }
 
     public Lecture updateLectureMeta(Long lectureId, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
