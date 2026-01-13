@@ -1,8 +1,6 @@
 package com.lxp.aplus.course.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
-import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,8 +27,8 @@ public class LectureResourceV2 extends BaseTimeEntity {
     @Column(name = "resource_type", nullable = false)
     private ResourceType resourceType;
 
-    @Column(name = "duration")
-    private Integer videoDuration;
+    @Embedded
+    private VideoDuration videoDuration;
 
     @Column(name = "is_downloadable")
     private boolean isDownloadable;
@@ -39,7 +37,7 @@ public class LectureResourceV2 extends BaseTimeEntity {
             String originalFileName,
             String fileKey,
             ResourceType resourceType,
-            Integer videoDuration,
+            VideoDuration videoDuration,
             boolean isDownloadable
     ) {
         this.originalFileName = originalFileName;
@@ -49,26 +47,19 @@ public class LectureResourceV2 extends BaseTimeEntity {
         this.isDownloadable = isDownloadable;
     }
 
-    private static final Map<ResourceType, Long> MAX_FILE_SIZE = Map.of(
-            ResourceType.VIDEO, 1000000L,
-            ResourceType.ZIP, 1000000L,
-            ResourceType.PDF, 50000L,
-            ResourceType.DOC, 50000L
-    );
-
     public static LectureResourceV2 create(
             String originalFileName,
             String fileKey,
-            Integer videoDuration,
+            Integer duration,
             boolean isDownloadable,
             long fileSize
     ) {
 
         ExtensionType extensionType = ExtensionType.fromFileName(originalFileName);
         ResourceType resourceType = ResourceType.fromExtension(extensionType.getExtension());
+        resourceType.validateFileSize(fileSize);
 
-        validateVideoDuration(resourceType, videoDuration);
-        validateFileSize(resourceType, fileSize);
+        VideoDuration videoDuration = resourceType == ResourceType.VIDEO ? VideoDuration.from(duration) : null;
 
         return new LectureResourceV2(
                 originalFileName,
@@ -77,18 +68,5 @@ public class LectureResourceV2 extends BaseTimeEntity {
                 videoDuration,
                 isDownloadable
         );
-    }
-
-    private static void validateVideoDuration(ResourceType resourceType, Integer videoDuration) {
-        if (resourceType == ResourceType.VIDEO && (videoDuration == null || videoDuration <= 0)) {
-            throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_VIDEO_DURATION_NOT_FOUND);
-        }
-    }
-
-    private static void validateFileSize(ResourceType resourceType, long fileSize) {
-        Long maxSize = MAX_FILE_SIZE.get(resourceType);
-        if (maxSize != null && fileSize > maxSize) {
-            throw new BusinessException(LectureResourceErrorCode.FILE_SIZE_EXCEEDED);
-        }
     }
 }

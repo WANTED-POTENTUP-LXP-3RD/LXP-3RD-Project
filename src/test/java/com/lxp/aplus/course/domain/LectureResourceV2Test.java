@@ -35,7 +35,7 @@ class LectureResourceV2Test {
         assertThat(resource.getOriginalFileName()).isEqualTo(originalFileName);
         assertThat(resource.getFileKey()).isEqualTo(fileKey);
         assertThat(resource.getResourceType()).isEqualTo(ResourceType.VIDEO);
-        assertThat(resource.getVideoDuration()).isEqualTo(videoDuration);
+        assertThat(resource.getVideoDuration().duration()).isEqualTo(videoDuration);
         assertThat(resource.isDownloadable()).isTrue();
     }
 

@@ -9,10 +9,10 @@ import io.minio.MinioClient;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidKeyException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -30,13 +30,13 @@ public class MinioPresignedUrlGenerator implements PresignedUrlGenerator {
 
     @Override
     public PresignedUrlResult generateGetUrl(String key) {
-
-        String presignedUrl = generatePresignedUrl(key, Method.GET, Map.of());
+        Method method = Method.GET;
+        String presignedUrl = generatePresignedUrl(key, method, Collections.emptyMap());
 
         return new PresignedUrlResult(
                 presignedUrl,
                 key,
-                HttpMethod.GET.toString(),
+                method.toString(),
                 expireSeconds
         );
     }
@@ -48,24 +48,26 @@ public class MinioPresignedUrlGenerator implements PresignedUrlGenerator {
 
         String key = keyGenerator.generate(bucket, originalFileName);
 
-        String presignedUrl = generatePresignedUrl(key, Method.PUT, headers);
+        Method method = Method.PUT;
+        String presignedUrl = generatePresignedUrl(key, method, headers);
 
         return new PresignedUrlResult(
                 presignedUrl,
                 key,
-                HttpMethod.PUT.toString(),
+                method.toString(),
                 expireSeconds
         );
     }
 
     @Override
     public PresignedUrlResult generateDeleteUrl(String key) {
-        String presignedUrl = generatePresignedUrl(key, Method.DELETE, Map.of());
+        Method method = Method.DELETE;
+        String presignedUrl = generatePresignedUrl(key, method, Map.of());
 
         return new PresignedUrlResult(
                 presignedUrl,
                 key,
-                HttpMethod.GET.toString(),
+                method.toString(),
                 expireSeconds
         );
     }
