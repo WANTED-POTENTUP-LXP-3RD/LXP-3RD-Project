@@ -43,10 +43,12 @@ public class ProgressCommandUseCase {
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(ProgressErrorCode.LEARNING_HISTORY_NOT_FOUND));
 
-        LectureResource lectureResource = parentLecture.getLectureResources().stream()
-                .filter(resource -> resource.getId().equals(request.resourceId()))
-                .findFirst()
-                .get();
+        LectureResource lectureResource = null;
+// TODO:
+//                parentLecture.getLectureResources().stream()
+//                .filter(resource -> resource.getId().equals(request.resourceId()))
+//                .findFirst()
+//                .get();
 
         Optional<Progress> existingProgress = progressRepository
                 .findByEnrollmentAndLectureResource(enrollment, lectureResource);

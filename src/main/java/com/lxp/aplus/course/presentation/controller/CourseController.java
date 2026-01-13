@@ -44,13 +44,12 @@ public class CourseController {
     private final CourseQueryUseCase courseQueryUseCase;
 
     @InstructorOnly
-    @PostMapping(value = "/api/instructor/courses", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/instructor/courses")
     public ResponseEntity<ResultResponse<CourseUpsertResponse>> createCourse(
             @Authenticated Long instructorId,
-            @RequestPart("request") @Valid CourseCreateRequest request,
-            @RequestPart("thumbnail") MultipartFile thumbnail
+            @RequestBody @Valid CourseCreateRequest request
     ) {
-        CourseUpsertResult result = courseCommandUseCase.createCourse(instructorId, request.toCommand(thumbnail));
+        CourseUpsertResult result = courseCommandUseCase.createCourse(instructorId, request.toCommand());
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_REGISTER_SUCCESS.getStatus())
