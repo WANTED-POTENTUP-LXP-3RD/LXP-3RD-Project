@@ -2,3 +2,5 @@ ALTER TABLE enrollments
     MODIFY COLUMN status VARCHAR(255) NOT NULL DEFAULT 'ENROLLED';
 
 
+ALTER TABLE enrollments
+    ADD COLUMN order_item_id BIGINT NULL;
