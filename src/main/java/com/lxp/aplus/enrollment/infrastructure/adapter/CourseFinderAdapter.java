@@ -25,6 +25,7 @@ public class CourseFinderAdapter implements CourseFinder {
 
     @Override
     @Transactional(readOnly = true)
+    // TODO: [성능 개선] N+1 쿼리 발생 지점. CourseFinder에 findCourseByIds(List<Long> courseIds)와 같은 배치 조회 기능 추가 필요.
     public Optional<CourseSummary> findCourseById(Long courseId) {
 
         return courseRepository.findById(courseId)
@@ -65,6 +66,7 @@ public class CourseFinderAdapter implements CourseFinder {
 
         @Override
         @Transactional(readOnly = true)
+        // TODO: [성능 개선] N+1 쿼리 발생 지점. CourseFinder에 findCategoryNamesByCourseIds(List<Long> courseIds)와 같은 배치 조회 기능 추가 필요.
         public List<String> findCategoryNamesByCourseId(Long courseId) {
             return courseRepository.findById(courseId)
                     .flatMap(course -> categoryRepository.findByIdWithParent(course.getCategoryId()))

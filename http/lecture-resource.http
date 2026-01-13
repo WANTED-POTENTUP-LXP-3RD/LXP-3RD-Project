@@ -1,0 +1,32 @@
+@host = http://localhost:8080
+
+### 로그인해서 토큰 받기
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+> {%
+    // ResultResponse<T> 구조에서 data.accessToken을 꺼냄
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.global.set("tokenType", response.body.data.tokenType ?? "Bearer");
+    client.log("saved accessToken=" + response.body.data.accessToken);
+%}
+
+### presigned url 생성
+POST {{host}}/api/instructor/resources
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+{
+"fileName" : "공고시간표(2018.07.11).zip",
+"contentType" : "application/zip",
+"size" : 15553000,
+"duration" : 600,
+"isDownloadable" : true
+}

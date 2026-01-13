@@ -2,7 +2,7 @@ package com.lxp.aplus.course.infrastructure.adapter;
 
 import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
-import com.lxp.aplus.enrollment.infrastructure.persistence.dto.StudentCountDto;
+import com.lxp.aplus.enrollment.domain.StudentCountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
