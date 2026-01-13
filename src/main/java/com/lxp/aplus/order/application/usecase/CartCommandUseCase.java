@@ -76,6 +76,5 @@ public class CartCommandUseCase {
     private Cart getCart(Long userId) {
         return cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.create(userId)));
-
     }
 }

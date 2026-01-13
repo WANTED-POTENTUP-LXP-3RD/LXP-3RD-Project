@@ -9,10 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "carts")
@@ -67,7 +64,11 @@ public class Cart extends BaseAggregateRoot {
     }
 
     public void removeCartItem(Long cartItemId) {
-        boolean removed = cartItems.removeIf(cartItem -> cartItem.getId().equals(cartItemId));
+        /*
+         * - Objects.equals: cartItem.getId()가 null인 경우(영속화 전)에도 NPE 없이 안전하게 비교하기 위함
+         * - removeIf: 조건에 맞는 요소를 리스트에서 즉시 제거 (orphanRemoval=true 설정에 의해 DB 삭제 전파)
+         */
+        boolean removed = cartItems.removeIf(cartItem -> Objects.equals(cartItem.getId(), cartItemId));
 
         if (!removed) {
             throw new BusinessException(CartErrorCode.CART_ITEM_NOT_FOUND);
