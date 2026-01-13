@@ -11,6 +11,22 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
+  # Gmail SMTP 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME:}  # 환경변수 또는 직접 입력
+    password: ${GMAIL_APP_PASSWORD:}  # Gmail 앱 비밀번호 (환경변수 권장)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
