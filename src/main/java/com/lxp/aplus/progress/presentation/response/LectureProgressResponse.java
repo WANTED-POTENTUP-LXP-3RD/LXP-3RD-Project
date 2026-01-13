@@ -1,29 +1,33 @@
 package com.lxp.aplus.progress.presentation.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.lxp.aplus.progress.application.result.LectureProgressResult;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record LectureProgressResponse(
-        Long resourceId,
-        String title,
-        int currentProgressRate,
-        int watchedDuration,
-        int totalDurationSeconds,
-        boolean isCompleted,
-        LocalDateTime lastWatchedAt
-) {
-    public static LectureProgressResponse from(LectureProgressResult result) {
-        return new LectureProgressResponse(
-                result.resourceId(),
-                result.title(),
-                result.currentProgressRate(),
-                result.watchedDuration(),
-                result.totalDurationSeconds(),
-                result.isCompleted(),
-                result.lastWatchedAt()
-        );
+@Getter
+public class LectureProgressResponse {
+    private final Long resourceId;
+    private final String title;
+    private final int watchedDuration;
+    private final int totalDurationSeconds;
+    private final boolean completed;
+    private final LocalDateTime lastWatchedAt;
+    private final int progressRate;
+
+    public LectureProgressResponse(Long resourceId, String title, int watchedDuration, int totalDurationSeconds, boolean completed, LocalDateTime lastWatchedAt) {
+        this.resourceId = resourceId;
+        this.title = title;
+        this.watchedDuration = watchedDuration;
+        this.totalDurationSeconds = totalDurationSeconds;
+        this.completed = completed;
+        this.lastWatchedAt = lastWatchedAt;
+        this.progressRate = calculateProgressRate(watchedDuration, totalDurationSeconds, completed);
+    }
+
+    private int calculateProgressRate(int watched, int total, boolean isCompleted) {
+        if (total == 0) {
+            return isCompleted ? 100 : 0;
+        }
+        return (int) (((double) watched / total) * 100);
     }
 }
