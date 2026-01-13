@@ -7,13 +7,15 @@ public record SliceResponse<T>(
         List<T> content,
         int page,
         int size,
+        Integer totalCount,
         boolean hasNext
 ) {
-    public static <T> SliceResponse<T> from(Slice<T> slice) {
+    public static <T> SliceResponse<T> of(Slice<T> slice, Integer totalCount) {
         return new SliceResponse<>(
                 slice.getContent(),
                 slice.getNumber(),
                 slice.getSize(),
+                totalCount,
                 slice.hasNext()
         );
     }

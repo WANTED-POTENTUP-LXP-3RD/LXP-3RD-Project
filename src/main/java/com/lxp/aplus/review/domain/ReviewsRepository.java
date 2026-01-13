@@ -9,4 +9,5 @@ public interface ReviewsRepository {
     Boolean existsOwnReviewInCourse(Long id, Long courseId);
     Optional<Reviews> getReview(Long userId, Long courseId);
     Slice<Reviews> getCourseReviews(Long courseId, Pageable pageable);
+    Integer countCourseReviews(Long courseId);
 }

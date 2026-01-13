@@ -80,7 +80,9 @@ public class ReviewController {
         Slice<ReviewResponse> result = reviewQueryUseCase.findReviewsInCourse(userId, courseId, pageable)
                 .map(ReviewResponse::from);
 
-        SliceResponse<ReviewResponse> response = SliceResponse.from(result);
+        Integer totalCount = reviewQueryUseCase.countReviewsInCourse(courseId);
+
+        SliceResponse<ReviewResponse> response = SliceResponse.of(result, totalCount);
 
         return ResponseEntity.status(ReviewResultCode.REVIEW_FIND_SUCCESS.getStatus())
                 .body(ResultResponse.of(ReviewResultCode.REVIEW_FIND_SUCCESS, response));
