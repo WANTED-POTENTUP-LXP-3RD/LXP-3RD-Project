@@ -3,4 +3,4 @@ ALTER TABLE enrollments
 
 
 ALTER TABLE enrollments
-    ADD COLUMN order_item_id BIGINT NULL;
+    ADD COLUMN order_item_id LONG NULL;
