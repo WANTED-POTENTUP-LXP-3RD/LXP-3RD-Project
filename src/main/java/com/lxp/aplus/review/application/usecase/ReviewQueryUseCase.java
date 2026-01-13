@@ -28,4 +28,8 @@ public class ReviewQueryUseCase {
         Slice<Reviews> reviews = reviewRepository.getCourseReviews(command.courseId(), pageable);
         return reviews.map(review -> ReviewResult.of(command.userId(), review));
     }
+
+    public Integer countReviewsInCourse(Long courseId) {
+        return reviewRepository.countCourseReviews(courseId);
+    }
 }

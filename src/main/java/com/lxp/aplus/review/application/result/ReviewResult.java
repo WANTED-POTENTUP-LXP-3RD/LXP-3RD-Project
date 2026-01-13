@@ -43,7 +43,7 @@ public record ReviewResult(
     }
 
     private static boolean isMine(Long userId, Long writerId) {
-        if(userId == null) {
+        if (userId == null) {
             return false;
         }
         return userId.equals(writerId);
