@@ -50,6 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveToken(request);
+        
+        log.debug("JWT 필터 실행: URI={}, 토큰 존재 여부={}", request.getRequestURI(), StringUtils.hasText(token));
 
         // 토큰이 있는 경우
         if (StringUtils.hasText(token)) {
@@ -64,8 +66,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtTokenProvider.validateToken(token)) {
                 // Access Token이 유효한 경우
                 Long userId = jwtTokenProvider.getUserIdFromToken(token);
+                log.debug("JWT 토큰 검증 성공: userId={}", userId);
                 setAuthentication(userId);
             } else {
+                log.debug("JWT 토큰 검증 실패: 토큰이 만료되었거나 유효하지 않음");
                 // Access Token이 만료된 경우 - Refresh Token으로 자동 갱신 시도
                 boolean refreshed = handleExpiredAccessToken(request, response);
                 // Refresh Token이 없거나 유효하지 않은 경우 플래그 설정
@@ -73,6 +77,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     request.setAttribute("TOKEN_EXPIRED", true);
                 }
             }
+        } else {
+            log.debug("JWT 토큰이 없음: URI={}", request.getRequestURI());
         }
 
         filterChain.doFilter(request, response);

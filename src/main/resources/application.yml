@@ -4,8 +4,11 @@ server:
 spring:
   application:
     name: LXP-Project
-  profiles:
-    active: local
+
+  web:
+    resources:
+      add-mappings: false  # 기본 정적 리소스 핸들러 비활성화
+
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -18,3 +21,12 @@ jwt:
   refresh-token-expiration: 604800000 # 7일 (밀리초)
   header: Authorization
   prefix: Bearer
+
+cors:
+  allowed-origins:
+    - http://localhost:3000
+    - http://127.0.0.1:3000
+
+logging:
+  level:
+    org.springframework.security: DEBUG
