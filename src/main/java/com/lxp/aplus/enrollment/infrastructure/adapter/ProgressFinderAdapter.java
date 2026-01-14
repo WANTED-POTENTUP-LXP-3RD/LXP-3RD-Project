@@ -18,11 +18,12 @@ public class ProgressFinderAdapter implements ProgressFinder {
 
     @Override
     public Map<Long, Boolean> getCompletionStatusMap(Long enrollmentId, List<Long> lectureResourceIds) {
-        List<Progress> progresses = progressRepository.findByEnrollmentIdAndLectureResourceIds(enrollmentId, lectureResourceIds);
+        List<Progress> allProgressesForEnrollment = progressRepository.findByEnrollmentId(enrollmentId);
 
-        return progresses.stream()
+        return allProgressesForEnrollment.stream()
+                .filter(progress -> lectureResourceIds.contains(progress.getLectureResourceId()))
                 .collect(Collectors.toMap(
-                        progress -> progress.getLectureResource().getId(),
+                        Progress::getLectureResourceId,
                         Progress::isCompleted
                 ));
     }
