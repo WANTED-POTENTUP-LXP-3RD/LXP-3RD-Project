@@ -10,4 +10,3 @@ create table if not exists lecture_resources_v2
     duration              int             DEFAULT NULL,
     PRIMARY KEY (`id`)
 );
-
