@@ -15,6 +15,7 @@ public record CartAddItemResponse(
     public static CartAddItemResponse of(Cart cart, Long addedCourseId, int amount) {
 
         // 리스트에서 해당 courseId를 가진 항목을 찾음
+        // TODO: dto에서 service의 책임을 지고 있음 -> 유즈케이스로 레이어로 이동
         CartItem addedCartItem = cart.getCartItems().stream()
                 .filter(cartItem -> cartItem.getCourseId().equals(addedCourseId))
                 .findFirst()
