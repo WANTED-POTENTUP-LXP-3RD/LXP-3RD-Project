@@ -1,0 +1,40 @@
+##########################################
+### 장바구니 API (/api/cart)
+##########################################
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. 장바구니 강좌 추가
+# - 성공 시 응답 바디에서 cartItemId를 추출하여 글로벌 변수에 저장합니다.
+POST {{baseUrl}}/api/cart/items
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "courseId": 1
+}
+
+> {%
+    // 응답 데이터에서 cartItemId 추출
+    // 결과 구조가 ResultResponse<CartAddItemResponse>이므로 response.body.data 접근
+    const cartItemId = response.body.data.cartItemId;
+
+    if (cartItemId) {
+        client.global.set("lastAddedCartItemId", cartItemId);
+        client.log("Cart Item ID saved: " + cartItemId);
+    } else {
+        client.log("Error: cartItemId not found in response.");
+    }
+%}
+
+
+### 2. 장바구니 강좌 삭제
+# - 1번 API 실행 후 저장된 lastAddedCartItemId 변수를 사용하여 삭제합니다.
+DELETE {{baseUrl}}/api/cart/items/{{lastAddedCartItemId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.log("Attempting to delete cartItemId: " + client.global.get("lastAddedCartItemId"));
+%}

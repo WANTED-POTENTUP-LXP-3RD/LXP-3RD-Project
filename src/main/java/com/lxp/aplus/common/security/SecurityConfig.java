@@ -65,7 +65,7 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            @Value("${cors.allowed-origins}") List<String> allowedOrigins) {
+            @Value("#{'${cors.allowed-origins}'.split(',')}") List<String> allowedOrigins) {
         CorsConfiguration config = new CorsConfiguration();
         
         // 허용할 Origin 설정 (application.yml에서 읽어옴)
