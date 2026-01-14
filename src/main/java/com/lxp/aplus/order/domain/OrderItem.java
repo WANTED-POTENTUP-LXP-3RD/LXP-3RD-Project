@@ -45,6 +45,7 @@ public class OrderItem extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long orderItemId;  // 주문 아이템 식별자
 
     @ManyToOne(fetch = FetchType.LAZY)
