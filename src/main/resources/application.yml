@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: LXP-Project
+  profiles:
+    active: local
 
   web:
     resources:
@@ -23,9 +25,7 @@ jwt:
   prefix: Bearer
 
 cors:
-  allowed-origins:
-    - http://localhost:3000
-    - http://127.0.0.1:3000
+  allowed-origins: http://localhost:3000,http://127.0.0.1:3000
 
 logging:
   level:
