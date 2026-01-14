@@ -21,9 +21,4 @@ SELECT
     lr.resource_type,
     l.total_duration_seconds
 FROM lecture_resources lr
-         JOIN lectures l ON lr.lecture_id = l.id;
-
-SELECT @max_id := COALESCE(MAX(id), 0) + 1 FROM lecture_resources_v2;
-SET @sql = CONCAT('ALTER TABLE lecture_resources_v2 AUTO_INCREMENT = ', @max_id);
-PREPARE STMT FROM @sql;
-EXECUTE STMT;
+JOIN lectures l ON lr.lecture_id = l.id;
