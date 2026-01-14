@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class UserQueryAdapter implements UserQueryPort {
+public class ReviewUserQueryAdapter implements UserQueryPort {
     private final UserRepository userRepository;
 
     @Override

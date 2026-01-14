@@ -7,7 +7,7 @@
 @contentType = application/json
 
 ### 테스트용 사용자 정보 (통일)
-@testEmail = test2@example.com
+@testEmail = test3@example.com
 @testPassword = password123
 @testName = 테스트 사용자3
 @testNickName = testuser3
@@ -127,3 +127,12 @@ Authorization: Bearer {{accessToken}}
 DELETE {{baseUrl}}/api/courses/{{courseId}}/review
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
+
+### 리뷰작성 체크
+POST {{baseUrl}}/api/reviews/my
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+    "courseIds" :[1,2,3]
+}

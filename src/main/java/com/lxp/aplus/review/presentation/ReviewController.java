@@ -10,15 +10,19 @@ import com.lxp.aplus.review.application.command.ReviewQueryCommand;
 import com.lxp.aplus.review.application.result.ReviewDeleteResult;
 import com.lxp.aplus.review.application.result.ReviewResult;
 import com.lxp.aplus.review.application.result.ReviewUpsertResult;
+import com.lxp.aplus.review.application.result.ReviewWroteResult;
 import com.lxp.aplus.review.application.usecase.ReviewCommandUseCase;
 import com.lxp.aplus.review.application.usecase.ReviewQueryUseCase;
 import com.lxp.aplus.review.presentation.request.ReviewCreateRequest;
+import com.lxp.aplus.review.presentation.request.ReviewFindCourseIdRequest;
 import com.lxp.aplus.review.presentation.request.ReviewUpdateRequest;
 import com.lxp.aplus.review.presentation.response.ReviewDeleteResponse;
 import com.lxp.aplus.review.presentation.response.ReviewResponse;
 import com.lxp.aplus.review.presentation.response.ReviewUpsertResponse;
+import com.lxp.aplus.review.presentation.response.ReviewWroteResponse;
 import com.lxp.aplus.review.presentation.response.SliceResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -102,5 +106,13 @@ public class ReviewController {
 
         return ResponseEntity.status(ReviewResultCode.REVIEW_DELETE_SUCCESS.getStatus())
                 .body(ResultResponse.of(ReviewResultCode.REVIEW_DELETE_SUCCESS, ReviewDeleteResponse.from(result)));
+    }
+
+    @PostMapping("/reviews/my")
+    public ResponseEntity<ResultResponse<List<ReviewWroteResponse>>> getMyReviewsIsWrote(
+            @RequestBody ReviewFindCourseIdRequest request, @Authenticated Long userId) {
+        List<ReviewWroteResponse> result = reviewQueryUseCase.checkReviewed(request.courseIds(), userId).stream().map(ReviewWroteResponse::from).toList();
+        return ResponseEntity.status(ReviewResultCode.REVIEW_FIND_SUCCESS.getStatus())
+                .body(ResultResponse.of(ReviewResultCode.REVIEW_FIND_SUCCESS, result));
     }
 }
