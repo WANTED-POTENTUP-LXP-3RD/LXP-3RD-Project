@@ -9,6 +9,7 @@ public record ReviewResponse(
         Long id,
         Long userId,
         Long courseId,
+        String nickname,
         Integer rating,
         String content,
         ReviewStatus status,
@@ -27,6 +28,7 @@ public record ReviewResponse(
                 .id(reviewResult.id())
                 .userId(reviewResult.userId())
                 .courseId(reviewResult.courseId())
+                .nickname(reviewResult.nickName())
                 .rating(reviewResult.displayRating())
                 .content(reviewResult.content())
                 .status(reviewResult.status())
