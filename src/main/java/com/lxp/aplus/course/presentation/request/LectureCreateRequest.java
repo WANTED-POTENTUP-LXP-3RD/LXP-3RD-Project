@@ -10,28 +10,21 @@ public record LectureCreateRequest(
         @NotNull(message = "제목은 필수입니다.")
         String title,
 
-        Integer totalDurationSeconds,
-
-        boolean isPreview,
+        @NotNull(message = "미리보기 여부는 필수 값입니다.")
+        Boolean isPreview,
 
         @Min(value = 1, message = "순서 인덱스는 1 이상이어야 합니다.")
         int orderIndex,
 
-        @NotNull(message = "강의 자료는 필수입니다.")
-        LectureResourceRequest resource
+        @NotNull(message = "리소스 키는 필수 입니다.")
+        String resourceKey
 ) {
-    public CreateLectureCommand toCommand(UploadFile uploadFile) {
+    public CreateLectureCommand toCommand() {
         return CreateLectureCommand.builder()
                 .title(this.title)
-                .totalDurationSeconds(this.totalDurationSeconds)
                 .isPreview(this.isPreview)
                 .orderIndex(this.orderIndex)
-                .resource(
-                        CreateLectureResourceCommand.builder()
-                                .isDownloadable(this.resource.isDownloadable())
-                                .uploadFile(uploadFile)
-                                .build()
-                )
+                .resourceKey(this.resourceKey)
                 .build();
     }
 }

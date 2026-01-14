@@ -32,3 +32,4 @@ minio:
   endpoint: "http://${MINIO_HOST}:${MINIO_PORT}"
   access-key: ${MINIO_ROOT_USER}
   secret-key: ${MINIO_ROOT_PASSWORD}
+  resource_expire_seconds: 120

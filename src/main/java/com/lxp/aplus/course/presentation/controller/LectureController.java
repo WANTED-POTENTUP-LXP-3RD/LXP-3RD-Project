@@ -32,24 +32,19 @@ public class LectureController {
 
     /** 강의 생성 **/
     @InstructorOnly
-    @PostMapping(
-            value = "/instructor/courses/{courseId}/sections/{sectionId}/lectures",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResultResponse<LectureResponse>> createLecture (@Valid @PathVariable Long courseId,
-                                                                          @Authenticated Long instructorId,
-                                                                          @PathVariable Long sectionId,
-                                                                          @RequestPart("lecture") LectureCreateRequest request,
-                                                                          @RequestPart("multiFile") MultipartFile file) throws IOException {
+    @PostMapping(value = "/instructor/courses/{courseId}/sections/{sectionId}/lectures")
+    public ResponseEntity<ResultResponse<LectureResponse>> createLecture (
+            @Authenticated Long instructorId,
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId,
+            @Valid @RequestBody LectureCreateRequest request
+    ) {
+        CreateLectureCommand command = request.toCommand();
 
-        UploadFile uploadFile = UploadFile.from(file);
-
-        CreateLectureCommand command = request.toCommand(uploadFile);
-
-        LectureResult result = lectureCommandUseCase.createLecture(courseId, sectionId, command);
+        LectureResult result = lectureCommandUseCase.createLecture(courseId, sectionId, instructorId, command);
 
         return ResponseEntity
                 .status(LectureResultCode.LECTURE_REGISTER_SUCCESS.getStatus())
-
                 .body(ResultResponse.of(
                         LectureResultCode.LECTURE_REGISTER_SUCCESS,
                         LectureResponse.from(result)));

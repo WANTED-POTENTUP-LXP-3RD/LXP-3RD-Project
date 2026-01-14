@@ -1,6 +1,7 @@
 package com.lxp.aplus.course.presentation.response;
 
 import com.lxp.aplus.course.domain.LectureResource;
+import com.lxp.aplus.course.domain.LectureResourceV2;
 import com.lxp.aplus.course.domain.ResourceType;
 import lombok.Builder;
 
@@ -8,12 +9,12 @@ import lombok.Builder;
 public record LectureResourceResponse(
         ResourceType resourceType,
         boolean isDownloadable,
-        String fileUrl
+        String fileKey
 ) {
-    public static LectureResourceResponse from(LectureResource resource) {
+    public static LectureResourceResponse from(LectureResourceV2 resource) {
         return LectureResourceResponse.builder()
                 .resourceType(resource.getResourceType())
-                .fileUrl(resource.getFileUrl())
+                .fileKey(resource.getFileKey())
                 .isDownloadable(resource.isDownloadable())
                 .build();
     }

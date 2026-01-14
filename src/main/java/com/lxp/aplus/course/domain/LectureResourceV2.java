@@ -17,6 +17,10 @@ public class LectureResourceV2 extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id")
+    private Lecture lecture;
+
     @Column(name = "original_file_name", nullable = false)
     private String originalFileName;
 
@@ -68,5 +72,9 @@ public class LectureResourceV2 extends BaseTimeEntity {
                 videoDuration,
                 isDownloadable
         );
+    }
+
+    void assignToLecture(Lecture lecture) {
+        this.lecture = lecture;
     }
 }

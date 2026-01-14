@@ -52,8 +52,8 @@ public class Section extends BaseTimeEntity {
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lecture> lectures = new ArrayList<>();
 
-    public Lecture addLecture(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
-        Lecture lecture = Lecture.create(this, title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
+    public Lecture addLecture(String title, boolean isPreview, LectureResourceV2 resource, int orderIndex) {
+        Lecture lecture = Lecture.create(this, title, resource, isPreview, orderIndex);
         this.lectures.add(lecture);
         return lecture;
     }
@@ -63,7 +63,7 @@ public class Section extends BaseTimeEntity {
                 .filter(l -> l.getId().equals(lectureId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
-        lecture.update(title, totalDurationSeconds, isPreview, orderIndex);
+        lecture.update(title, isPreview, orderIndex);
         return lecture;
     }
 
@@ -72,7 +72,8 @@ public class Section extends BaseTimeEntity {
                 .filter(l -> l.getId().equals(lectureId))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(LectureErrorCode.LECTURE_NOT_FOUND));
-        lecture.update(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
+        // TODO: 리소스 업데이트
+//        lecture.update(title, totalDurationSeconds, isPreview, orderIndex, isDownloadable, fileKey, fileUrl, originFileName);
         return lecture;
     }
 
