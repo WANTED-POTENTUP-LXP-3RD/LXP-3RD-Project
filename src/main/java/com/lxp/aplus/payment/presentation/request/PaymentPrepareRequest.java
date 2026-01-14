@@ -9,7 +9,7 @@ import java.util.List;
 
 public record PaymentPrepareRequest(
         @NotNull(message = "items는 필수입니다.")
-        @Size(min = 1, max = 1, message = "현재는 1개의 item만 가능합니다.(v2025-12-11)") // TODO: 묶음 결제(장바구니) 기능 추가 시 max 변경
+        @Size(min = 1, message = "최소 1개 이상의 상품을 선택해야합니다.")
         @Valid
         List<Item> items
 ) {
