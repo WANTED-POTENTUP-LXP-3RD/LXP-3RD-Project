@@ -1,15 +1,14 @@
 package com.lxp.aplus.order.domain;
 
+import com.lxp.aplus.common.domain.BaseTimeEntity;
 import com.lxp.aplus.order.application.CoursePrice;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+
 
 /**
  * OrderLine (Value Object)
@@ -38,32 +37,49 @@ import java.math.BigDecimal;
  *   Entity(OrderItem)로의 승격을 검토한다
  */
 
-@Embeddable
+@Entity
+@Table(name = "order_items")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderLine {
+public class OrderItem extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long orderItemId;  // 주문 아이템 식별자
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @Enumerated(EnumType.STRING)
-    private ItemType itemType;
+    @Column(nullable = false)
+    private ItemType itemType; // 상품 타입
 
-    private Long itemId;
+    @Column(nullable = false)
+    private Long itemId; // 상품 아이디 (현재는 courseId)
 
     @Column(nullable = false, precision = 10, scale = 0)
     private BigDecimal price;
 
-    protected OrderLine(ItemType itemType, Long itemId, BigDecimal price) {
+    protected OrderItem(ItemType itemType, Long itemId, BigDecimal price) {
         this.itemType = itemType;
         this.itemId = itemId;
         this.price = price;
     }
 
-    // FIXME: course 네이밍 바꾸기 (course 도메인과 헷갈릴 여지 있음)
-    public static OrderLine course(Long courseId, BigDecimal price) {
-        return new OrderLine(ItemType.COURSE, courseId, price);
+    /**
+     * 연관관계 편의 메서드
+     * Order 엔티티에서 호출하여 양방향 관계를 맺어줍니다.
+     */
+    public void assignOrder(Order order) {
+        if (this.order != null) {
+            return; // 이미 할당된 경우 재할당 방지
+        }
+        this.order = order;
     }
 
-    public static OrderLine from(CoursePrice coursePrice) {
-        return new OrderLine(
+    public static OrderItem create(CoursePrice coursePrice) {
+        return new OrderItem(
                 ItemType.COURSE,
                 coursePrice.courseId(),
                 BigDecimal.valueOf(coursePrice.price()) // int -> BigDecimal

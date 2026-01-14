@@ -37,12 +37,12 @@ public class Order extends BaseAggregateRoot {
     @Column(nullable = false, updatable = false, precision = 19, scale = 0)
     private BigDecimal amount;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "order_lines",
-            joinColumns = @JoinColumn(name = "order_id")
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    private List<OrderLine> orderLines = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -62,13 +62,18 @@ public class Order extends BaseAggregateRoot {
             String orderId,
             Long userId,
             BigDecimal amount,
-            List<OrderLine> orderLines
+            List<OrderItem> orderItems
     ) {
         this.orderId = orderId;
         this.userId = userId;
         this.currency = "KRW";
         this.amount = amount;
-        this.orderLines = orderLines;
+        //this.orderItems = orderItems;
+
+        for (OrderItem orderItem : orderItems) {
+            this.orderItems.add(orderItem);
+            orderItem.assignOrder(this);
+        }
     }
 
     /* ========= 생성 ========= */
@@ -80,15 +85,15 @@ public class Order extends BaseAggregateRoot {
      */
     public static Order create(
             Long userId,
-            List<OrderLine> orderLines
+            List<OrderItem> orderItems
     ) {
         // 1. orderId 생성
         // TODO: orderId 생성 규칙 만들기
         String orderId = UUID.randomUUID().toString();
 
         // 2. 총액 계산
-        BigDecimal amount = orderLines.stream()
-                .map(OrderLine::getPrice)
+        BigDecimal amount = orderItems.stream()
+                .map(OrderItem::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 3. Order 생성 및 반환 (생성자를 통해 불변성 확보)
@@ -96,7 +101,7 @@ public class Order extends BaseAggregateRoot {
                 orderId,
                 userId,
                 amount,
-                new ArrayList<>(orderLines)
+                new ArrayList<>(orderItems)
         );
     }
 
