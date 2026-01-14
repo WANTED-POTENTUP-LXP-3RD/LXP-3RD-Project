@@ -2,6 +2,8 @@ package com.lxp.aplus.review.infrastructure.persistence;
 
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.constant.ReviewStatus;
+import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -13,4 +15,5 @@ public interface ReviewsJpaRepository extends JpaRepository<Reviews, Long> {
     Integer countByCourseId(Long courseId);
     Optional<Reviews> findByUserIdAndCourseIdAndStatus(Long userId, Long courseId, ReviewStatus status);
     Long deleteByUserIdAndCourseId(Long userId, Long courseId);
+    List<Reviews> findByUserIdAndCourseIdIn(Long userId, List<Long> courseIds);
 }

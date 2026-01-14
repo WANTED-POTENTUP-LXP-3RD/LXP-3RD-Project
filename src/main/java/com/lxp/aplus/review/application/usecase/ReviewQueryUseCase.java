@@ -5,8 +5,13 @@ import com.lxp.aplus.common.error.code.ReviewErrorCode;
 import com.lxp.aplus.review.application.command.ReviewQueryCommand;
 import com.lxp.aplus.review.application.port.out.UserQueryPort;
 import com.lxp.aplus.review.application.result.ReviewResult;
+import com.lxp.aplus.review.application.result.ReviewWroteResult;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
+import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -38,5 +43,20 @@ public class ReviewQueryUseCase {
 
     public Integer countReviewsInCourse(Long courseId) {
         return reviewRepository.countCourseReviews(courseId);
+    }
+
+    public List<ReviewWroteResult> checkReviewed(List<Long> courseIds, Long userId){
+        List<ReviewWroteDto> result = reviewRepository.checkReviewedByCourseIds(courseIds, userId);
+
+        Set<Long> writtenIds = result.stream()
+                .map(ReviewWroteDto::courseId)
+                .collect(Collectors.toSet());
+
+        return courseIds.stream()
+                .map(id -> new ReviewWroteResult(
+                        id,
+                        writtenIds.contains(id) // 작성 목록에 있으면 true, 없으면 false
+                ))
+                .toList();
     }
 }

@@ -3,6 +3,8 @@ package com.lxp.aplus.review.infrastructure.persistence;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
 import com.lxp.aplus.review.domain.constant.ReviewStatus;
+import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -42,5 +44,10 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     @Override
     public Long deleteReview(Long userId, Long courseId) {
         return reviewJpaRepository.deleteByUserIdAndCourseId(userId, courseId);
+    }
+
+    @Override
+    public List<ReviewWroteDto> checkReviewedByCourseIds(List<Long> courseIds, Long userId) {
+        return reviewJpaRepository.findByUserIdAndCourseIdIn(userId, courseIds).stream().map(ReviewWroteDto::from).toList();
     }
 }
