@@ -28,7 +28,7 @@ public class CartController {
             @RequestBody @Valid CartAddItemRequest request
     ) {
 
-        CartAddItemResponse response = this.cartCommandUseCase.addCartItemToCart(request.toCommand(userId));
+        CartAddItemResponse response = cartCommandUseCase.addCartItemToCart(request.toCommand(userId));
 
         return ResponseEntity
                 .status(CART_ADD_ITEM_SUCCESS.getStatus())
@@ -41,7 +41,7 @@ public class CartController {
             @PathVariable Long cartItemId
     ) {
         CartRemoveItemCommand command = CartRemoveItemCommand.of(userId, cartItemId);
-        CartRemoveItemResponse response = this.cartCommandUseCase.removeCartItemFromCart(command);
+        CartRemoveItemResponse response = cartCommandUseCase.removeCartItemFromCart(command);
 
         return ResponseEntity
                 .status(CART_REMOVE_ITEM_SUCCESS.getStatus())
