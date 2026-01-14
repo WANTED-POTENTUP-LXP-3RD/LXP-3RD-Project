@@ -2,7 +2,7 @@ package com.lxp.aplus.enrollment.infrastructure.persistence;
 
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
-import com.lxp.aplus.enrollment.infrastructure.persistence.dto.StudentCountDto;
+import com.lxp.aplus.enrollment.domain.StudentCountDto; // Updated import
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
