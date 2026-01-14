@@ -27,4 +27,14 @@ public class ProgressFinderAdapter implements ProgressFinder {
                         Progress::isCompleted
                 ));
     }
+
+    @Override
+    public boolean hasProgress(Long enrollmentId) {
+        return progressRepository.existsByEnrollmentId(enrollmentId);
+    }
+
+    @Override
+    public void removeByEnrollmentId(Long enrollmentId) {
+        progressRepository.deleteByEnrollmentId(enrollmentId);
+    }
 }
