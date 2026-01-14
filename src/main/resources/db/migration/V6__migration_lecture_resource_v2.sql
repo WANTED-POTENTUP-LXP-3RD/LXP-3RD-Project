@@ -1,4 +1,4 @@
-INSERT IGNORE INTO LECTURE_RESOURCES_V2 (created_at, updated_at, file_key, is_downloadable, original_file_name, resource_type, duration)
+INSERT IGNORE INTO lecture_resources_v2 (created_at, updated_at, file_key, is_downloadable, original_file_name, resource_type, duration)
 SELECT
     lr.created_at,
     lr.updated_at,
