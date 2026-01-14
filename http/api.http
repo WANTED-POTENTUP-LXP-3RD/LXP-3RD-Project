@@ -7,11 +7,11 @@
 @contentType = application/json
 
 ### 테스트용 사용자 정보 (통일)
-@testEmail = test@example.com
+@testEmail = test2@example.com
 @testPassword = password123
-@testName = 테스트 사용자
-@testNickName = testuser
-@testPhoneNumber = 010-1234-5678
+@testName = 테스트 사용자2
+@testNickName = testuser2
+@testPhoneNumber = 010-1234-5679
 
 ##########################################
 ### 인증 API (/api/auth)
