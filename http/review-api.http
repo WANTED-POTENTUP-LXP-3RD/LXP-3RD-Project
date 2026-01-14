@@ -1,0 +1,138 @@
+    ### API HTTP Client
+### IntelliJ에서 직접 실행 가능 (▶ 버튼 클릭)
+### 변수 설정: baseUrl, accessToken, refreshToken 등
+
+### 변수 설정 (실행 전에 수정 가능)
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 테스트용 사용자 정보 (통일)
+@testEmail = test3@example.com
+@testPassword = password123
+@testName = 테스트 사용자3
+@testNickName = testuser3
+@testPhoneNumber = 010-1233-5673
+@courseId = 1
+@reviewId = 1
+
+##########################################
+### 인증 API (/api/auth)
+##########################################
+
+### 1. 회원가입 (테스트용 사용자 생성)
+# @name signup
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "nickname": "{{testNickName}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### 1-1. 회원가입 및 자동 로그인 (토큰 자동 저장)
+# @name signupAndLogin
+POST {{baseUrl}}/api/auth/signup-and-login
+Content-Type: {{contentType}}
+
+{
+  "nickname": "{{testNickName}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+    client.log("Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 2. 로그인 (토큰 자동 저장)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+    client.log("Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 로그인 후 위의 스크립트가 자동으로 토큰을 변수에 저장합니다.
+### accessToken과 refreshToken 변수가 자동으로 설정됩니다.
+
+### 3. 토큰 재발급 (Refresh Token 사용, 새 토큰 자동 저장)
+# @name refreshToken
+POST {{baseUrl}}/api/auth/token/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("New Access Token: " + response.body.data.accessToken);
+    client.log("New Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 4. 로그아웃 (Access Token과 Refresh Token 모두 사용)
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+X-Refresh-Token: {{refreshToken}}
+
+##########################################
+### 리뷰 API
+##########################################
+
+### 리뷰 작성
+POST {{baseUrl}}/api/courses/{{courseId}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "rating": 4,
+  "content": "강사님 잘생김132312"
+}
+
+### 리뷰 수정
+PATCH {{baseUrl}}/api/courses/{{courseId}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "rating" : 5,
+  "content": "ddd"
+}
+
+### 리뷰 단건 조회
+GET {{baseUrl}}/api/courses/{{courseId}}/review
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 리뷰 다건 조회
+GET {{baseUrl}}/api/courses/{{courseId}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 리뷰 삭제
+DELETE {{baseUrl}}/api/courses/{{courseId}}/review
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 리뷰작성 체크
+POST {{baseUrl}}/api/reviews/my
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+    "courseIds" :[1,2,3]
+}
