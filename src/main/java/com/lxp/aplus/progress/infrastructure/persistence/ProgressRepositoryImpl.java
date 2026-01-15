@@ -28,4 +28,14 @@ public class ProgressRepositoryImpl implements ProgressRepository {
     public List<Progress> findByEnrollmentId(Long enrollmentId) {
         return jpaRepository.findByEnrollmentId(enrollmentId);
     }
+
+    @Override
+    public boolean existsByEnrollmentId(Long enrollmentId) {
+        return jpaRepository.existsByEnrollmentId(enrollmentId);
+    }
+
+    @Override
+    public void deleteByEnrollmentId(Long enrollmentId) {
+        jpaRepository.deleteByEnrollmentId(enrollmentId);
+    }
 }
