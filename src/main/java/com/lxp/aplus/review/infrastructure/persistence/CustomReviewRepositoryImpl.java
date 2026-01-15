@@ -19,7 +19,7 @@ public class CustomReviewRepositoryImpl implements CustomReviewRepository {
                 .select(Projections.constructor(ReviewSummary.class,
                         reviews.courseId,
                         reviews.rating.avg(),
-                        reviews.id.count()
+                        reviews.id.count().intValue()
                 ))
                 .from(reviews)
                 .where(reviews.courseId.in(courseIds))
