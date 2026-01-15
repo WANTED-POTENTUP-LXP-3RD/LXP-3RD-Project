@@ -4,7 +4,6 @@ import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.order.application.command.CartRemoveItemCommand;
 import com.lxp.aplus.order.application.usecase.CartCommandUseCase;
-import com.lxp.aplus.order.application.usecase.CartQueryUseCase;
 import com.lxp.aplus.order.presentation.request.CartAddItemRequest;
 import com.lxp.aplus.order.presentation.response.CartAddItemResponse;
 import com.lxp.aplus.order.presentation.response.CartGetItemsResponse;
@@ -22,14 +21,13 @@ import static com.lxp.aplus.common.result.code.CartResultCode.*;
 public class CartController {
 
     private final CartCommandUseCase cartCommandUseCase;
-    private final CartQueryUseCase cartQueryUseCase;
 
-    @GetMapping
+    @GetMapping("/items")
     public ResponseEntity<ResultResponse<CartGetItemsResponse>> getCartAllItems(
             @Authenticated Long userId
     ) {
 
-        CartGetItemsResponse response = cartQueryUseCase.getCartItems(userId);
+        CartGetItemsResponse response = cartCommandUseCase.getCartItems(userId);
 
         return ResponseEntity
                 .status(CART_GET_ITEMS_SUCCESS.getStatus())
