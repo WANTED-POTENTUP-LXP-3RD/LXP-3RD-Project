@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReviewsJpaRepository extends JpaRepository<Reviews, Long> {
+public interface ReviewsJpaRepository extends JpaRepository<Reviews, Long>, CustomReviewRepository {
     Boolean existsByUserIdAndCourseId(Long userId, Long courseId);
     Slice<Reviews> findByCourseIdAndStatus(Long courseId, ReviewStatus status, Pageable pageable);
     Integer countByCourseId(Long courseId);
