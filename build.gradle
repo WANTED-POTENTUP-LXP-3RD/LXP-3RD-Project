@@ -58,9 +58,6 @@ sourceSets {
 
 tasks.withType(JavaCompile) {
     options.getGeneratedSourceOutputDirectory().set(querydslDir)
-    options.compilerArgs += [
-            "-Aquerydsl.useFields=true"
-    ]
 }
 
 clean {
