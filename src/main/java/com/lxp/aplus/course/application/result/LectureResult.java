@@ -5,6 +5,7 @@ import com.lxp.aplus.course.domain.LectureResource;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Builder
 public record LectureResult (
@@ -18,7 +19,15 @@ public record LectureResult (
         LectureResourceResult resource
 ) {
     public static LectureResult from(Lecture lecture) {
-        LectureResource lectureResource = lecture.getLectureResources().get(0);
+        LectureResourceResult resourceResult = Optional.ofNullable(lecture.getLectureResources())
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.get(0))
+                .map(res -> LectureResourceResult.builder()
+                        .resourceType(res.getResourceType())
+                        .isDownloadable(res.isDownloadable())
+                        .fileKey(res.getFileKey())
+                        .build())
+                .orElse(null);
 
         return LectureResult.builder()
                 .id(lecture.getId())
@@ -28,17 +37,7 @@ public record LectureResult (
                 .orderIndex(lecture.getOrderIndex())
                 .createdAt(lecture.getCreatedAt())
                 .updatedAt(lecture.getUpdatedAt())
-                .resource(new LectureResourceResult(lecture.getLectureResources().get(0).getResourceType(),
-                        lecture.getLectureResources().get(0).isDownloadable(),
-                        lecture.getLectureResources().get(0).getFileUrl()
-                ))
-                .resource(
-                        LectureResourceResult.builder()
-                                .resourceType(lectureResource.getResourceType())
-                                .isDownloadable(lectureResource.isDownloadable())
-                                .fileUrl(lectureResource.getFileUrl())
-                                .build()
-                )
+                .resource(resourceResult)
                 .build();
     }
 }

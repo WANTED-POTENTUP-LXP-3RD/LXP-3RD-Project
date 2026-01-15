@@ -8,6 +8,6 @@ public record CreateLectureCommand(
         Integer totalDurationSeconds,
         boolean isPreview,
         int orderIndex,
-        CreateLectureResourceCommand resource
+        String resourceKey
 ) {
 }
