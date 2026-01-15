@@ -50,7 +50,7 @@ public record LectureResponse(
                         LectureResourceResponse.builder()
                                 .resourceType(result.resource().resourceType())
                                 .isDownloadable(result.resource().isDownloadable())
-                                .fileKey(result.resource().fileKey())
+                                .fileUrl(result.resource().fileUrl())
                                 .build()
                 )
                 .build();

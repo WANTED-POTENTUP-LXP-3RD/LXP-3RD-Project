@@ -1,6 +1,7 @@
 package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.course.application.mapper.LectureResultUrlMapper;
 import com.lxp.aplus.course.application.result.LectureResult;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
@@ -15,7 +16,7 @@ import static com.lxp.aplus.common.error.code.CourseErrorCode.COURSE_NOT_FOUND;
 @Transactional
 @RequiredArgsConstructor
 public class LectureQueryUseCase {
-
+    private final LectureResultUrlMapper lectureResultUrlMapper;
     private final CourseRepository courseRepository;
 
     public LectureResult getLectureDetails (Long courseId, Long lectureId) {
@@ -23,6 +24,6 @@ public class LectureQueryUseCase {
                 .orElseThrow(() -> new BusinessException(COURSE_NOT_FOUND));
         Lecture lecture = course.readLecture(lectureId);
 
-        return LectureResult.from(lecture);
+        return lectureResultUrlMapper.toResult(lecture);
     }
 }

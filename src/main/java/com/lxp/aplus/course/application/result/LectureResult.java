@@ -25,7 +25,7 @@ public record LectureResult (
                 .map(res -> LectureResourceResult.builder()
                         .resourceType(res.getResourceType())
                         .isDownloadable(res.isDownloadable())
-                        .fileKey(res.getFileKey())
+                        .fileUrl(res.getFileKey())
                         .build())
                 .orElse(null);
 

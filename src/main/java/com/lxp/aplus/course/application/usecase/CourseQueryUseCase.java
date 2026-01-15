@@ -3,6 +3,7 @@ package com.lxp.aplus.course.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.UserErrorCode;
+import com.lxp.aplus.course.application.mapper.CourseResultMapper;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;
 import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
 import com.lxp.aplus.course.application.port.out.ReviewQueryPort;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CourseQueryUseCase {
+    private final CourseResultMapper courseResultMapper;
     private final CourseRepository courseRepository;
     private final UserQueryPort userQueryPort;
     private final CategoryQueryPort categoryQueryPort;
@@ -67,7 +69,7 @@ public class CourseQueryUseCase {
 
                     ReviewSummary reviewInfo = reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue());
 
-                    return CourseResult.of(
+                    return courseResultMapper.toResult(
                             course,
                             categoryNamesMap.get(course.getCategoryId()),
                             instructorName,
@@ -104,8 +106,7 @@ public class CourseQueryUseCase {
 
         boolean isPurchased = enrollmentQueryPort.isEnrolled(userId, courseId);
         int studentCount = enrollmentQueryPort.getStudentCount(courseId);
-
-        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
+        return courseResultMapper.toDetailResult(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
                 reviewStat);
     }
 
@@ -128,8 +129,7 @@ public class CourseQueryUseCase {
 
         boolean isPurchased = enrollmentQueryPort.isEnrolled(instructorId, courseId);
         int studentCount = enrollmentQueryPort.getStudentCount(courseId);
-
-        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
+        return courseResultMapper.toDetailResult(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
                 reviewStat);
     }
 
