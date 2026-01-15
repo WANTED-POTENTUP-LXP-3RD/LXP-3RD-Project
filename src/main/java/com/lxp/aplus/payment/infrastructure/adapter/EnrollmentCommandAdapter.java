@@ -35,6 +35,7 @@ public class EnrollmentCommandAdapter implements EnrollmentCommandPort {
             Long courseId = entry.getKey();
             Long orderItemId = entry.getValue();
 
+            // TODO: N+1 문제 확인
             boolean isEnrolled = enrollmentRepository.existsByStudentIdAndCourseId(userId, courseId);
 
             if (!isEnrolled) {

@@ -43,6 +43,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem extends BaseTimeEntity {
 
+    // TODO: orderItemId -> id로 수정
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -73,6 +74,7 @@ public class OrderItem extends BaseTimeEntity {
      * Order 엔티티에서 호출하여 양방향 관계를 맺어줍니다.
      */
     public void assignOrder(Order order) {
+        // TODO: OrderItem 생성자에서 반영해주고 update 불가하게 처리해주면 안되나요?
         if (this.order != null) {
             return; // 이미 할당된 경우 재할당 방지
         }
