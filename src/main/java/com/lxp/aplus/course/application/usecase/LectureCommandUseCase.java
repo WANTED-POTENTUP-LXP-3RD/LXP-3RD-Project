@@ -6,6 +6,7 @@ import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import com.lxp.aplus.course.application.command.CreateLectureCommand;
 import com.lxp.aplus.course.application.command.UpdateLectureCommand;
 import com.lxp.aplus.course.application.file.FileValidator;
+import com.lxp.aplus.course.application.mapper.LectureResultUrlMapper;
 import com.lxp.aplus.course.application.result.LectureResult;
 import com.lxp.aplus.course.application.vo.UploadFile;
 import com.lxp.aplus.course.domain.*;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class LectureCommandUseCase {
-
+    private final LectureResultUrlMapper lectureResultUrlMapper;
     private final CourseRepository courseRepository;
     private final LectureResourceRepository lectureResourceRepository;
     private final FileValidator fileValidator;
@@ -48,7 +49,7 @@ public class LectureCommandUseCase {
 
         courseRepository.flush();
 
-        return LectureResult.from(lecture);
+        return lectureResultUrlMapper.toResult(lecture);
     }
 
     public LectureResult updateLecture(Long courseId, Long lectureId, UpdateLectureCommand command) {
