@@ -38,7 +38,7 @@ public class CartCommandUseCase {
         }
 
         // 2. cart 조회 (없으면 생성)
-        Cart cart = getCart(command.userId());
+        Cart cart = getOrCreateCart(command.userId());
 
         // 3. cart에 새로운 cartItem 추가
         cart.addCartItem(command.courseId());
@@ -57,7 +57,7 @@ public class CartCommandUseCase {
      */
     public CartRemoveItemResponse removeCartItemFromCart(CartRemoveItemCommand command) {
         // 1. cart 조회 (없으면 생성)
-        Cart cart = getCart(command.userId());
+        Cart cart = getOrCreateCart(command.userId());
 
         // 2. cart에서 항목 제거 (dirty checking)
         cart.removeCartItem(command.cartItemId());
@@ -71,7 +71,7 @@ public class CartCommandUseCase {
     /*
      * 사용자별 장바구니를 조회하거나, 없을 경우 새 장바구니를 생성하여 반환한다.
      */
-    private Cart getCart(Long userId) {
+    private Cart getOrCreateCart(Long userId) {
         return cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.create(userId)));
     }
