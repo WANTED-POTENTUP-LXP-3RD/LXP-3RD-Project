@@ -28,7 +28,7 @@ public class Lecture extends BaseTimeEntity {
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LectureResource> lectureResources = new ArrayList<>();
+    private List<LectureResourceV2> lectureResources = new ArrayList<>();
 
     @Column(name = "total_duration_seconds")
     private Integer totalDurationSeconds;
@@ -43,40 +43,44 @@ public class Lecture extends BaseTimeEntity {
     @Min(1)
     private int orderIndex;
 
-    private Lecture(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
+    private Lecture(Section section, String title, LectureResourceV2 resource, boolean isPreview, int orderIndex) {
         this.section = section;
         this.title = title;
-        this.totalDurationSeconds = totalDurationSeconds;
         this.isPreview = isPreview;
         this.orderIndex = orderIndex;
-        this.lectureResources = new ArrayList<>();
+        this.lectureResources.add(resource);
+        this.totalDurationSeconds = resource.getVideoDuration().getDuration();
     }
 
-    public static Lecture create(Section section, String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
-        Lecture lecture = new Lecture(section, title, totalDurationSeconds, isPreview, orderIndex);
-        LectureResource resource = LectureResource.create(lecture, isDownloadable, fileKey, fileUrl,  originFileName);
-        lecture.lectureResources.add(resource);
+    public static Lecture create(Section section, String title, LectureResourceV2 resource, boolean isPreview, int orderIndex) {
+        Lecture lecture = new Lecture(section, title, resource, isPreview, orderIndex);
+        lecture.addResource(resource);
 
         return lecture;
     }
 
-    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex) {
-        this.title = title;
-        this.totalDurationSeconds = totalDurationSeconds;
-        this.isPreview = isPreview;
-        this.orderIndex = orderIndex;
-    }
-
-    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
-        this.title = title;
-        this.totalDurationSeconds = totalDurationSeconds;
-        this.isPreview = isPreview;
-        this.orderIndex = orderIndex;
-
-        this.lectureResources.clear();
-        LectureResource resource = LectureResource.create(this, isDownloadable, fileKey, fileUrl, originFileName);
+    public void addResource(LectureResourceV2 resource) {
         this.lectureResources.add(resource);
+        resource.assignToLecture(this);
     }
+
+    public void update(String title, boolean isPreview, int orderIndex) {
+        this.title = title;
+        this.isPreview = isPreview;
+        this.orderIndex = orderIndex;
+    }
+
+    // TODO: 업데이트 로직 구현 필요 
+//    public void update(String title, Integer totalDurationSeconds, boolean isPreview, int orderIndex, boolean isDownloadable, String fileKey, String fileUrl, String originFileName) {
+//        this.title = title;
+//        this.totalDurationSeconds = totalDurationSeconds;
+//        this.isPreview = isPreview;
+//        this.orderIndex = orderIndex;
+//
+//        this.lectureResources.clear();
+//        LectureResource resource = LectureResource.create(this, isDownloadable, fileKey, fileUrl, originFileName);
+//        this.lectureResources.add(resource);
+//    }
 
     public void validateHasResource() {
         if (this.lectureResources == null || this.lectureResources.isEmpty()) {

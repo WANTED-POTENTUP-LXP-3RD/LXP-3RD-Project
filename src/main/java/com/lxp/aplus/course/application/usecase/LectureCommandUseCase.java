@@ -2,6 +2,7 @@ package com.lxp.aplus.course.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
+import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import com.lxp.aplus.course.application.command.CreateLectureCommand;
 import com.lxp.aplus.course.application.command.UpdateLectureCommand;
 import com.lxp.aplus.course.application.file.FileValidator;
@@ -20,29 +21,29 @@ import org.springframework.stereotype.Service;
 public class LectureCommandUseCase {
 
     private final CourseRepository courseRepository;
+    private final LectureResourceRepository lectureResourceRepository;
     private final FileValidator fileValidator;
     private final LectureFileStore lectureFileStore;
 
-    public LectureResult createLecture(Long courseId, Long sectionId, CreateLectureCommand command) {
+    public LectureResult createLecture(Long courseId, Long sectionId, Long instructorId, CreateLectureCommand command) {
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        UploadFile file = command.resource().uploadFile();
+        course.validateOwner(instructorId);
 
-        fileValidator.validateRequired(file);
-        StoredFileInfo storedFile = lectureFileStore.storeLectureResourceFile(courseId, file);
+        LectureResourceV2 lectureResourceV2 = lectureResourceRepository.findByKey(command.resourceKey())
+                .orElseThrow(() -> new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_NOT_FOUND));
+        if (lectureResourceV2.getLecture() != null) {
+            throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_ALREADY_USE);
+        }
 
         Lecture lecture = course.createLecture(
                 sectionId,
                 command.title(),
-                command.totalDurationSeconds(),
                 command.isPreview(),
-                command.orderIndex(),
-                command.resource().isDownloadable(),
-                storedFile.fileKey(),
-                storedFile.fileUrl(),
-                file.originalFileName()
+                lectureResourceV2,
+                command.orderIndex()
         );
 
         courseRepository.flush();

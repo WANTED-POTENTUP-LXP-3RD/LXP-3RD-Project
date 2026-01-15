@@ -5,6 +5,8 @@ import com.lxp.aplus.course.domain.LectureResourceV2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class LectureResourceRepositoryImpl implements LectureResourceRepository {
@@ -13,5 +15,10 @@ public class LectureResourceRepositoryImpl implements LectureResourceRepository 
     @Override
     public LectureResourceV2 save(LectureResourceV2 lectureResource) {
         return lectureResourceJpaRepository.save(lectureResource);
+    }
+
+    @Override
+    public Optional<LectureResourceV2> findByKey(String key) {
+        return lectureResourceJpaRepository.findByFileKey(key);
     }
 }

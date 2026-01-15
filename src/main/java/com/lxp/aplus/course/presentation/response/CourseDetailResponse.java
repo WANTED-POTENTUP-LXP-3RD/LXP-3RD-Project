@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
+import com.lxp.aplus.course.application.dto.ReviewStat;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;
@@ -15,10 +16,11 @@ public record CourseDetailResponse(
         String title,
         String summary,
         String description,
+        ReviewStat reviewStat,
         int price,
         CourseStatus status,
         CourseLevel level,
-        String thumbnailUrl,
+        String thumbnailResourceKey,
         InstructorResponse instructor,
         boolean isPurchased,
         int studentCount,
@@ -32,10 +34,11 @@ public record CourseDetailResponse(
                 .title(result.title())
                 .summary(result.summary())
                 .description(result.description())
+                .reviewStat(result.reviewStat())
                 .price(result.price())
                 .status(result.status())
                 .level(result.level())
-                .thumbnailUrl(result.thumbnailUrl())
+                .thumbnailResourceKey(result.thumbnailResourceKey())
                 .instructor(InstructorResponse.from(result.instructor()))
                 .isPurchased(result.isPurchased())
                 .studentCount(result.studentCount())

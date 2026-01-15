@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.application.result;
 
+import com.lxp.aplus.course.application.dto.ReviewStat;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;
@@ -15,27 +16,29 @@ public record CourseDetailResult(
         String title,
         String summary,
         String description,
+        ReviewStat reviewStat,
         int price,
         CourseStatus status,
         CourseLevel level,
-        String thumbnailUrl,
+        String thumbnailResourceKey,
         InstructorResult instructor,
         boolean isPurchased,
         int studentCount,
         int totalDuration,
         List<SectionResult> sections
 ) {
-    public static CourseDetailResult of(Course course, List<String> categoryNames, InstructorResult instructor, boolean isPurchased, int studentCount, int totalDuration) {
+    public static CourseDetailResult of(Course course, List<String> categoryNames, InstructorResult instructor, boolean isPurchased, int studentCount, int totalDuration, ReviewStat reviewStat) {
         return CourseDetailResult.builder()
                 .courseId(course.getId())
                 .categories(categoryNames)
                 .title(course.getTitle())
                 .summary(course.getSummary())
                 .description(course.getDescription())
+                .reviewStat(reviewStat)
                 .price(course.getPrice())
                 .status(course.getCourseStatus())
                 .level(course.getCourseLevel())
-                .thumbnailUrl(course.getThumbnailUrl())
+                .thumbnailResourceKey(course.getThumbnailResourceKey())
                 .instructor(instructor)
                 .isPurchased(isPurchased)
                 .studentCount(studentCount)

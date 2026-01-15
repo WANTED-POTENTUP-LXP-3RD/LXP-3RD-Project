@@ -3,7 +3,7 @@ package com.lxp.aplus.payment.infrastructure.adapter;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.OrderErrorCode;
 import com.lxp.aplus.order.domain.Order;
-import com.lxp.aplus.order.domain.OrderLine;
+import com.lxp.aplus.order.domain.OrderItem;
 import com.lxp.aplus.order.domain.OrderRepository;
 import com.lxp.aplus.payment.application.port.out.OrderQueryPort;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +33,8 @@ public class OrderQueryAdapter implements OrderQueryPort {
                 .orElseThrow(() -> new BusinessException(OrderErrorCode.ORDER_NOT_FOUND));
 
         // 2. OrderLine 목록에서 courseId 추출 및 반환
-        return order.getOrderLines().stream()
-                .map(OrderLine::getItemId)
+        return order.getOrderItems().stream()
+                .map(OrderItem::getItemId)
                 .collect(Collectors.toList());
     }
 }

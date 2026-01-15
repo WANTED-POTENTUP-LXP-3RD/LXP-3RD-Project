@@ -1,0 +1,437 @@
+### API HTTP Client
+### IntelliJ에서 직접 실행 가능 (▶ 버튼 클릭)
+### 변수 설정: baseUrl, accessToken, refreshToken 등
+
+### 변수 설정 (실행 전에 수정 가능)
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 강좌/섹션 ID 변수
+### 방법 1: 강좌 생성 API(3번)를 먼저 실행하면 client.global.set()으로 자동 설정됩니다.
+### 방법 2: 아래 변수를 직접 설정하세요 (IntelliJ HTTP Client에서 변수가 작동하지 않을 경우)
+### 주의: 변수가 작동하지 않으면 URL에 직접 값을 입력하세요 (예: /api/instructor/courses/1/sections/1/lectures)
+@courseId = 1
+@sectionId = 1
+
+### 테스트용 사용자 정보 (통일)
+@testEmail = test@example.com
+@testPassword = password123
+@testName = 테스트 사용자
+@testNickName = testuser
+@testPhoneNumber = 010-1234-5678
+
+##########################################
+### 인증 API (/api/auth)
+##########################################
+
+### 1. 회원가입 (테스트용 사용자 생성)
+# @name signup
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "nickname": "{{testNickName}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### 1-1. 회원가입 및 자동 로그인 (토큰 자동 저장)
+# @name signupAndLogin
+POST {{baseUrl}}/api/auth/signup-and-login
+Content-Type: {{contentType}}
+
+{
+  "nickname": "{{testNickName}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+    client.log("Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 2. 로그인 (토큰 자동 저장)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("Access Token: " + response.body.data.accessToken);
+    client.log("Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 로그인 후 위의 스크립트가 자동으로 토큰을 변수에 저장합니다.
+### accessToken과 refreshToken 변수가 자동으로 설정됩니다.
+
+### 3. 토큰 재발급 (Refresh Token 사용, 새 토큰 자동 저장)
+# @name refreshToken
+POST {{baseUrl}}/api/auth/token/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+    client.log("New Access Token: " + response.body.data.accessToken);
+    client.log("New Refresh Token: " + response.body.data.refreshToken);
+%}
+
+### 4. 로그아웃 (Access Token과 Refresh Token 모두 사용)
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+X-Refresh-Token: {{refreshToken}}
+
+##########################################
+### 사용자 API (/api/users)
+##########################################
+
+### 5. 내 정보 조회 (Access Token 사용)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+### 6. 내 정보 수정 (Access Token 사용)
+PATCH {{baseUrl}}/api/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nickName": "updatedNickname",
+  "email": "updated@example.com"
+}
+
+### 7. 비밀번호 변경 (Access Token 사용)
+PATCH {{baseUrl}}/api/users/me/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "newPassword": "newPassword123"
+}
+
+### 8. 회원탈퇴 (Access Token 사용)
+DELETE {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+### 9. 강사 권한 추가 (Access Token 사용)
+PATCH {{baseUrl}}/api/users/me/roles/instructor
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+##########################################
+### Access Token 자동 갱신 테스트
+##########################################
+
+### 10. Access Token 자동 갱신 테스트
+### Access Token이 만료되었을 때, X-Refresh-Token 헤더를 함께 보내면
+### 응답 헤더에 X-New-Access-Token으로 새로운 토큰이 반환됩니다.
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer expired-access-token
+X-Refresh-Token: {{refreshToken}}
+
+> {%
+    const newAccessToken = response.headers.valueOf("X-New-Access-Token");
+    if (newAccessToken) {
+        client.global.set("accessToken", newAccessToken);
+        client.log("New Access Token from header: " + newAccessToken);
+    }
+%}
+
+##########################################
+### 에러 케이스 테스트
+##########################################
+
+### 11. 잘못된 이메일로 로그인 시도
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "wrong@example.com",
+  "password": "{{testPassword}}"
+}
+
+### 12. 잘못된 비밀번호로 로그인 시도
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "password": "wrongPassword"
+}
+
+### 13. 유효하지 않은 Refresh Token으로 재발급 시도
+POST {{baseUrl}}/api/auth/token/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "invalid-refresh-token"
+}
+
+### 14. Access Token 없이 인증 필요한 API 호출
+GET {{baseUrl}}/api/users/me
+
+### 15. 만료된 Access Token으로 API 호출 (Refresh Token 없음)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer expired-access-token
+
+
+### 1. 전체 카테고리 목록 조회
+GET {{baseUrl}}/api/categories
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+### 2. 특정 상위 카테고리의 하위 목록 조회 (Query Parameter)
+GET {{baseUrl}}/api/categories?parentId=1
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+
+
+### 1. 내가 등록한 코스 목록 조회 (기본값: 10개씩, 최신순)
+GET {{baseUrl}}/api/instructor/courses
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+---
+
+### 2. 내가 등록한 코스 목록 조회 (페이징 파라미터 추가)
+# page: 페이지 번호 (0부터 시작)
+# size: 한 페이지에 보여줄 개수
+# sort: 정렬 기준 필드 및 방향
+GET {{baseUrl}}/api/instructor/courses?page=0&size=5&sort=createdAt,desc
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+##########################################
+### 강좌(Course) 생성 및 관리 API
+##########################################
+
+### 3. 강좌 생성 (Multipart: request JSON + thumbnail 파일)
+# 강의 등록을 위한 강좌를 먼저 생성해야 합니다.
+# 주의: 컨트롤러는 "request" (JSON)와 "thumbnail" (파일)을 기대합니다.
+# CourseLevel: BEGINNER, NOVICE, INTERMEDIATE, ADVANCED
+POST {{baseUrl}}/api/instructor/courses
+Content-Type: multipart/form-data; boundary=CourseBoundary
+Authorization: Bearer {{accessToken}}
+
+--CourseBoundary
+Content-Disposition: form-data; name="request"
+Content-Type: application/json
+
+{
+  "title": "스프링 부트 완전 정복",
+  "categoryId": 1,
+  "summary": "기초부터 실전까지 배우는 스프링 부트 강의",
+  "description": "이 강의는 스프링 부트를 처음 배우는 분들을 위한 종합 강의입니다. 기초 개념부터 실전 프로젝트까지 단계별로 학습할 수 있습니다.",
+  "price": 55000,
+  "courseLevel": "BEGINNER"
+}
+--CourseBoundary
+Content-Disposition: form-data; name="thumbnail"; filename="image.jpeg"
+Content-Type: image/jpeg
+
+< ./files/image.jpeg
+--CourseBoundary--
+
+> {%
+    // 생성된 강좌 ID를 변수에 저장
+    if (response.status === 201 || response.status === 200) {
+        client.global.set("courseId", response.body.data.id);
+        client.log("Course ID saved: " + response.body.data.id);
+    }
+%}
+
+### 4. 강좌 상세 조회 (강사용)
+# 주의: 강좌 생성 API(3번)를 먼저 실행하여 courseId 변수를 설정하거나, 위에서 수동으로 설정하세요.
+GET {{baseUrl}}/api/instructor/courses/{{courseId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### 5. 강좌 수정
+PATCH {{baseUrl}}/api/instructor/courses/{{courseId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "수정된 강좌 제목",
+  "summary": "수정된 한 줄 요약",
+  "description": "수정된 상세 설명",
+  "price": 49000
+}
+
+##########################################
+### 섹션(Section) 생성 및 관리 API
+##########################################
+
+### 6. 섹션 생성
+# 강좌에 새로운 섹션을 추가합니다.
+# orderIndex는 섹션의 순서를 나타냅니다 (1부터 시작)
+POST {{baseUrl}}/api/instructor/courses/{{courseId}}/sections
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "1단원: 환경 설정",
+  "orderIndex": 1
+}
+
+> {%
+    // 생성된 섹션 ID를 변수에 저장
+    if (response.status === 201 || response.status === 200) {
+        client.global.set("sectionId", response.body.data.id);
+        client.log("Section ID saved: " + response.body.data.id);
+    }
+%}
+
+### 7. 섹션 수정
+PATCH {{baseUrl}}/api/instructor/courses/{{courseId}}/sections/{{sectionId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "수정된 섹션 제목",
+  "orderIndex": 1
+}
+
+### 8. 섹션 삭제
+DELETE {{baseUrl}}/api/instructor/courses/{{courseId}}/sections/{{sectionId}}
+Authorization: Bearer {{accessToken}}
+
+##########################################
+### 강의(Lecture) 생성 및 관리 API
+##########################################
+
+### 9. 강의 생성 (Multipart: lecture JSON + multiFile)
+# 파일 업로드 시에는 Multipart 형식을 사용합니다.
+# 주의: 컨트롤러는 "lecture" (JSON)와 "multiFile" (파일)을 기대합니다.
+# 변수가 작동하지 않으면 URL에 직접 값을 입력하세요 (예: /courses/1/sections/1/lectures)
+POST {{baseUrl}}/api/instructor/courses/{{courseId}}/sections/{{sectionId}}/lectures
+Content-Type: multipart/form-data; boundary=LectureBoundary
+Authorization: Bearer {{accessToken}}
+
+--LectureBoundary
+Content-Disposition: form-data; name="lecture"
+Content-Type: application/json
+
+{
+  "title": "1. 스프링 부트 소개",
+  "totalDurationSeconds": 480,
+  "isPreview": true,
+  "orderIndex": 1,
+  "resource": {
+    "isDownloadable": false
+  }
+}
+--LectureBoundary
+Content-Disposition: form-data; name="multiFile"; filename="215926_small.mp4"
+Content-Type: video/mp4
+
+< ./files/215926_small.mp4
+--LectureBoundary--
+
+### 10. [참고] 이전에 에러 났던 강의 등록 API (설정 활용 버전)
+# 파일 업로드 시에는 Multipart 형식을 사용합니다.
+# 주의: 컨트롤러는 "lecture" (JSON)와 "multiFile" (파일)을 기대합니다.
+# 변수(courseId, sectionId)가 설정되어 있지 않으면 하드코딩된 값 사용
+POST {{baseUrl}}/api/instructor/courses/{{courseId}}/sections/{{sectionId}}/lectures
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Authorization: Bearer {{accessToken}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="lecture"
+Content-Type: application/json
+
+{
+  "title": "새로운 강의 제목",
+  "totalDurationSeconds": 480,
+  "isPreview": false,
+  "orderIndex": 1,
+  "resource": {
+    "isDownloadable": false
+  }
+}
+--WebAppBoundary
+Content-Disposition: form-data; name="multiFile"; filename="215926_small.mp4"
+Content-Type: video/mp4
+
+< ./files/215926_small.mp4
+--WebAppBoundary--
+
+##########################################
+### 전체 플로우 테스트 시나리오
+##########################################
+
+### 시나리오 1: 정상적인 로그인 → API 사용 → 로그아웃
+### 1. 위의 "2. 로그인" 실행 (토큰이 자동으로 변수에 저장됨)
+### 2. "5. 내 정보 조회" 실행하여 인증 확인
+### 3. "4. 로그아웃" 실행
+
+### 시나리오 2: 토큰 재발급 테스트
+### 1. "2. 로그인" 실행하여 토큰 획득 (자동 저장됨)
+### 2. "3. 토큰 재발급" 실행하여 새 토큰 획득 (자동 저장됨)
+### 3. "5. 내 정보 조회" 실행하여 새 토큰으로 인증 확인
+
+### 시나리오 3: Access Token 자동 갱신 테스트
+### 1. "2. 로그인" 실행하여 토큰 획득 (자동 저장됨)
+### 2. Access Token 만료 시뮬레이션을 위해 "10. Access Token 자동 갱신 테스트" 실행
+### 3. 응답 헤더의 X-New-Access-Token이 자동으로 변수에 저장됨
+### 4. "5. 내 정보 조회" 실행하여 새 토큰으로 API 호출 테스트
+
+### 시나리오 4: 회원가입 → 로그인 → 정보 수정 → 비밀번호 변경 → 회원탈퇴
+### 1. "1. 회원가입" 실행
+### 2. "2. 로그인" 실행 (토큰 자동 저장)
+### 3. "6. 내 정보 수정" 실행
+### 4. "7. 비밀번호 변경" 실행
+### 5. "8. 회원탈퇴" 실행
+
+##########################################
+### CORS 테스트
+##########################################
+
+### CORS 테스트 1: Preflight 요청 (OPTIONS) - 허용된 Origin
+# 브라우저가 실제 요청 전에 보내는 Preflight 요청 테스트
+# Origin 헤더에 허용된 Origin을 포함하면 성공해야 함
+OPTIONS {{baseUrl}}/api/auth/login
+Origin: http://localhost:3000
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Content-Type
+
+### CORS 테스트 2: Preflight 요청 (OPTIONS) - 허용되지 않은 Origin
+# 허용되지 않은 Origin으로 요청하면 CORS 에러가 발생해야 함
+OPTIONS {{baseUrl}}/api/auth/login
+Origin: http://localhost:4000
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Content-Type
+
+### CORS 테스트 3: 실제 요청에서 CORS 헤더 확인
+# 응답 헤더에 Access-Control-Allow-Origin이 포함되어 있는지 확인
+GET {{baseUrl}}/api/categories
+Origin: http://localhost:3000
+Accept: application/json
+
+### CORS 테스트 4: 허용된 메서드 테스트 (POST)
+POST {{baseUrl}}/api/auth/login
+Origin: http://localhost:3000
+Content-Type: application/json
+
+{
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### CORS 테스트 5: 허용되지 않은 메서드 테스트 (HEAD)
+# HEAD 메서드는 허용 목록에 없으므로 CORS 에러가 발생할 수 있음
+HEAD {{baseUrl}}/api/categories
+Origin: http://localhost:3000

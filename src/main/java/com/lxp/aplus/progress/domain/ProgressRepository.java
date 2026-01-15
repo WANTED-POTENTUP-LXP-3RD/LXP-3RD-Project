@@ -9,4 +9,8 @@ public interface ProgressRepository {
     Optional<Progress> findByEnrollmentIdAndLectureResourceId(Long enrollmentId, Long lectureResourceId);
 
     List<Progress> findByEnrollmentId(Long enrollmentId);
+
+    boolean existsByEnrollmentId(Long enrollmentId);
+
+    void deleteByEnrollmentId(Long enrollmentId);
 }

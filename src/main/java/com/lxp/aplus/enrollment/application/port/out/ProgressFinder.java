@@ -5,4 +5,8 @@ import java.util.Map;
 
 public interface ProgressFinder {
     Map<Long, Boolean> getCompletionStatusMap(Long enrollmentId, List<Long> lectureResourceIds);
+
+    boolean hasProgress(Long enrollmentId);
+
+    void removeByEnrollmentId(Long enrollmentId);
 }

@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.application.result;
 
+import com.lxp.aplus.course.application.dto.ReviewStat;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;
@@ -15,27 +16,27 @@ public record CourseResult(
         String summary,
         String instructorName,
         List<String> categories,
-        String thumbnailUrl,
+        String thumbnailResourceKey,
         CourseStatus status,
         int price,
         CourseLevel level,
         int studentCount,
-        double rating,
+        ReviewStat reviewStat,
         LocalDateTime lastModifiedAt
 ) {
-    public static CourseResult of(Course course, List<String> categoryNames, String instructorName, int studentCount) {
+    public static CourseResult of(Course course, List<String> categoryNames, String instructorName, int studentCount, ReviewStat reviewStat) {
         return CourseResult.builder()
                 .courseId(course.getId())
                 .title(course.getTitle())
                 .summary(course.getSummary())
                 .instructorName(instructorName)
                 .categories(categoryNames)
-                .thumbnailUrl(course.getThumbnailUrl())
+                .thumbnailResourceKey(course.getThumbnailResourceKey())
                 .status(course.getCourseStatus())
                 .price(course.getPrice())
                 .level(course.getCourseLevel())
                 .studentCount(studentCount)
-                .rating(5.0)
+                .reviewStat(reviewStat)
                 .lastModifiedAt(course.getUpdatedAt())
                 .build();
     }

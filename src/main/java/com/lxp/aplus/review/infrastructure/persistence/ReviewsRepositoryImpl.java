@@ -4,6 +4,7 @@ import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
 import com.lxp.aplus.review.domain.constant.ReviewStatus;
 import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
+import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,10 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     @Override
     public List<ReviewWroteDto> checkReviewedByCourseIds(List<Long> courseIds, Long userId) {
         return reviewJpaRepository.findByUserIdAndCourseIdIn(userId, courseIds).stream().map(ReviewWroteDto::from).toList();
+    }
+
+    @Override
+    public List<ReviewSummary> getReviewInfoInCourse(List<Long> courseId) {
+        return reviewJpaRepository.getReviewInfosInCourse(courseId);
     }
 }

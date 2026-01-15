@@ -6,9 +6,9 @@ import com.lxp.aplus.common.error.code.OrderErrorCode;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.order.application.CoursePrice;
+import com.lxp.aplus.order.domain.OrderItem;
 import com.lxp.aplus.payment.application.result.OrderCreateResult;
 import com.lxp.aplus.order.domain.Order;
-import com.lxp.aplus.order.domain.OrderLine;
 import com.lxp.aplus.order.domain.OrderRepository;
 import com.lxp.aplus.payment.application.port.out.OrderCommandPort;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +32,13 @@ public class OrderCommandAdapter implements OrderCommandPort {
         // 1. Course 가격 조회 (From Course BC)
         List<CoursePrice> coursePrices = getCoursePriceByIds(courseIds);
 
-        // 2. OrderLine 리스트 생성
-        List<OrderLine> orderLines = coursePrices.stream()
-                .map(OrderLine::from)
-                .collect(Collectors.toList());
+        // 2. OrderItem 리스트 생성
+        List<OrderItem> OrderItems = coursePrices.stream()
+                .map(OrderItem::create)
+                .toList();
 
         // 3. Order 생성 및 저장
-        Order order = Order.create(userId, orderLines);
+        Order order = Order.create(userId, OrderItems);
         orderRepository.save(order);
 
         return OrderCreateResult.of(order.getOrderId(), order.getAmount());
@@ -68,5 +68,15 @@ public class OrderCommandAdapter implements OrderCommandPort {
 
         // 2. Order 상태 변경
         order.completeWithApprovedPayment(approvedPaymentId, approvedAmount);
+    }
+
+    public List<OrderItem> getOrderItemsOfOrder(String orderId) {
+
+        // 1. Order 조회
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(OrderErrorCode.ORDER_NOT_FOUND));
+
+        // 2. Order의 OrderItem 리스트 조회
+        return order.getOrderItems();
     }
 }

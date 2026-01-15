@@ -5,22 +5,24 @@ import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.UserErrorCode;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;
 import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
+import com.lxp.aplus.course.application.port.out.ReviewQueryPort;
 import com.lxp.aplus.course.application.port.out.UserQueryPort;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
+import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,6 +32,7 @@ public class CourseQueryUseCase {
     private final UserQueryPort userQueryPort;
     private final CategoryQueryPort categoryQueryPort;
     private final EnrollmentQueryPort enrollmentQueryPort;
+    private final ReviewQueryPort reviewQueryPort;
 
     public Page<CourseResult> getInstructorCourses(Long instructorId, Pageable pageable) {
         Page<Course> courses = courseRepository.findAllByInstructorIdExcludingDeleted(instructorId, pageable);
@@ -53,6 +56,8 @@ public class CourseQueryUseCase {
 
         Map<Long, List<String>> categoryNamesMap = categoryQueryPort.getCategoryNamesBatch(categoryIds);
         Map<Long, Integer> studentCountMap = enrollmentQueryPort.getStudentCountBatch(courseIds);
+        Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(courseIds).stream()
+                .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
 
         List<CourseResult> courseResponses = courses.getContent().stream()
                 .map(course -> {
@@ -60,11 +65,14 @@ public class CourseQueryUseCase {
                             .map(InstructorResult::name)
                             .orElse("알 수 없음");
 
+                    ReviewSummary reviewInfo = reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue());
+
                     return CourseResult.of(
                             course,
                             categoryNamesMap.get(course.getCategoryId()),
                             instructorName,
-                            studentCountMap.getOrDefault(course.getId(), 0)
+                            studentCountMap.getOrDefault(course.getId(), 0),
+                            com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfo)
                     );
                 })
                 .toList();
@@ -83,6 +91,10 @@ public class CourseQueryUseCase {
         Course course = courseRepository.findPublishedWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
+        Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
+                .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
+        com.lxp.aplus.course.application.dto.ReviewStat reviewStat = com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
+
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
         InstructorResult instructorResult = userQueryPort.findInstructorById(course.getInstructorId())
@@ -93,12 +105,17 @@ public class CourseQueryUseCase {
         boolean isPurchased = enrollmentQueryPort.isEnrolled(userId, courseId);
         int studentCount = enrollmentQueryPort.getStudentCount(courseId);
 
-        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration);
+        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
+                reviewStat);
     }
 
     public CourseDetailResult getInstructorCourseDetail(Long courseId, Long instructorId) {
         Course course = courseRepository.findWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
+
+        Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
+                .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
+        com.lxp.aplus.course.application.dto.ReviewStat reviewStat = com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
 
         course.validateOwner(instructorId);
 
@@ -112,7 +129,8 @@ public class CourseQueryUseCase {
         boolean isPurchased = enrollmentQueryPort.isEnrolled(instructorId, courseId);
         int studentCount = enrollmentQueryPort.getStudentCount(courseId);
 
-        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration);
+        return CourseDetailResult.of(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
+                reviewStat);
     }
 
     private int calculateTotalDuration(Course course) {
