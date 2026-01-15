@@ -1,7 +1,7 @@
 package com.lxp.aplus.review.domain;
 
 import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
-import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewStats;
+import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +15,5 @@ public interface ReviewsRepository {
     Integer countCourseReviews(Long courseId);
     Long deleteReview(Long userId, Long courseId);
     List<ReviewWroteDto> checkReviewedByCourseIds(List<Long> courseIds, Long userId);
-    List<ReviewStats> getReviewInfoInCourse(List<Long> courseId);
+    List<ReviewSummary> getReviewInfoInCourse(List<Long> courseId);
 }

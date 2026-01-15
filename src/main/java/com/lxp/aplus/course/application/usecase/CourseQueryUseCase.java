@@ -3,7 +3,6 @@ package com.lxp.aplus.course.application.usecase;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.UserErrorCode;
-import com.lxp.aplus.course.application.dto.ReviewStat;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;
 import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
 import com.lxp.aplus.course.application.port.out.ReviewQueryPort;
@@ -13,7 +12,7 @@ import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
-import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewStats;
+import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +56,8 @@ public class CourseQueryUseCase {
 
         Map<Long, List<String>> categoryNamesMap = categoryQueryPort.getCategoryNamesBatch(categoryIds);
         Map<Long, Integer> studentCountMap = enrollmentQueryPort.getStudentCountBatch(courseIds);
-        Map<Long, ReviewStats> reviewInfoMap = reviewQueryPort.getReviewInfos(courseIds).stream()
-                .collect(Collectors.toMap(ReviewStats::courseId, info -> info));
+        Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(courseIds).stream()
+                .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
 
         List<CourseResult> courseResponses = courses.getContent().stream()
                 .map(course -> {
@@ -66,14 +65,14 @@ public class CourseQueryUseCase {
                             .map(InstructorResult::name)
                             .orElse("알 수 없음");
 
-                    ReviewStats reviewInfo = reviewInfoMap.getOrDefault(course.getId(), ReviewStats.defaultValue());
+                    ReviewSummary reviewInfo = reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue());
 
                     return CourseResult.of(
                             course,
                             categoryNamesMap.get(course.getCategoryId()),
                             instructorName,
                             studentCountMap.getOrDefault(course.getId(), 0),
-                            ReviewStat.from(reviewInfo)
+                            com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfo)
                     );
                 })
                 .toList();
@@ -92,9 +91,9 @@ public class CourseQueryUseCase {
         Course course = courseRepository.findPublishedWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        Map<Long, ReviewStats> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
-                .collect(Collectors.toMap(ReviewStats::courseId, info -> info));
-        ReviewStat reviewStat = ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewStats.defaultValue()));
+        Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
+                .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
+        com.lxp.aplus.course.application.dto.ReviewStat reviewStat = com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
@@ -114,9 +113,9 @@ public class CourseQueryUseCase {
         Course course = courseRepository.findWithCurriculumById(courseId)
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        Map<Long, ReviewStats> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
-                .collect(Collectors.toMap(ReviewStats::courseId, info -> info));
-        ReviewStat reviewStat = ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewStats.defaultValue()));
+        Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
+                .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
+        com.lxp.aplus.course.application.dto.ReviewStat reviewStat = com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
 
         course.validateOwner(instructorId);
 

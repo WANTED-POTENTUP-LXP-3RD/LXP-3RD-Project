@@ -1,16 +1,16 @@
 package com.lxp.aplus.course.application.dto;
 
-import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewStats;
+import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 
 public record ReviewStat(
         int reviewCount,
         Double avgRating
 ) {
-    public static ReviewStat from(ReviewStats reviewStats) {
-        return new ReviewStat(reviewStats.totalReviews(), reviewStats.avgRating());
+    public static ReviewStat from(ReviewSummary reviewSummary) {
+        return new ReviewStat(reviewSummary.totalReviews(), reviewSummary.avgRating());
     }
 
-    public static ReviewStat of(Long courseId, int reviewCount, Double avgRating) {
+    public static ReviewStat of(int reviewCount, Double avgRating) {
         return new ReviewStat(reviewCount,avgRating);
     }
 
