@@ -62,13 +62,13 @@ public class Enrollment extends BaseAggregateRoot {
 
     public void cancel(LocalDateTime currentTime) {
         if (this.status == EnrollmentStatus.COMPLETED) {
-            throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_COMPLETED_ENROLLMENT);
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_CANNOT_CANCEL_COMPLETED);
         }
         if (this.status == EnrollmentStatus.CANCELED) {
-            throw new BusinessException(EnrollmentErrorCode.ALREADY_CANCELLED_ENROLLMENT);
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_ALREADY_CANCELLED);
         }
         if (isExpired(currentTime)) {
-            throw new BusinessException(EnrollmentErrorCode.CANNOT_CANCEL_EXPIRED_ENROLLMENT);
+            throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_CANNOT_CANCEL_EXPIRED);
         }
         this.status = EnrollmentStatus.CANCELED;
     }

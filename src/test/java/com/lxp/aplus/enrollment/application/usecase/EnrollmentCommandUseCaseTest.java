@@ -94,6 +94,6 @@ class EnrollmentCommandUseCaseTest {
         assertThatThrownBy(() -> enrollmentCommandUseCase.enroll(command))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
-                .isEqualTo(EnrollmentErrorCode.ALREADY_ENROLLED_COURSE);
+                .isEqualTo(EnrollmentErrorCode.ENROLLMENT_ALREADY_ENROLLED);
     }
 }

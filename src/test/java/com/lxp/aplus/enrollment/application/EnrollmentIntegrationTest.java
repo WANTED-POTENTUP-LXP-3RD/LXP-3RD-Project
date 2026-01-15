@@ -116,7 +116,7 @@ public class EnrollmentIntegrationTest {
             // when & then
             assertThatThrownBy(() -> enrollmentCommandUseCase.cancel(testEnrollment.getId(), testStudent.getId()))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage(EnrollmentErrorCode.CANNOT_CANCEL_AFTER_STARTED.getMessage());
+                    .hasMessage(EnrollmentErrorCode.ENROLLMENT_CANNOT_CANCEL_AFTER_STARTED.getMessage());
         }
 
         @Test
@@ -141,7 +141,7 @@ public class EnrollmentIntegrationTest {
             // when & then
             assertThatThrownBy(() -> enrollmentCommandUseCase.cancel(testEnrollment.getId(), testStudent.getId()))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage(EnrollmentErrorCode.ALREADY_CANCELLED_ENROLLMENT.getMessage());
+                    .hasMessage(EnrollmentErrorCode.ENROLLMENT_ALREADY_CANCELLED.getMessage());
         }
     }
 

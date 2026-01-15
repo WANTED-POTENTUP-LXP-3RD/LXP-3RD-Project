@@ -62,7 +62,7 @@ class EnrollmentTest {
         // when & then
         assertThatThrownBy(() -> enrollment.cancel(LocalDateTime.now()))
                 .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.ALREADY_CANCELLED_ENROLLMENT);
+                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.ENROLLMENT_ALREADY_CANCELLED);
     }
 
     @Test
@@ -75,7 +75,7 @@ class EnrollmentTest {
         // when & then
         assertThatThrownBy(() -> enrollment.cancel(LocalDateTime.now()))
                 .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.CANNOT_CANCEL_EXPIRED_ENROLLMENT);
+                .hasFieldOrPropertyWithValue("errorCode", EnrollmentErrorCode.ENROLLMENT_CANNOT_CANCEL_EXPIRED);
     }
 
     @Test
