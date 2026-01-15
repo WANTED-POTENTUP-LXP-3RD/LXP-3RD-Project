@@ -22,7 +22,7 @@ public class CartController {
 
     private final CartCommandUseCase cartCommandUseCase;
 
-    @GetMapping("/items")
+    @GetMapping
     public ResponseEntity<ResultResponse<CartGetItemsResponse>> getCartAllItems(
             @Authenticated Long userId
     ) {
