@@ -1,15 +1,17 @@
 package com.lxp.aplus.payment.infrastructure.adapter;
 
+import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.order.domain.OrderItem;
 import com.lxp.aplus.payment.application.port.out.EnrollmentCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * EnrollmentCommandPort의 구현체 (Adapter)
@@ -23,20 +25,24 @@ public class EnrollmentCommandAdapter implements EnrollmentCommandPort {
     private final EnrollmentRepository enrollmentRepository;
 
     @Override
-    public void enrollUserInCourses(Long userId, List<Long> courseIds) {
+    public void enrollUserInCourses(Long userId, Map<Long, Long> courseToOrderItemMap) {
 
         // 1. 중복 수강 여부 확인 -> Enrollment 생성
         // TODO: Enrollment 도메인 규칙으로 이동
         List<Enrollment> newEnrollments = new ArrayList<>();
 
-        for (Long courseId : courseIds) {
+        for (Map.Entry<Long, Long> entry : courseToOrderItemMap.entrySet()) {
+            Long courseId = entry.getKey();
+            Long orderItemId = entry.getValue();
+
+            // TODO: N+1 문제 확인
             boolean isEnrolled = enrollmentRepository.existsByStudentIdAndCourseId(userId, courseId);
 
             if (!isEnrolled) {
                 Enrollment enrollment = Enrollment.create(
                         userId,
                         courseId,
-                        null
+                        orderItemId
                 );
 
                 newEnrollments.add(enrollment);
