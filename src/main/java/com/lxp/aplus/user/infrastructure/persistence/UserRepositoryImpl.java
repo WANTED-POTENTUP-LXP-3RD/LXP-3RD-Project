@@ -5,6 +5,7 @@ import com.lxp.aplus.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -49,6 +50,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findById(Long id) {
         return jpaRepository.findById(id);
+    }
+
+    @Override
+    public List<User> findByIdIn(List<Long> ids) {
+        return jpaRepository.findByIdIn(ids);
     }
 
     @Override

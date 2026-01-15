@@ -7,14 +7,18 @@ import com.lxp.aplus.order.application.command.CartAddItemCommand;
 import com.lxp.aplus.order.application.command.CartRemoveItemCommand;
 import com.lxp.aplus.order.application.port.out.CourseQueryPort;
 import com.lxp.aplus.order.application.port.out.CourseSalesStatus;
+import com.lxp.aplus.order.application.port.out.CourseSnapshot;
 import com.lxp.aplus.order.domain.Cart;
+import com.lxp.aplus.order.domain.CartItem;
 import com.lxp.aplus.order.domain.CartRepository;
 import com.lxp.aplus.order.presentation.response.CartAddItemResponse;
+import com.lxp.aplus.order.presentation.response.CartGetItemsResponse;
 import com.lxp.aplus.order.presentation.response.CartRemoveItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -38,7 +42,7 @@ public class CartCommandUseCase {
         }
 
         // 2. cart 조회 (없으면 생성)
-        Cart cart = getCart(command.userId());
+        Cart cart = getOrCreateCart(command.userId());
 
         // 3. cart에 새로운 cartItem 추가
         cart.addCartItem(command.courseId());
@@ -57,7 +61,7 @@ public class CartCommandUseCase {
      */
     public CartRemoveItemResponse removeCartItemFromCart(CartRemoveItemCommand command) {
         // 1. cart 조회 (없으면 생성)
-        Cart cart = getCart(command.userId());
+        Cart cart = getOrCreateCart(command.userId());
 
         // 2. cart에서 항목 제거 (dirty checking)
         cart.removeCartItem(command.cartItemId());
@@ -70,8 +74,12 @@ public class CartCommandUseCase {
 
     /*
      * 사용자별 장바구니를 조회하거나, 없을 경우 새 장바구니를 생성하여 반환한다.
+     *
+     * TODO: 회원가입 시 장바구니 미리 생성하도록 수정
+     * 1. GET 요청에서 자원 생성 책임을 분리하고, 조회 시점에 데이터 존재를 보장하기 위함
+     * 2. CQRS 패턴을 지키기 위함
      */
-    private Cart getCart(Long userId) {
+    private Cart getOrCreateCart(Long userId) {
         return cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.create(userId)));
     }
@@ -96,5 +104,24 @@ public class CartCommandUseCase {
                     return 0;
                 })
                 .sum();
+    }
+
+    public CartGetItemsResponse getCartItems(Long userId) {
+
+        // 1. 장바구니 조회
+        Cart cart = getOrCreateCart(userId);
+
+        // 2. 장바구니 항목 조회
+        List<CartItem> cartItems = cart.getCartItems();
+
+        // 3. 응답 DTO 변환 및 반환
+        if (cartItems.isEmpty()) {
+            return CartGetItemsResponse.empty(cart.getId());
+        }
+
+        Map<Long, CourseSnapshot> courseSnapshotMap = courseQueryPort.getCourseSnapshot(cart.getCourseIds());
+        int totalAmount = calculateCartAmount(cart);
+
+        return CartGetItemsResponse.of(cart, courseSnapshotMap, totalAmount);
     }
 }

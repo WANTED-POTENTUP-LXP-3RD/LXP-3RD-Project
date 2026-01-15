@@ -7,6 +7,9 @@ import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.course.domain.CourseStatus;
 import com.lxp.aplus.order.application.port.out.CourseQueryPort;
 import com.lxp.aplus.order.application.port.out.CourseSalesStatus;
+import com.lxp.aplus.order.application.port.out.CourseSnapshot;
+import com.lxp.aplus.user.domain.User;
+import com.lxp.aplus.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +31,10 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CourseQueryAdapter implements CourseQueryPort {
 
-    // FIXME: Course BC 침범 (의도됨) ⚠️
+    // FIXME: Course BC, User BC 침범 (의도됨) ⚠️
     // TODO: Repository 대신 HTTP/gRPC를 호출하는 외부 모듈 주입
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
 
     /**
      * 단일 강좌의 판매 가능 여부 확인
@@ -62,6 +66,38 @@ public class CourseQueryAdapter implements CourseQueryPort {
                 .collect(Collectors.toMap(
                         Course::getId,
                         course -> new CourseSalesStatus(course.getPrice(), course.getCourseStatus())
+                ));
+    }
+
+    /*
+     * 강좌의 구매 시점 상품 정보 조회
+     */
+    @Override
+    public Map<Long, CourseSnapshot> getCourseSnapshot(List<Long> courseIds) {
+
+        // 1. 강좌 조회
+        List<Course> courses = courseRepository.findByIdIn(courseIds);
+
+        // 2. instructorId 목록 추출
+        List<Long> instructorIds = courses.stream()
+                .map(Course::getInstructorId)
+                .toList();
+        // 3. 강사 조회
+        List<User> instructors = userRepository.findByIdIn(instructorIds);
+
+        // 4. id → User 매핑
+        Map<Long, User> instructorMap = instructors.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+
+        // 5. Course → CourseSnapshot 변환
+        return courses.stream()
+                .collect(Collectors.toMap(
+                        Course::getId,
+                        course -> {
+                            User instructor = instructorMap.get(course.getInstructorId());
+
+                            return CourseSnapshot.of(course, instructor);
+                        }
                 ));
     }
 }

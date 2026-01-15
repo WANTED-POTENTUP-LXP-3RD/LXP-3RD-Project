@@ -5,6 +5,7 @@ import com.lxp.aplus.user.domain.UserRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -33,7 +34,9 @@ import java.util.Optional;
  * @see UserRepositoryImpl
  */
 public interface UserJpaRepository extends JpaRepository<User, Long> {
-    
+
+    List<User> findByIdIn(List<Long> ids);
+
     /**
      * User와 Role을 함께 조회 (Fetch Join)
      * 
