@@ -34,7 +34,7 @@ public record CourseDetailResponse(
                 .title(result.title())
                 .summary(result.summary())
                 .description(result.description())
-                .reviewInfo(result.reviewStat())
+                .reviewStat(result.reviewStat())
                 .price(result.price())
                 .status(result.status())
                 .level(result.level())

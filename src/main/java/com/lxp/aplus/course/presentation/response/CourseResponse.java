@@ -36,7 +36,7 @@ public record CourseResponse(
                 .price(result.price())
                 .level(result.level())
                 .studentCount(result.studentCount())
-                .reviewInfo(result.reviewStat())
+                .reviewStat(result.reviewStat())
                 .lastModifiedAt(result.lastModifiedAt())
                 .build();
     }

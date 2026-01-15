@@ -34,7 +34,7 @@ public record CourseDetailResult(
                 .title(course.getTitle())
                 .summary(course.getSummary())
                 .description(course.getDescription())
-                .reviewInfo(reviewStat)
+                .reviewStat(reviewStat)
                 .price(course.getPrice())
                 .status(course.getCourseStatus())
                 .level(course.getCourseLevel())
