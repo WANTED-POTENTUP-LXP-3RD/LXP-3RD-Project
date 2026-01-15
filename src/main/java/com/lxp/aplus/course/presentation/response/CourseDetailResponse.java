@@ -20,7 +20,7 @@ public record CourseDetailResponse(
         int price,
         CourseStatus status,
         CourseLevel level,
-        String thumbnailResourceKey,
+        String thumbnailUrl,
         InstructorResponse instructor,
         boolean isPurchased,
         int studentCount,
@@ -38,7 +38,7 @@ public record CourseDetailResponse(
                 .price(result.price())
                 .status(result.status())
                 .level(result.level())
-                .thumbnailResourceKey(result.thumbnailResourceKey())
+                .thumbnailUrl(result.thumbnailUrl())
                 .instructor(InstructorResponse.from(result.instructor()))
                 .isPurchased(result.isPurchased())
                 .studentCount(result.studentCount())

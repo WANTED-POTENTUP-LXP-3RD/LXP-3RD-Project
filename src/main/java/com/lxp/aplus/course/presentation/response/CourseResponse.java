@@ -16,7 +16,7 @@ public record CourseResponse(
         String summary,
         String instructorName,
         List<String> categories,
-        String thumbnailResourceKey,
+        String thumbnailUrl,
         CourseStatus status,
         int price,
         CourseLevel level,
@@ -31,7 +31,7 @@ public record CourseResponse(
                 .summary(result.summary())
                 .instructorName(result.instructorName())
                 .categories(result.categories())
-                .thumbnailResourceKey(result.thumbnailResourceKey())
+                .thumbnailUrl(result.thumbnailUrl())
                 .status(result.status())
                 .price(result.price())
                 .level(result.level())
