@@ -48,7 +48,7 @@ public class ReviewQueryUseCase {
 
 
         return reviews.map(review -> {
-            String writerName = writerNicknames.getOrDefault(review.getUserId(), "Unknown");
+            String writerName = writerNicknames.getOrDefault(review.getUserId(), "알 수 없음");
 
             return ReviewResult.of(command.userId(), writerName, review);
         });
