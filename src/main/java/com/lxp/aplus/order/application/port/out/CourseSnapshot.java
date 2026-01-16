@@ -21,7 +21,7 @@ public record CourseSnapshot(
                 .courseId(course.getId())
                 .courseTitle(course.getTitle())
                 .courseStatus(course.getCourseStatus())
-                .instructorName(instructor.getName())
+                .instructorName(instructor.getNickName())
                 .thumbnailUrl(course.getThumbnailResourceKey())
                 .price(course.getPrice())
                 .build();
