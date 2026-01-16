@@ -64,7 +64,7 @@ public class CourseQueryUseCase {
         List<CourseResult> courseResponses = courses.getContent().stream()
                 .map(course -> {
                     String instructorName = userQueryPort.findInstructorById(course.getInstructorId())
-                            .map(InstructorResult::name)
+                            .map(InstructorResult::nickName)
                             .orElse("알 수 없음");
 
                     ReviewSummary reviewInfo = reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue());

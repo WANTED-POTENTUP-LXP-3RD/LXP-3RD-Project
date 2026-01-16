@@ -6,12 +6,12 @@ import lombok.Builder;
 @Builder
 public record InstructorResult(
         Long id,
-        String name
+        String nickName
 ) {
     public static InstructorResult from(User user) {
         return InstructorResult.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .nickName(user.getNickName())
                 .build();
     }
 }
