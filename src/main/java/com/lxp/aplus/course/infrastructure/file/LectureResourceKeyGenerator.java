@@ -1,4 +1,4 @@
-package com.lxp.aplus.course.infrastructure.file.minio;
+package com.lxp.aplus.course.infrastructure.file;
 
 import org.springframework.stereotype.Component;
 

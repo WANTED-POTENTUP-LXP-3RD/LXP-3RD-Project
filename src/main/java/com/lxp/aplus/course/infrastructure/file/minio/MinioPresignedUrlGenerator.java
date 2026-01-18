@@ -4,11 +4,13 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import com.lxp.aplus.course.application.port.out.PresignedUrlGenerator;
 import com.lxp.aplus.course.application.result.PresignedUrlResult;
+import com.lxp.aplus.course.infrastructure.file.LectureResourceKeyGenerator;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidKeyException;
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "storage.type", havingValue = "minio", matchIfMissing = true)
 public class MinioPresignedUrlGenerator implements PresignedUrlGenerator {
     private final MinioClient minioClient;
     private final LectureResourceKeyGenerator keyGenerator;

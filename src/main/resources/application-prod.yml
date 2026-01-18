@@ -33,3 +33,17 @@ minio:
   access-key: ${MINIO_ROOT_USER}
   secret-key: ${MINIO_ROOT_PASSWORD}
   resource_expire_seconds: 120
+
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_S3_BUCKET}
+      expire_seconds: ${CLOUD_S3_EXPIRE_SECONDS}
+    stack.auto: false
+    region.static: ${CLOUD_S3_REGION_STATIC}
+    credentials:
+      access-key: ${CLOUD_S3_ACCESS_KEY}
+      secret-key: ${CLOUD_S3_SECRET_KEY}
+
+storage:
+  type: ${STORAGE_TYPE}
