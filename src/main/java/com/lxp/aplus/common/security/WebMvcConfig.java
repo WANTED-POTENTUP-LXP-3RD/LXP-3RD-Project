@@ -18,10 +18,12 @@ import java.util.List;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AuthenticatedArgumentResolver authenticatedArgumentResolver;
+    private final CurrentUserArgumentResolver currentUserArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authenticatedArgumentResolver);
+        resolvers.add(currentUserArgumentResolver);
     }
 
     @Override

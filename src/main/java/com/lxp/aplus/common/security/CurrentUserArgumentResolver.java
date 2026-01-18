@@ -51,7 +51,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         Optional<User> user = userRepository.findUserWithRolesById(userId);
         
         // 사용자를 찾을 수 없으면 null 반환
-        if (user == null) {
+        if (user.isEmpty()) {
             return null;
         }
 
