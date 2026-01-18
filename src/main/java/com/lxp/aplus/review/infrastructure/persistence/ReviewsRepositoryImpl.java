@@ -43,8 +43,8 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     }
 
     @Override
-    public Long deleteReview(Long userId, Long courseId) {
-        return reviewJpaRepository.deleteByUserIdAndCourseId(userId, courseId);
+    public void deleteReview(Reviews review) {
+        reviewJpaRepository.delete(review);
     }
 
     @Override

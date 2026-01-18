@@ -13,7 +13,7 @@ public interface ReviewsRepository {
     Optional<Reviews> getReview(Long userId, Long courseId);
     Slice<Reviews> getCourseReviews(Long courseId, Pageable pageable);
     Integer countCourseReviews(Long courseId);
-    Long deleteReview(Long userId, Long courseId);
+    void deleteReview(Reviews review);
     List<ReviewWroteDto> checkReviewedByCourseIds(List<Long> courseIds, Long userId);
     List<ReviewSummary> getReviewInfoInCourse(List<Long> courseId);
 }
