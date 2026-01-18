@@ -9,9 +9,12 @@ import com.lxp.aplus.review.application.result.ReviewWroteResult;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
 import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,23 +32,33 @@ public class ReviewQueryUseCase {
         Reviews review = reviewRepository.getReview(command.userId(), command.courseId())
                 .orElseThrow(() -> new BusinessException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-        String nickName = userQueryPort.findUserName(command.userId());
+        String nickName = userQueryPort.findUserNames(List.of(command.userId())).get(command.userId());
 
         return ReviewResult.of(command.userId(), nickName, review);
     }
 
     public Slice<ReviewResult> findReviewsInCourse(ReviewQueryCommand command, Pageable pageable) {
         Slice<Reviews> reviews = reviewRepository.getCourseReviews(command.courseId(), pageable);
-        String nickName = userQueryPort.findUserName(command.userId());
+        List<Long> writerIds = reviews.stream()
+                .map(Reviews::getUserId)
+                .distinct()
+                .toList();
 
-        return reviews.map(review -> ReviewResult.of(command.userId(), nickName, review));
+        Map<Long, String> writerNicknames = userQueryPort.findUserNames(writerIds);
+
+
+        return reviews.map(review -> {
+            String writerName = writerNicknames.getOrDefault(review.getUserId(), "알 수 없음");
+
+            return ReviewResult.of(command.userId(), writerName, review);
+        });
     }
 
     public Integer countReviewsInCourse(Long courseId) {
         return reviewRepository.countCourseReviews(courseId);
     }
 
-    public List<ReviewWroteResult> checkReviewed(List<Long> courseIds, Long userId){
+    public List<ReviewWroteResult> checkReviewed(List<Long> courseIds, Long userId) {
         List<ReviewWroteDto> result = reviewRepository.checkReviewedByCourseIds(courseIds, userId);
 
         Set<Long> writtenIds = result.stream()
