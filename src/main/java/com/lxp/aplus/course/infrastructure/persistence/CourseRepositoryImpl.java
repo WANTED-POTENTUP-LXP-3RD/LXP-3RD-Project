@@ -1,9 +1,7 @@
 package com.lxp.aplus.course.infrastructure.persistence;
 
-import com.lxp.aplus.course.domain.Course;
-import com.lxp.aplus.course.domain.CourseRepository;
-import com.lxp.aplus.course.domain.CourseStatus;
-import com.lxp.aplus.course.domain.Lecture;
+import com.lxp.aplus.course.application.port.in.dto.ResourceSummary;
+import com.lxp.aplus.course.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,5 +63,10 @@ public class CourseRepositoryImpl implements CourseRepository {
     @Override
     public List<Course> findByIdIn(List<Long> ids) {
         return jpaRepository.findByIdIn(ids);
+    }
+
+    @Override
+    public List<ResourceSummary> findLectureSummariesByCourseId(Long courseId) {
+        return jpaRepository.findLectureSummariesByCourseId(courseId);
     }
 }
