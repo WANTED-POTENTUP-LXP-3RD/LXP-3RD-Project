@@ -88,7 +88,8 @@ public class CourseController {
             @CurrentUser UserInfo userInfo,
             @PathVariable("courseId") Long courseId
     ) {
-        CourseDetailResult result = courseQueryUseCase.getPublishedCourseDetail(courseId, userInfo.id());
+        Long userId = (userInfo != null) ? userInfo.id() : null;
+        CourseDetailResult result = courseQueryUseCase.getPublishedCourseDetail(courseId, userId);
 
         return ResponseEntity
                 .status(CourseResultCode.COURSE_READ_SUCCESS.getStatus())
