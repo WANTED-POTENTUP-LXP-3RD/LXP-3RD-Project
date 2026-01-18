@@ -362,6 +362,13 @@ Content-Type: application/json
     "isDownloadable": false
   }
 }
+
+### 11. 강좌 상세 조회
+# 주의: 강좌 생성 API(3번)를 먼저 실행하여 courseId 변수를 설정하거나, 위에서 수동으로 설정하세요.
+GET {{baseUrl}}/api/courses/{{courseId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
 --WebAppBoundary
 Content-Disposition: form-data; name="multiFile"; filename="215926_small.mp4"
 Content-Type: video/mp4
