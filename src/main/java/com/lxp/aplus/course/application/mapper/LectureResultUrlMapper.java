@@ -19,6 +19,7 @@ public class LectureResultUrlMapper {
     public LectureResourceResult toResult(LectureResourceV2 resource) {
         String url = presignedUrlGenerator.generateGetUrl(resource.getFileKey()).url();
         return LectureResourceResult.builder()
+                .resourceId(resource.getId())
                 .resourceType(resource.getResourceType())
                 .isDownloadable(resource.isDownloadable())
                 .fileUrl(url)

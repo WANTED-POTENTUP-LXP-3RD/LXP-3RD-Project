@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record LectureResourceResult(
+        Long resourceId,
         ResourceType resourceType,
         boolean isDownloadable,
         String fileUrl
