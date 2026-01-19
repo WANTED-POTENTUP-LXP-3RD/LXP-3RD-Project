@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.infrastructure.persistence;
 
+import com.lxp.aplus.course.application.port.in.dto.ResourceSummary;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseStatus;
 import com.lxp.aplus.course.domain.Lecture;
@@ -41,4 +42,14 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
     List<Lecture> findAllLecturesWithResourcesByCourseId(@Param("courseId") Long courseId);
 
     List<Course> findByIdIn(List<Long> ids);
+
+    @Query("SELECT new com.lxp.aplus.course.application.port.in.dto.ResourceSummary(" +
+            "lr.id, l.title, l.totalDurationSeconds) " +
+            "FROM Lecture l " +
+            "JOIN l.section s " +
+            "JOIN l.lectureResources lr " +
+            "WHERE s.course.id = :courseId " +
+            "AND lr.resourceType = 'VIDEO' " +
+            "ORDER BY s.orderIndex ASC, l.orderIndex ASC")
+    List<ResourceSummary> findLectureSummariesByCourseId(@Param("courseId") Long courseId);
 }
