@@ -1,5 +1,6 @@
 package com.lxp.aplus.course.domain;
 
+import com.lxp.aplus.course.application.port.in.dto.ResourceSummary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,4 +18,5 @@ public interface CourseRepository {
     int countLecturesByCourseId(Long courseId);
     List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId);
     List<Course> findByIdIn(List<Long> ids);
+    List<ResourceSummary> findLectureSummariesByCourseId(Long courseId);
 }
