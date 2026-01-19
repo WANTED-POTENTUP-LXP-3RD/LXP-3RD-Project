@@ -48,6 +48,7 @@ public record LectureResponse(
                 .updatedAt(result.updatedAt())
                 .resource(
                         LectureResourceResponse.builder()
+                                .resourceId(result.resource().resourceId())
                                 .resourceType(result.resource().resourceType())
                                 .isDownloadable(result.resource().isDownloadable())
                                 .fileUrl(result.resource().fileUrl())

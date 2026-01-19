@@ -6,12 +6,14 @@ import lombok.Builder;
 
 @Builder
 public record LectureResourceResponse(
+        Long resourceId,
         ResourceType resourceType,
         boolean isDownloadable,
         String fileUrl
 ) {
     public static LectureResourceResponse from(LectureResourceV2 resource) {
         return LectureResourceResponse.builder()
+                .resourceId(resource.getId())
                 .resourceType(resource.getResourceType())
                 .fileUrl(resource.getFileKey())
                 .isDownloadable(resource.isDownloadable())
