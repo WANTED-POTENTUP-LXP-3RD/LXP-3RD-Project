@@ -1,7 +1,6 @@
 package com.lxp.aplus.course.application.result;
 
 import com.lxp.aplus.course.domain.Lecture;
-import com.lxp.aplus.course.domain.LectureResource;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -23,6 +22,7 @@ public record LectureResult (
                 .filter(list -> !list.isEmpty())
                 .map(list -> list.get(0))
                 .map(res -> LectureResourceResult.builder()
+                        .resourceId(res.getId())
                         .resourceType(res.getResourceType())
                         .isDownloadable(res.isDownloadable())
                         .fileUrl(res.getFileKey())
