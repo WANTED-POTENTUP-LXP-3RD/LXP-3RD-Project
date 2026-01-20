@@ -14,6 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CourseRepositoryImpl implements CourseRepository {
     private final CourseJpaRepository jpaRepository;
+    private final CourseDslRepository courseDslRepository;
 
     @Override
     public Course save(Course course) {
@@ -42,22 +43,22 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     @Override
     public Optional<Course> findWithCurriculumById(Long courseId) {
-        return jpaRepository.findWithCurriculumById(courseId);
+        return courseDslRepository.findWithCurriculumById(courseId);
     }
 
     @Override
     public Optional<Course> findPublishedWithCurriculumById(Long courseId) {
-        return jpaRepository.findPublishedWithCurriculumById(courseId);
+        return courseDslRepository.findPublishedWithCurriculumById(courseId);
     }
 
     @Override
     public int countLecturesByCourseId(Long courseId) {
-        return jpaRepository.countLecturesByCourseId(courseId);
+        return courseDslRepository.countLecturesByCourseId(courseId);
     }
 
     @Override
     public List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId) {
-        return jpaRepository.findAllLecturesWithResourcesByCourseId(courseId);
+        return courseDslRepository.findAllLecturesWithResourcesByCourseId(courseId);
     }
 
     @Override
@@ -67,6 +68,6 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     @Override
     public List<ResourceSummary> findLectureSummariesByCourseId(Long courseId) {
-        return jpaRepository.findLectureSummariesByCourseId(courseId);
+        return courseDslRepository.findLectureSummariesByCourseId(courseId);
     }
 }
