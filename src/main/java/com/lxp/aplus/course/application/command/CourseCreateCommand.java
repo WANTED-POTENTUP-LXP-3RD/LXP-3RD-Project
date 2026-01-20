@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 public record CourseCreateCommand(
+        Long instructorId,
         String title,
         String summary,
         String description,

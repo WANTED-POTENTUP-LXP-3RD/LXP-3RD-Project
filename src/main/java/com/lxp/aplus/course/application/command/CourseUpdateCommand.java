@@ -5,6 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record CourseUpdateCommand(
+        Long courseId,
+        Long instructorId,
         String title,
         String summary,
         String description,

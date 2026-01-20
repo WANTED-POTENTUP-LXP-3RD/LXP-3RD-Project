@@ -4,6 +4,7 @@ import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.SectionResultCode;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.InstructorOnly;
+import com.lxp.aplus.course.application.command.SectionDeleteCommand;
 import com.lxp.aplus.course.application.result.SectionUpsertResult;
 import com.lxp.aplus.course.application.usecase.SectionCommandUseCase;
 import com.lxp.aplus.course.presentation.request.SectionCreateRequest;
@@ -31,7 +32,7 @@ public class SectionController {
             @PathVariable("courseId") Long courseId,
             @Valid @RequestBody SectionCreateRequest request
     ) {
-        SectionUpsertResult result = sectionCommandUseCase.createSection(courseId, instructorId, request.toCommand());
+        SectionUpsertResult result = sectionCommandUseCase.createSection(request.toCommand(courseId, instructorId));
 
         return ResponseEntity
                 .status(SectionResultCode.SECTION_REGISTER_SUCCESS.getStatus())
@@ -46,7 +47,7 @@ public class SectionController {
             @PathVariable("sectionId") Long sectionId,
             @RequestBody SectionUpdateRequest request
     ) {
-        SectionUpsertResult result = sectionCommandUseCase.updateSection(courseId, instructorId, sectionId, request.toCommand());
+        SectionUpsertResult result = sectionCommandUseCase.updateSection(request.toCommand(courseId, instructorId, sectionId));
 
         return ResponseEntity
                 .status(SectionResultCode.SECTION_UPDATE_SUCCESS.getStatus())
@@ -60,7 +61,7 @@ public class SectionController {
             @PathVariable("courseId") Long courseId,
             @PathVariable("sectionId") Long sectionId
     ) {
-        sectionCommandUseCase.deleteSection(courseId, instructorId, sectionId);
+        sectionCommandUseCase.deleteSection(SectionDeleteCommand.of(courseId, instructorId, sectionId));
 
         return ResponseEntity
                 .status(SectionResultCode.SECTION_DELETE_SUCCESS.getStatus())

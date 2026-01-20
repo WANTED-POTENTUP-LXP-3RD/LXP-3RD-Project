@@ -12,8 +12,10 @@ public record CourseUpdateRequest(
         String thumbnailUrl,
         Integer price
 ) {
-    public CourseUpdateCommand toCommand() {
+    public CourseUpdateCommand toCommand(Long courseId, Long instructorId) {
         return CourseUpdateCommand.builder()
+                .instructorId(instructorId)
+                .courseId(courseId)
                 .title(this.title)
                 .summary(this.summary)
                 .description(this.description)

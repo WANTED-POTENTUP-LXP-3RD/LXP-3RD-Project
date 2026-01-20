@@ -4,6 +4,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.SectionErrorCode;
 import com.lxp.aplus.course.application.command.SectionCreateCommand;
+import com.lxp.aplus.course.application.command.SectionDeleteCommand;
 import com.lxp.aplus.course.application.command.SectionUpdateCommand;
 import com.lxp.aplus.course.application.result.SectionUpsertResult;
 import com.lxp.aplus.course.domain.Course;
@@ -19,11 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class SectionCommandUseCase {
     private final CourseRepository courseRepository;
 
-    public SectionUpsertResult createSection(Long courseId, Long instructorId, SectionCreateCommand command) {
-        Course course = courseRepository.findById(courseId)
+    public SectionUpsertResult createSection(SectionCreateCommand command) {
+        Course course = courseRepository.findById(command.courseId())
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        course.validateOwner(instructorId);
+        course.validateOwner(command.instructorId());
         course.addSection(command.title(), command.orderIndex());
         Course savedCourse = courseRepository.save(course);
         courseRepository.flush();
@@ -37,21 +38,21 @@ public class SectionCommandUseCase {
         return SectionUpsertResult.from(newSection);
     }
 
-    public SectionUpsertResult updateSection(Long courseId, Long instructorId, Long sectionId, SectionUpdateCommand command) {
-        Course course = courseRepository.findById(courseId)
+    public SectionUpsertResult updateSection(SectionUpdateCommand command) {
+        Course course = courseRepository.findById(command.courseId())
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        course.validateOwner(instructorId);
-        Section updatedSection = course.updateSection(sectionId, command.title(), command.orderIndex());
+        course.validateOwner(command.instructorId());
+        Section updatedSection = course.updateSection(command.sectionId(), command.title(), command.orderIndex());
 
         return SectionUpsertResult.from(updatedSection);
     }
 
-    public void deleteSection(Long courseId, Long instructorId, Long sectionId) {
-        Course course = courseRepository.findById(courseId)
+    public void deleteSection(SectionDeleteCommand command) {
+        Course course = courseRepository.findById(command.courseId())
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        course.validateOwner(instructorId);
-        course.deleteSection(sectionId);
+        course.validateOwner(command.instructorId());
+        course.deleteSection(command.sectionId());
     }
 }

@@ -73,9 +73,9 @@ public class Course extends BaseAggregateRoot {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    public static Course createDraftCourse(Long instructorId, CourseCreateCommand command) {
+    public static Course createDraftCourse(CourseCreateCommand command) {
         return Course.builder()
-                .instructorId(instructorId)
+                .instructorId(command.instructorId())
                 .categoryId(command.categoryId())
                 .title(command.title())
                 .summary(command.summary())

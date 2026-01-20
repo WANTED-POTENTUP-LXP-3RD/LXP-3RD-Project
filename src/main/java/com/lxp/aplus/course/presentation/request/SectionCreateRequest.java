@@ -10,8 +10,10 @@ public record SectionCreateRequest(
         @NotNull(message = "섹션 순서는 필수입니다.")
         Integer orderIndex
 ) {
-    public SectionCreateCommand toCommand() {
+    public SectionCreateCommand toCommand(Long courseId, Long instructorId) {
         return SectionCreateCommand.builder()
+                .courseId(courseId)
+                .instructorId(instructorId)
                 .title(this.title)
                 .orderIndex(this.orderIndex)
                 .build();

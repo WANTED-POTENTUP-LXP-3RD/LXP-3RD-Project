@@ -6,7 +6,7 @@ public record SectionUpdateRequest(
         String title,
         Integer orderIndex
 ) {
-    public SectionUpdateCommand toCommand() {
+    public SectionUpdateCommand toCommand(Long courseId, Long instructorId, Long sectionId) {
         return SectionUpdateCommand.builder()
                 .title(this.title)
                 .orderIndex(this.orderIndex)

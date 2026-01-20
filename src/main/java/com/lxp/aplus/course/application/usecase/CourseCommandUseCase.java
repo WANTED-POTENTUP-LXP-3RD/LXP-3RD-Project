@@ -19,18 +19,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseCommandUseCase {
     private final CourseRepository courseRepository;
 
-    public CourseUpsertResult createCourse(Long instructorId, CourseCreateCommand command) {
-        Course course = Course.createDraftCourse(instructorId, command);
+    public CourseUpsertResult createCourse(CourseCreateCommand command) {
+        Course course = Course.createDraftCourse(command);
         Course savedCourse = courseRepository.save(course);
 
         return CourseUpsertResult.from(savedCourse);
     }
 
-    public CourseUpsertResult updateCourse(Long courseId, Long instructorId, CourseUpdateCommand command) {
-        Course course = courseRepository.findById(courseId)
+    public CourseUpsertResult updateCourse(CourseUpdateCommand command) {
+        Course course = courseRepository.findById(command.courseId())
                 .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
 
-        course.validateOwner(instructorId);
+        course.validateOwner(command.instructorId());
         course.updateCourse(command);
 
         return CourseUpsertResult.from(course);

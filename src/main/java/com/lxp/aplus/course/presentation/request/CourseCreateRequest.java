@@ -13,8 +13,9 @@ public record CourseCreateRequest(@NotBlank(message = "제목은 필수입니다
                                   @NotNull(message = "가격은 필수입니다.") @Min(value = 0, message = "가격은 0원 이상이어야 합니다.") int price,
                                   @NotNull(message = "난이도는 필수입니다.") CourseLevel courseLevel
 ) {
-    public CourseCreateCommand toCommand() {
+    public CourseCreateCommand toCommand(Long instructorId) {
         return CourseCreateCommand.builder()
+                .instructorId(instructorId)
                 .title(this.title)
                 .summary(this.summary)
                 .description(this.description)
