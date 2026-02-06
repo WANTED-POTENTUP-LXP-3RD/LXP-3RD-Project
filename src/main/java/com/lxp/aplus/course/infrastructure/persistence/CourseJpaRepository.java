@@ -44,12 +44,14 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
     List<Course> findByIdIn(List<Long> ids);
 
     @Query("SELECT new com.lxp.aplus.course.application.port.in.dto.ResourceSummary(" +
-            "lr.id, l.title, l.totalDurationSeconds) " +
+            "lr.id, l.title, l.totalDurationSeconds, lr.resourceType) " +
             "FROM Lecture l " +
             "JOIN l.section s " +
             "JOIN l.lectureResources lr " +
             "WHERE s.course.id = :courseId " +
-            "AND lr.resourceType = 'VIDEO' " +
             "ORDER BY s.orderIndex ASC, l.orderIndex ASC")
     List<ResourceSummary> findLectureSummariesByCourseId(@Param("courseId") Long courseId);
+
+    @Query("SELECT l.totalDurationSeconds FROM Lecture l JOIN l.lectureResources lr WHERE lr.id = :lectureResourceId")
+    Optional<Integer> findLectureDurationByResourceId(@Param("lectureResourceId") Long lectureResourceId);
 }
