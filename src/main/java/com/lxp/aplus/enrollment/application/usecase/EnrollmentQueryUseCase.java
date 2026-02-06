@@ -28,7 +28,7 @@ public class EnrollmentQueryUseCase {
 
     private final EnrollmentRepository enrollmentRepository;
     private final CourseFinder courseFinder;
-    private final ProgressReader progressReader; // ProgressFinder -> ProgressReader로 변경
+    private final ProgressReader progressReader;
 
     public Page<EnrollmentListItemResult> getEnrollmentList(Long studentId, EnrollmentStatus status, Pageable pageable) {
         Page<Enrollment> enrollmentsPage = enrollmentRepository.findByStudentIdAndStatus(studentId, status, pageable);
@@ -41,7 +41,6 @@ public class EnrollmentQueryUseCase {
                     
                     List<String> categoryNames = courseFinder.findCategoryNamesByCourseId(enrollment.getCourseId());
 
-                    // 기존 계산 로직 제거, Progress 모듈에 조회
                     int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
 
                     return EnrollmentListItemResult.of(
@@ -62,7 +61,6 @@ public class EnrollmentQueryUseCase {
 
         enrollment.validateOwner(studentId);
 
-        // 기존 계산 로직 제거, Progress 모듈에 조회
         int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
 
         return EnrollmentDetailResult.of(enrollment, overallProgressRate);
@@ -72,7 +70,6 @@ public class EnrollmentQueryUseCase {
         Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
-        // 기존 계산 로직 제거, Progress 모듈에 조회
         int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
 
         return EnrollmentDetailResult.of(enrollment, overallProgressRate);
