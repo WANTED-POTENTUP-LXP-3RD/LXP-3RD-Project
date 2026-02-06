@@ -1,4 +1,4 @@
-package com.lxp.aplus.user.application.dto;
+package com.lxp.aplus.user.application.dto.response;
 
 import com.lxp.aplus.user.domain.Role;
 import com.lxp.aplus.user.domain.RoleType;

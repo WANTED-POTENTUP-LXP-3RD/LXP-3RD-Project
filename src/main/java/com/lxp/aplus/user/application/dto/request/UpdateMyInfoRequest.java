@@ -1,4 +1,4 @@
-package com.lxp.aplus.user.application.dto;
+package com.lxp.aplus.user.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 

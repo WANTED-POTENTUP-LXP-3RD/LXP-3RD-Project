@@ -1,10 +1,8 @@
 package com.lxp.aplus.user.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
-import com.lxp.aplus.user.application.dto.*;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
 import com.lxp.aplus.user.domain.UserStatus;
 import com.lxp.aplus.common.error.code.UserErrorCode;
 import org.junit.jupiter.api.DisplayName;

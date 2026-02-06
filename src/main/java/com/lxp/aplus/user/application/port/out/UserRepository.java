@@ -1,4 +1,6 @@
-package com.lxp.aplus.user.domain;
+package com.lxp.aplus.user.application.port.out;
+
+import com.lxp.aplus.user.domain.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +14,3 @@ public interface UserRepository {
     Optional<User> findUserWithRolesByEmail(String email);
     boolean existsById(Long id);
 }
-

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "storage.type", havingValue = "minio", matchIfMissing = true)
 public class MinioPresignedUrlGenerator implements PresignedUrlGenerator {

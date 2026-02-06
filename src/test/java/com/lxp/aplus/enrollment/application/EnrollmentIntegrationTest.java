@@ -12,7 +12,6 @@ import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,8 +1,8 @@
-package com.lxp.aplus.user.application.dto;
+package com.lxp.aplus.user.application.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
-public record WithdrawUserRequest(
+public record ActivateUserRequest(
         @NotNull(message = "사용자 ID는 필수입니다")
         Long userId
 ) {

@@ -1,4 +1,4 @@
-package com.lxp.aplus.user.application.dto;
+package com.lxp.aplus.user.application.dto.request;
 
 import com.lxp.aplus.user.domain.UserStatus;
 import jakarta.validation.constraints.NotNull;
