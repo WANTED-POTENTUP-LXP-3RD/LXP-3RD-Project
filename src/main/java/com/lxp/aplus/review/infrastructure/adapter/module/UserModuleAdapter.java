@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class ReviewUserModuleAdapter implements UserQueryPort {
+public class UserModuleAdapter implements UserQueryPort {
     private final UserInternalUseCase userInternalUseCase;
 
     @Override
