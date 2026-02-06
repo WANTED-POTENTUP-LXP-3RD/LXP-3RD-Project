@@ -38,8 +38,8 @@ public class ProgressQueryUseCase {
         List<Progress> progresses = progressRepository.findByEnrollmentId(enrollmentStatusDto.enrollmentId());
         List<LectureSummaryDto> lectureDetails = lectureProvider.getLectureDetailsByCourseId(courseId);
 
-        LearningProgress learningProgress = new LearningProgress(progresses);
-        int overallProgressRate = learningProgress.calculateOverallProgressRate(lectureDetails.size());
+        LearningProgress learningProgress = new LearningProgress(enrollmentStatusDto.enrollmentId(), progresses);
+        int overallProgressRate = learningProgress.calculateOverallProgressRate(lectureDetails);
         Optional<Progress> lastWatchedProgressOpt = learningProgress.findLastWatchedProgress();
         List<LectureProgressResponse> lectureProgressResponses = learningProgress.mapToLectureProgressResponses(lectureDetails);
 
