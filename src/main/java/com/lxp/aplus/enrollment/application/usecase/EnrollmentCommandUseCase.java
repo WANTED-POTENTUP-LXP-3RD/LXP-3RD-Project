@@ -5,7 +5,7 @@ import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
 import com.lxp.aplus.enrollment.application.event.EnrollmentCanceledEvent;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
-import com.lxp.aplus.enrollment.application.port.out.ProgressFinder;
+import com.lxp.aplus.enrollment.application.port.out.ProgressReader;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class EnrollmentCommandUseCase{
 
     private final EnrollmentRepository enrollmentRepository;
     private final CourseFinder courseFinder;
-    private final ProgressFinder progressFinder;
+    private final ProgressReader progressReader; // ProgressFinder -> ProgressReader로 변경
     private final ApplicationEventPublisher eventPublisher;
 
     /**
@@ -74,13 +74,13 @@ public class EnrollmentCommandUseCase{
 
         enrollment.validateOwner(studentId);
 
-        if (progressFinder.hasProgress(enrollmentId)) {
+        if (progressReader.hasProgress(enrollmentId)) {
             throw new BusinessException(EnrollmentErrorCode.ENROLLMENT_CANNOT_CANCEL_AFTER_STARTED);
         }
 
         enrollment.cancel(LocalDateTime.now());
 
-        progressFinder.removeByEnrollmentId(enrollmentId);
+        progressReader.removeByEnrollmentId(enrollmentId);
 
         eventPublisher.publishEvent(new EnrollmentCanceledEvent(enrollment.getOrderItemId()));
 

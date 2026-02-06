@@ -5,7 +5,7 @@ import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-import com.lxp.aplus.enrollment.application.port.out.ProgressFinder;
+import com.lxp.aplus.enrollment.application.port.out.ProgressReader;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +28,7 @@ public class EnrollmentQueryUseCase {
 
     private final EnrollmentRepository enrollmentRepository;
     private final CourseFinder courseFinder;
-    private final ProgressFinder progressFinder;
+    private final ProgressReader progressReader; // ProgressFinder -> ProgressReader로 변경
 
     public Page<EnrollmentListItemResult> getEnrollmentList(Long studentId, EnrollmentStatus status, Pageable pageable) {
         Page<Enrollment> enrollmentsPage = enrollmentRepository.findByStudentIdAndStatus(studentId, status, pageable);
@@ -42,12 +41,13 @@ public class EnrollmentQueryUseCase {
                     
                     List<String> categoryNames = courseFinder.findCategoryNamesByCourseId(enrollment.getCourseId());
 
-                    int completionPercentage = calculateCompletionPercentage(enrollment);
+                    // 기존 계산 로직 제거, Progress 모듈에 조회
+                    int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
 
                     return EnrollmentListItemResult.of(
                             enrollment,
                             courseSummary,
-                            completionPercentage,
+                            overallProgressRate,
                             categoryNames
                     );
                 })
@@ -62,44 +62,24 @@ public class EnrollmentQueryUseCase {
 
         enrollment.validateOwner(studentId);
 
-        int completionPercentage = calculateCompletionPercentage(enrollment);
+        // 기존 계산 로직 제거, Progress 모듈에 조회
+        int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
 
-        return EnrollmentDetailResult.of(enrollment, completionPercentage);
+        return EnrollmentDetailResult.of(enrollment, overallProgressRate);
     }
 
     public EnrollmentDetailResult getEnrollmentDetailByCourseId(Long studentId, Long courseId) {
         Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
-        int completionPercentage = calculateCompletionPercentage(enrollment);
+        // 기존 계산 로직 제거, Progress 모듈에 조회
+        int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
 
-        return EnrollmentDetailResult.of(enrollment, completionPercentage);
+        return EnrollmentDetailResult.of(enrollment, overallProgressRate);
     }
 
     public long getStudentCountForCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
-    }
-
-    /**
-     * 강의 리소스 수와 완료된 리소스 수를 기반으로 진도율을 계산하는 헬퍼 메서드입니다.
-     * 실제 계산 로직은 Enrollment 도메인 객체에 위임합니다.
-     *
-     * @param enrollment 진도율을 계산할 수강 정보 엔티티
-     * @return 계산된 진도율 (0-100)
-     */
-    private int calculateCompletionPercentage(Enrollment enrollment) {
-        List<Long> lectureResourceIds = courseFinder.getLectureResourceIds(enrollment.getCourseId());
-        if (lectureResourceIds.isEmpty()) {
-            return 0;
-        }
-
-        Map<Long, Boolean> resourceIdToIsCompletedMap = progressFinder.getCompletionStatusMap(enrollment.getId(), lectureResourceIds);
-        long completedResourceCount = resourceIdToIsCompletedMap.values()
-                .stream()
-                .filter(Boolean::booleanValue)
-                .count();
-
-        return enrollment.calculateProgressRate(completedResourceCount, lectureResourceIds.size());
     }
 }
 
