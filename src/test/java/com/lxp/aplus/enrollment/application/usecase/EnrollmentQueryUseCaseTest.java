@@ -4,7 +4,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-import com.lxp.aplus.enrollment.application.port.out.ProgressFinder;
+import com.lxp.aplus.enrollment.application.port.out.ProgressReader;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
@@ -21,10 +21,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.LongStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -42,7 +42,7 @@ class EnrollmentQueryUseCaseTest {
     private CourseFinder courseFinder;
 
     @Mock
-    private ProgressFinder progressFinder;
+    private ProgressReader progressReader;
 
     private static final Long STUDENT_ID = 1L;
     private static final Long COURSE_ID_1 = 100L;
@@ -61,15 +61,9 @@ class EnrollmentQueryUseCaseTest {
         ReflectionTestUtils.setField(enrollment1, "id", 5001L);
         List<String> categories1 = List.of("프로그래밍", "백엔드");
 
-        List<Long> resourceIds1 = LongStream.rangeClosed(1, 10).boxed().toList();
-        Map<Long, Boolean> completionMap1 = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
-
         Enrollment enrollment2 = Enrollment.create(STUDENT_ID, COURSE_ID_2, 1L);
         ReflectionTestUtils.setField(enrollment2, "id", 5002L);
         List<String> categories2 = List.of("프로그래밍", "프론트엔드");
-        
-        List<Long> resourceIds2 = LongStream.rangeClosed(11, 30).boxed().toList();
-        Map<Long, Boolean> completionMap2 = Map.of(11L, true, 12L, true, 13L, true, 14L, true, 15L, true, 16L, true, 17L, true);
 
         List<Enrollment> enrollments = List.of(enrollment1, enrollment2);
         Page<Enrollment> enrollmentsPage = new PageImpl<>(enrollments, pageable, enrollments.size());
@@ -84,11 +78,8 @@ class EnrollmentQueryUseCaseTest {
         given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
         given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
 
-        given(courseFinder.getLectureResourceIds(COURSE_ID_1)).willReturn(resourceIds1);
-        given(courseFinder.getLectureResourceIds(COURSE_ID_2)).willReturn(resourceIds2);
-
-        given(progressFinder.getCompletionStatusMap(5001L, resourceIds1)).willReturn(completionMap1);
-        given(progressFinder.getCompletionStatusMap(5002L, resourceIds2)).willReturn(completionMap2);
+        given(progressReader.getOverallProgressRate(5001L, COURSE_ID_1)).willReturn(40);
+        given(progressReader.getOverallProgressRate(5002L, COURSE_ID_2)).willReturn(35);
 
         // when
         Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
@@ -96,7 +87,7 @@ class EnrollmentQueryUseCaseTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(2);
-        
+
         EnrollmentListItemResult result1 = result.getContent().get(0);
         assertThat(result1.courseId()).isEqualTo(COURSE_ID_1);
         assertThat(result1.progressRate()).isEqualTo(40);
@@ -151,12 +142,8 @@ class EnrollmentQueryUseCaseTest {
         Enrollment enrollment = Enrollment.create(studentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
-        List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();
-        Map<Long, Boolean> completionMap = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
-
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
-        given(courseFinder.getLectureResourceIds(courseId)).willReturn(lectureResourceIds);
-        given(progressFinder.getCompletionStatusMap(enrollmentId, lectureResourceIds)).willReturn(completionMap);
+        given(progressReader.getOverallProgressRate(enrollmentId, courseId)).willReturn(40);
 
         // when
         EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetail(studentId, enrollmentId);
@@ -215,12 +202,8 @@ class EnrollmentQueryUseCaseTest {
         Enrollment enrollment = Enrollment.create(studentId, courseId, 1L);
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
-        List<Long> lectureResourceIds = LongStream.rangeClosed(1, 10).boxed().toList();
-        Map<Long, Boolean> completionMap = Map.of(1L, true, 2L, true, 3L, true, 4L, true);
-
         given(enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)).willReturn(Optional.of(enrollment));
-        given(courseFinder.getLectureResourceIds(courseId)).willReturn(lectureResourceIds);
-        given(progressFinder.getCompletionStatusMap(enrollmentId, lectureResourceIds)).willReturn(completionMap);
+        given(progressReader.getOverallProgressRate(enrollmentId, courseId)).willReturn(40);
 
         // when
         EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetailByCourseId(studentId, courseId);

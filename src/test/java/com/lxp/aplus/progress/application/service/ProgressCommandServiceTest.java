@@ -1,16 +1,16 @@
-package com.lxp.aplus.progress.application.usecase;
+package com.lxp.aplus.progress.application.service;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.common.error.code.ProgressErrorCode;
 import com.lxp.aplus.progress.application.command.ProgressUpdateCommand;
-import com.lxp.aplus.progress.application.port.EnrollmentStatusDto;
-import com.lxp.aplus.progress.application.port.EnrollmentReader;
-import com.lxp.aplus.progress.application.port.LectureDurationDto;
-import com.lxp.aplus.progress.application.port.LectureProvider;
+import com.lxp.aplus.progress.application.dto.response.ProgressUpdateResponse;
+import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
+import com.lxp.aplus.progress.application.port.out.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
+import com.lxp.aplus.progress.application.port.out.dto.LectureDurationDto;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
-import com.lxp.aplus.progress.presentation.response.ProgressUpdateResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,10 +28,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class ProgressCommandUseCaseTest {
+class ProgressCommandServiceTest {
 
     @InjectMocks
-    private ProgressCommandUseCase progressCommandUseCase;
+    private ProgressCommandService progressCommandService;
 
     @Mock
     private ProgressRepository progressRepository;
@@ -61,7 +61,7 @@ class ProgressCommandUseCaseTest {
         given(progressRepository.save(any(Progress.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        ProgressUpdateResponse response = progressCommandUseCase.updateProgress(userId, courseId, command);
+        ProgressUpdateResponse response = progressCommandService.updateProgress(userId, courseId, command);
 
         // then
         ArgumentCaptor<Progress> progressCaptor = ArgumentCaptor.forClass(Progress.class);
@@ -97,7 +97,7 @@ class ProgressCommandUseCaseTest {
         given(progressRepository.save(any(Progress.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        progressCommandUseCase.updateProgress(userId, courseId, command);
+        progressCommandService.updateProgress(userId, courseId, command);
 
         // then
         ArgumentCaptor<Progress> progressCaptor = ArgumentCaptor.forClass(Progress.class);
@@ -120,7 +120,7 @@ class ProgressCommandUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> progressCommandUseCase.updateProgress(userId, courseId, command));
+                () -> progressCommandService.updateProgress(userId, courseId, command));
         assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 
@@ -138,7 +138,7 @@ class ProgressCommandUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> progressCommandUseCase.updateProgress(userId, courseId, command));
+                () -> progressCommandService.updateProgress(userId, courseId, command));
         assertThat(exception.getErrorCode()).isEqualTo(ProgressErrorCode.CANNOT_UPDATE_EXPIRED_ENROLLMENT);
     }
 
@@ -164,7 +164,7 @@ class ProgressCommandUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> progressCommandUseCase.updateProgress(userId, courseId, command));
+                () -> progressCommandService.updateProgress(userId, courseId, command));
         assertThat(exception.getErrorCode()).isEqualTo(ProgressErrorCode.WATCHED_DURATION_EXCEEDS_TOTAL);
     }
 }
