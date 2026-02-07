@@ -2,8 +2,8 @@ package com.lxp.aplus.enrollment.infrastructure.adapter;
 
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
-import com.lxp.aplus.progress.application.port.EnrollmentReader;
-import com.lxp.aplus.progress.application.port.EnrollmentStatusDto;
+import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
+import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

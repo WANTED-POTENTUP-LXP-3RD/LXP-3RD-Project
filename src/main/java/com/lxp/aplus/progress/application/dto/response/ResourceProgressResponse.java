@@ -1,11 +1,11 @@
-package com.lxp.aplus.progress.presentation.response;
+package com.lxp.aplus.progress.application.dto.response;
 
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class LectureProgressResponse {
+public class ResourceProgressResponse {
     private static final int MAX_PROGRESS_RATE = 100;
     private static final int MIN_PROGRESS_RATE = 0;
 
@@ -17,7 +17,7 @@ public class LectureProgressResponse {
     private final LocalDateTime lastWatchedAt;
     private final int progressRate;
 
-    public LectureProgressResponse(Long resourceId, String title, int watchedDuration, int totalDurationSeconds, boolean completed, LocalDateTime lastWatchedAt) {
+    public ResourceProgressResponse(Long resourceId, String title, int watchedDuration, int totalDurationSeconds, boolean completed, LocalDateTime lastWatchedAt) {
         this.resourceId = resourceId;
         this.title = title;
         this.watchedDuration = watchedDuration;

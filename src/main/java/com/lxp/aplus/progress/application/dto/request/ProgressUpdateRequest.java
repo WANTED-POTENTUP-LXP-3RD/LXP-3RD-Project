@@ -1,4 +1,4 @@
-package com.lxp.aplus.progress.presentation.request;
+package com.lxp.aplus.progress.application.dto.request;
 
 import com.lxp.aplus.progress.application.command.ProgressUpdateCommand;
 import jakarta.validation.constraints.NotNull;

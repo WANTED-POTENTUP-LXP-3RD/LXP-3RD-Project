@@ -1,4 +1,4 @@
-package com.lxp.aplus.progress.infrastructure.persistence;
+package com.lxp.aplus.progress.adapter.out.persistence;
 
 import com.lxp.aplus.progress.domain.Progress;
 import org.springframework.data.jpa.repository.JpaRepository;

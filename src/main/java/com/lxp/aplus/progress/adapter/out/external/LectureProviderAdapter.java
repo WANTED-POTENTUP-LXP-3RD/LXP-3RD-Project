@@ -2,9 +2,9 @@ package com.lxp.aplus.progress.adapter.out.external;
 
 import com.lxp.aplus.course.application.port.in.dto.ResourceSummary;
 import com.lxp.aplus.course.infrastructure.persistence.CourseJpaRepository;
-import com.lxp.aplus.progress.application.port.LectureDurationDto;
-import com.lxp.aplus.progress.application.port.LectureProvider;
-import com.lxp.aplus.progress.application.port.LectureSummaryDto;
+import com.lxp.aplus.progress.application.port.out.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.dto.LectureDurationDto;
+import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

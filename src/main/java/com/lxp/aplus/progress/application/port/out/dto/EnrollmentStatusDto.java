@@ -1,4 +1,4 @@
-package com.lxp.aplus.progress.application.port;
+package com.lxp.aplus.progress.application.port.out.dto;
 
 public record EnrollmentStatusDto(
         Long enrollmentId,

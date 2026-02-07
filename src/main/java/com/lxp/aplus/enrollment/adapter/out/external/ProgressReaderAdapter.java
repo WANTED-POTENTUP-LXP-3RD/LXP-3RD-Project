@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class ProgressReaderAdapter implements ProgressReader {
 
-    // Progress 모듈의 external Port를 주입
     private final ProgressSummaryPort progressSummaryPort;
 
     @Override

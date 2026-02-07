@@ -1,4 +1,4 @@
-package com.lxp.aplus.progress.infrastructure.persistence;
+package com.lxp.aplus.progress.adapter.out.persistence;
 
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class ProgressRepositoryImpl implements ProgressRepository {
+class ProgressPersistenceAdapter implements ProgressRepository {
 
     private final ProgressJpaRepository jpaRepository;
 

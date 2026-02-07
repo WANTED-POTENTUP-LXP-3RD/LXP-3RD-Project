@@ -1,11 +1,12 @@
 package com.lxp.aplus.progress.application.service.internal;
 
-import com.lxp.aplus.progress.application.port.LectureSummaryDto;
 import com.lxp.aplus.progress.application.port.in.external.ProgressSummaryPort;
-import com.lxp.aplus.progress.application.port.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.LearningProgress;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.domain.ProgressRepository;
+import com.lxp.aplus.progress.domain.vo.LectureSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +33,9 @@ class ProgressSummaryService implements ProgressSummaryPort {
             return 0;
         }
 
+        List<LectureSummary> summaries = toLectureSummaries(resources);
         LearningProgress learningProgress = new LearningProgress(enrollmentId, progresses);
-        return learningProgress.calculateOverallProgressRate(resources);
+        return learningProgress.calculateOverallProgressRate(summaries);
     }
 
     @Override
@@ -46,5 +48,16 @@ class ProgressSummaryService implements ProgressSummaryPort {
     @Transactional
     public void removeByEnrollmentId(Long enrollmentId) {
         progressRepository.deleteByEnrollmentId(enrollmentId);
+    }
+
+    private List<LectureSummary> toLectureSummaries(List<LectureSummaryDto> lectureDetails) {
+        return lectureDetails.stream()
+                .map(lecture -> new LectureSummary(
+                        lecture.resourceId(),
+                        lecture.title(),
+                        lecture.resourceType(),
+                        lecture.totalDurationSeconds()
+                ))
+                .toList();
     }
 }
