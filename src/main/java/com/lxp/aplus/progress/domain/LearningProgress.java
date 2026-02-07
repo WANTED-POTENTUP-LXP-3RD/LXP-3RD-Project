@@ -1,8 +1,7 @@
 package com.lxp.aplus.progress.domain;
 
 import com.lxp.aplus.course.domain.ResourceType;
-import com.lxp.aplus.progress.application.port.LectureSummaryDto;
-import com.lxp.aplus.progress.presentation.response.LectureProgressResponse;
+import com.lxp.aplus.progress.domain.vo.LectureSummary;
 import lombok.Getter;
 
 import java.util.Comparator;
@@ -32,7 +31,7 @@ public class LearningProgress {
      * @param lectureDetails 리소스 목록 (resourceType 포함)
      * @return 전체 진도율 (0~100)
      */
-    public int calculateOverallProgressRate(List<LectureSummaryDto> lectureDetails) {
+    public int calculateOverallProgressRate(List<LectureSummary> lectureDetails) {
         if (lectureDetails.isEmpty()) {
             return 0;
         }
@@ -59,7 +58,7 @@ public class LearningProgress {
      * @param progress 해당 리소스의 Progress (없으면 null)
      * @return 리소스 진도율 (0~100)
      */
-    private int calculateResourceRate(LectureSummaryDto lecture, Progress progress) {
+    private int calculateResourceRate(LectureSummary lecture, Progress progress) {
         // VIDEO 타입: 시청 비율 계산
         if (lecture.resourceType() == ResourceType.VIDEO) {
             int total = lecture.totalDurationSeconds();
@@ -84,36 +83,8 @@ public class LearningProgress {
                 .max(Comparator.comparing(Progress::getLastWatchedAt));
     }
 
-    public List<LectureProgressResponse> mapToLectureProgressResponses(List<LectureSummaryDto> lectureDetails) {
-        Map<Long, Progress> progressMap = progresses.stream()
+    public Map<Long, Progress> mapProgressByResourceId() {
+        return progresses.stream()
                 .collect(Collectors.toMap(Progress::getLectureResourceId, Function.identity()));
-
-        return lectureDetails.stream()
-                .map(lecture -> {
-                    Progress progress = progressMap.get(lecture.resourceId());
-                    return createLectureProgressResponse(lecture, progress);
-                })
-                .toList();
-    }
-
-    private LectureProgressResponse createLectureProgressResponse(LectureSummaryDto lecture, Progress progress) {
-        if (progress == null) {
-            return new LectureProgressResponse(
-                    lecture.resourceId(),
-                    lecture.title(),
-                    0,
-                    lecture.totalDurationSeconds(),
-                    false,
-                    null
-            );
-        }
-        return new LectureProgressResponse(
-                lecture.resourceId(),
-                lecture.title(),
-                progress.getWatchedDuration(),
-                lecture.totalDurationSeconds(),
-                progress.isCompleted(),
-                progress.getLastWatchedAt()
-        );
     }
 }
