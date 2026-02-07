@@ -1,7 +1,7 @@
 package com.lxp.aplus.user.infrastructure.persistence;
 
-import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.application.port.out.UserRepository;
+import com.lxp.aplus.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

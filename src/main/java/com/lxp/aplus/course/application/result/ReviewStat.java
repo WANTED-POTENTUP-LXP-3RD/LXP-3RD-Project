@@ -1,4 +1,4 @@
-package com.lxp.aplus.course.application.dto;
+package com.lxp.aplus.course.application.result;
 
 import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 

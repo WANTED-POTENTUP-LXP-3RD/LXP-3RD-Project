@@ -4,13 +4,13 @@ import com.lxp.aplus.user.domain.User;
 import lombok.Builder;
 
 @Builder
-public record UserInternalDto(
+public record UserInternalResult(
         Long id,
         String nickName,
         String email
 ) {
-    public static UserInternalDto from(User user) {
-        return UserInternalDto.builder()
+    public static UserInternalResult from(User user) {
+        return UserInternalResult.builder()
                 .id(user.getId())
                 .nickName(user.getNickName())
                 .email(user.getEmail())

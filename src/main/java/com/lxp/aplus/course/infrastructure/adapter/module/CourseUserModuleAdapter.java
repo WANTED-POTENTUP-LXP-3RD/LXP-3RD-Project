@@ -1,4 +1,4 @@
-package com.lxp.aplus.course.infrastructure.adapter;
+package com.lxp.aplus.course.infrastructure.adapter.module;
 
 import com.lxp.aplus.course.application.port.out.UserQueryPort;
 import com.lxp.aplus.course.application.result.InstructorResult;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserQueryAdapter implements UserQueryPort {
+public class CourseUserModuleAdapter implements UserQueryPort {
     private final UserInternalUseCase userInternalUseCase;
 
     @Override
