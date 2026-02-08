@@ -5,7 +5,7 @@ import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 
 import java.util.List;
 
-public interface LectureProvider {
+public interface LectureQueryPort {
     LectureDurationDto getLectureInfo(Long lectureResourceId);
 
     List<LectureSummaryDto> getLectureDetailsByCourseId(Long courseId);

@@ -5,7 +5,7 @@ import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.progress.application.dto.response.CourseProgressResponse;
 import com.lxp.aplus.progress.application.dto.response.ResourceProgressResponse;
 import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
-import com.lxp.aplus.progress.application.port.out.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.Progress;
@@ -36,7 +36,7 @@ class ProgressQueryServiceTest {
     @Mock
     private EnrollmentReader enrollmentReader;
     @Mock
-    private LectureProvider lectureProvider;
+    private LectureQueryPort lectureProvider;
 
     @Test
     @DisplayName("성공 - 도메인 객체를 통해 학습 이력을 정확히 조회한다")

@@ -6,7 +6,7 @@ import com.lxp.aplus.common.error.code.ProgressErrorCode;
 import com.lxp.aplus.progress.application.command.ProgressUpdateCommand;
 import com.lxp.aplus.progress.application.dto.response.ProgressUpdateResponse;
 import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
-import com.lxp.aplus.progress.application.port.out.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.out.dto.LectureDurationDto;
 import com.lxp.aplus.progress.domain.Progress;
@@ -38,7 +38,7 @@ class ProgressCommandServiceTest {
     @Mock
     private EnrollmentReader enrollmentReader;
     @Mock
-    private LectureProvider lectureProvider;
+    private LectureQueryPort lectureProvider;
 
     @Test
     @DisplayName("성공 - 새로운 학습 이력을 생성하고 진도율을 갱신한다")

@@ -4,9 +4,9 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.progress.application.dto.response.CourseProgressResponse;
 import com.lxp.aplus.progress.application.dto.response.ResourceProgressResponse;
-import com.lxp.aplus.progress.application.port.in.ProgressQueryPort;
+import com.lxp.aplus.progress.application.port.in.ProgressQueryUseCase;
 import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
-import com.lxp.aplus.progress.application.port.out.LectureProvider;
+import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.LearningProgress;
@@ -23,11 +23,11 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-class ProgressQueryService implements ProgressQueryPort {
+public class ProgressQueryService implements ProgressQueryUseCase {
 
     private final ProgressRepository progressRepository;
     private final EnrollmentReader enrollmentReader;
-    private final LectureProvider lectureProvider;
+    private final LectureQueryPort lectureProvider;
 
     @Override
     public CourseProgressResponse getCourseProgress(Long userId, Long courseId) {
