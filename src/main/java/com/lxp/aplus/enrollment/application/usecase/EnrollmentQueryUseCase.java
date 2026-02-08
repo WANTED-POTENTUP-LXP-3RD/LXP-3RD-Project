@@ -78,6 +78,5 @@ public class EnrollmentQueryUseCase {
     public long getStudentCountForCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
     }
+
 }
-
-

@@ -1,4 +1,4 @@
-package com.lxp.aplus.enrollment.infrastructure.adapter;
+package com.lxp.aplus.enrollment.adapter.out.external;
 
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 
 @Component
 @RequiredArgsConstructor

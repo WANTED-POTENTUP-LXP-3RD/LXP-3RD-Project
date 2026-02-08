@@ -22,7 +22,7 @@ public class EnrollmentCommandUseCase{
 
     private final EnrollmentRepository enrollmentRepository;
     private final CourseFinder courseFinder;
-    private final ProgressReader progressReader; // ProgressFinder -> ProgressReader로 변경
+    private final ProgressReader progressReader;
     private final ApplicationEventPublisher eventPublisher;
 
     /**
