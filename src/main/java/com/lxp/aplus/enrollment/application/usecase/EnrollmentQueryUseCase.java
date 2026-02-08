@@ -5,7 +5,8 @@ import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-import com.lxp.aplus.enrollment.application.port.out.ProgressReader;
+import com.lxp.aplus.enrollment.application.port.out.ProgressQueryPort;
+import com.lxp.aplus.enrollment.application.port.out.dto.EnrollmentProgressDto;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
@@ -28,7 +29,7 @@ public class EnrollmentQueryUseCase {
 
     private final EnrollmentRepository enrollmentRepository;
     private final CourseFinder courseFinder;
-    private final ProgressReader progressReader;
+    private final ProgressQueryPort progressQueryPort;
 
     public Page<EnrollmentListItemResult> getEnrollmentList(Long studentId, EnrollmentStatus status, Pageable pageable) {
         Page<Enrollment> enrollmentsPage = enrollmentRepository.findByStudentIdAndStatus(studentId, status, pageable);
@@ -41,12 +42,12 @@ public class EnrollmentQueryUseCase {
                     
                     List<String> categoryNames = courseFinder.findCategoryNamesByCourseId(enrollment.getCourseId());
 
-                    int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
+                    EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
 
                     return EnrollmentListItemResult.of(
                             enrollment,
                             courseSummary,
-                            overallProgressRate,
+                            progress.overallProgressRate(),
                             categoryNames
                     );
                 })
@@ -61,18 +62,18 @@ public class EnrollmentQueryUseCase {
 
         enrollment.validateOwner(studentId);
 
-        int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
+        EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
 
-        return EnrollmentDetailResult.of(enrollment, overallProgressRate);
+        return EnrollmentDetailResult.of(enrollment, progress.overallProgressRate());
     }
 
     public EnrollmentDetailResult getEnrollmentDetailByCourseId(Long studentId, Long courseId) {
         Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
-        int overallProgressRate = progressReader.getOverallProgressRate(enrollment.getId(), enrollment.getCourseId());
+        EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
 
-        return EnrollmentDetailResult.of(enrollment, overallProgressRate);
+        return EnrollmentDetailResult.of(enrollment, progress.overallProgressRate());
     }
 
     public long getStudentCountForCourse(Long courseId) {

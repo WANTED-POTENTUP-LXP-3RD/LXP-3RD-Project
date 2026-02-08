@@ -4,7 +4,8 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-import com.lxp.aplus.enrollment.application.port.out.ProgressReader;
+import com.lxp.aplus.enrollment.application.port.out.ProgressQueryPort;
+import com.lxp.aplus.enrollment.application.port.out.dto.EnrollmentProgressDto;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
@@ -42,7 +43,7 @@ class EnrollmentQueryUseCaseTest {
     private CourseFinder courseFinder;
 
     @Mock
-    private ProgressReader progressReader;
+    private ProgressQueryPort progressQueryPort;
 
     private static final Long STUDENT_ID = 1L;
     private static final Long COURSE_ID_1 = 100L;
@@ -78,8 +79,8 @@ class EnrollmentQueryUseCaseTest {
         given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
         given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
 
-        given(progressReader.getOverallProgressRate(5001L, COURSE_ID_1)).willReturn(40);
-        given(progressReader.getOverallProgressRate(5002L, COURSE_ID_2)).willReturn(35);
+        given(progressQueryPort.getProgress(5001L, COURSE_ID_1)).willReturn(new EnrollmentProgressDto(40));
+        given(progressQueryPort.getProgress(5002L, COURSE_ID_2)).willReturn(new EnrollmentProgressDto(35));
 
         // when
         Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
@@ -143,7 +144,7 @@ class EnrollmentQueryUseCaseTest {
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         given(enrollmentRepository.findById(enrollmentId)).willReturn(Optional.of(enrollment));
-        given(progressReader.getOverallProgressRate(enrollmentId, courseId)).willReturn(40);
+        given(progressQueryPort.getProgress(enrollmentId, courseId)).willReturn(new EnrollmentProgressDto(40));
 
         // when
         EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetail(studentId, enrollmentId);
@@ -203,7 +204,7 @@ class EnrollmentQueryUseCaseTest {
         ReflectionTestUtils.setField(enrollment, "id", enrollmentId);
 
         given(enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)).willReturn(Optional.of(enrollment));
-        given(progressReader.getOverallProgressRate(enrollmentId, courseId)).willReturn(40);
+        given(progressQueryPort.getProgress(enrollmentId, courseId)).willReturn(new EnrollmentProgressDto(40));
 
         // when
         EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetailByCourseId(studentId, courseId);
