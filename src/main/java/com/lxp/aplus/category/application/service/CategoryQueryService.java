@@ -1,7 +1,7 @@
 package com.lxp.aplus.category.application.service;
 
 import com.lxp.aplus.category.application.dto.response.CategoryResult;
-import com.lxp.aplus.category.application.internal.dto.CategoryInternalDto;
+import com.lxp.aplus.category.application.internal.dto.CategoryInternalResult;
 import com.lxp.aplus.category.application.port.in.CategoryQueryUseCase;
 import com.lxp.aplus.category.domain.Category;
 import com.lxp.aplus.category.application.port.out.CategoryRepository;
@@ -26,8 +26,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
     }
 
     @Override
-    public Optional<CategoryInternalDto> findByIdWithParent(Long id) {
+    public Optional<CategoryInternalResult> findByIdWithParent(Long id) {
         return categoryRepository.findByIdWithParent(id)
-                .map(CategoryInternalDto::from);
+                .map(CategoryInternalResult::from);
     }
 }
