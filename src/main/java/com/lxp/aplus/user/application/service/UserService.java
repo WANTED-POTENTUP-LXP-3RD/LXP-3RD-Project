@@ -16,6 +16,8 @@ import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.application.port.out.UserRepository;
+import com.lxp.aplus.user.application.port.out.InstructorApplicationRepository;
+import com.lxp.aplus.user.domain.InstructorApplication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService implements UserCommandUseCase, UserQueryUseCase {
     private final UserRepository userRepository;
+    private final InstructorApplicationRepository instructorApplicationRepository;
     private final CustomPasswordEncoder customPasswordEncoder;
 
     // ========== Query Methods (조회) ==========
@@ -115,6 +118,17 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
     @Transactional
     public UserResponse addInstructorRole(Long userId) {
         return addRole(userId, RoleType.INSTRUCTOR);
+    }
+
+    @Override
+    @Transactional
+    public void applyForInstructor(Long userId) {
+        // 이미 신청한 경우 확인
+        if (instructorApplicationRepository.findByUserId(userId).isPresent()) {
+            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_EXISTS);
+        }
+        InstructorApplication application = InstructorApplication.create(userId);
+        instructorApplicationRepository.save(application);
     }
 
     private UserResponse addRole(Long userId, RoleType roleType) {

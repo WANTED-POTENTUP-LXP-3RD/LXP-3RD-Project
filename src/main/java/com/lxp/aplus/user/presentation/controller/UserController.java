@@ -3,6 +3,7 @@ package com.lxp.aplus.user.presentation.controller;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.UserResultCode;
 import com.lxp.aplus.common.security.Authenticated;
+import com.lxp.aplus.common.security.InstructorOnly;
 import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.user.application.dto.response.UserResponse;
 import com.lxp.aplus.user.application.dto.request.UpdateMyInfoRequest;
@@ -101,5 +102,13 @@ public class UserController {
         return ResponseEntity.ok(ResultResponse.of(UserResultCode.USER_ROLE_ADD_SUCCESS, response));
     }
 
-    
+    /**
+     * 강사 권한 요청 API
+     * POST /api/users/instructor/applications
+     */
+    @PostMapping("/instructor/applications")
+    public ResponseEntity<ResultResponse<Void>> applyForInstructor(@Authenticated Long userId) {
+        userCommandUseCase.applyForInstructor(userId);
+        return ResponseEntity.ok(ResultResponse.from(UserResultCode.INSTRUCTOR_APPLICATION_SUCCESS));
+    }
 }

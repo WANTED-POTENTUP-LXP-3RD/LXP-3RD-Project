@@ -15,6 +15,8 @@ public interface UserCommandUseCase {
 
     UserResponse addInstructorRole(Long userId);
 
+    void applyForInstructor(Long userId);
+
     UserResponse withdrawUser(WithdrawUserRequest request);
 
     UserResponse activateUser(ActivateUserRequest request);
