@@ -1,7 +1,7 @@
 package com.lxp.aplus.enrollment.infrastructure.adapter;
 
-import com.lxp.aplus.category.domain.Category;
-import com.lxp.aplus.category.domain.CategoryRepository;
+import com.lxp.aplus.category.application.internal.dto.CategoryInternalResult;
+import com.lxp.aplus.category.application.internal.usecase.CategoryInternalUseCase;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class CourseFinderAdapter implements CourseFinder {
 
     private final CourseRepository courseRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryInternalUseCase categoryInternalUseCase;
 
     @Override
     @Transactional(readOnly = true)
@@ -69,13 +69,13 @@ public class CourseFinderAdapter implements CourseFinder {
         // TODO: [성능 개선] N+1 쿼리 발생 지점. CourseFinder에 findCategoryNamesByCourseIds(List<Long> courseIds)와 같은 배치 조회 기능 추가 필요.
         public List<String> findCategoryNamesByCourseId(Long courseId) {
             return courseRepository.findById(courseId)
-                    .flatMap(course -> categoryRepository.findByIdWithParent(course.getCategoryId()))
+                    .flatMap(course -> categoryInternalUseCase.findByIdWithParent(course.getCategoryId()))
                     .map(category -> {
                         List<String> categoryNames = new LinkedList<>();
-                        Category currentCategory = category;
+                        CategoryInternalResult currentCategory = category;
                         while (currentCategory != null) {
-                            categoryNames.add(0, currentCategory.getName());
-                            currentCategory = currentCategory.getParent();
+                            categoryNames.add(0, currentCategory.name());
+                            currentCategory = CategoryInternalResult.from(currentCategory.parent());
                         }
                         return categoryNames;
                     })
