@@ -1,10 +1,8 @@
 package com.lxp.aplus.user.application.usecase;
 
 import com.lxp.aplus.user.application.dto.UserResponse;
-import com.lxp.aplus.user.domain.Role;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
 import com.lxp.aplus.user.domain.UserStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

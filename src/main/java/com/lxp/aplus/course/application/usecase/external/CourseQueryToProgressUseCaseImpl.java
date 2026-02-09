@@ -24,11 +24,7 @@ public class CourseQueryToProgressUseCaseImpl implements CourseQueryToProgressUs
     public ResourceDuration getLectureDuration(Long resourceId) {
         return lectureResourceJpaRepository.findById(resourceId)
                 .map(ResourceDuration::from).orElseThrow(() -> new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_VIDEO_DURATION_NOT_FOUND));
-
     }
 
-    @Override
-    public List<ResourceSummary> findLectureSummariesByCourseId(Long courseId) {
-        return courseRepository.findLectureSummariesByCourseId(courseId);
-    }
+
 }

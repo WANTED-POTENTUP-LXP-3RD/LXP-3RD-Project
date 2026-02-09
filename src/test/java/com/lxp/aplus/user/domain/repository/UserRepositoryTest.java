@@ -2,7 +2,6 @@ package com.lxp.aplus.user.domain.repository;
 
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.domain.RoleType;
-import com.lxp.aplus.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
