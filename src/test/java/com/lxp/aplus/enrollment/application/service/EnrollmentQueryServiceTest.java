@@ -1,8 +1,8 @@
-package com.lxp.aplus.enrollment.application.usecase;
+package com.lxp.aplus.enrollment.application.service;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
+import com.lxp.aplus.enrollment.application.port.out.CourseReader;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.port.out.ProgressQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.dto.EnrollmentProgressDto;
@@ -31,16 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class EnrollmentQueryUseCaseTest {
+class EnrollmentQueryServiceTest {
 
     @InjectMocks
-    private EnrollmentQueryUseCase enrollmentQueryUseCase;
+    private EnrollmentQueryService enrollmentQueryService;
 
     @Mock
     private EnrollmentRepository enrollmentRepository;
 
     @Mock
-    private CourseFinder courseFinder;
+    private CourseReader courseReader;
 
     @Mock
     private ProgressQueryPort progressQueryPort;
@@ -71,19 +71,19 @@ class EnrollmentQueryUseCaseTest {
         given(enrollmentRepository.findByStudentIdAndStatus(STUDENT_ID, status, pageable))
                 .willReturn(enrollmentsPage);
 
-        given(courseFinder.findCourseById(COURSE_ID_1))
+        given(courseReader.findCourseById(COURSE_ID_1))
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_1, COURSE_NAME_1)));
-        given(courseFinder.findCourseById(COURSE_ID_2))
+        given(courseReader.findCourseById(COURSE_ID_2))
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_2, COURSE_NAME_2)));
 
-        given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
-        given(courseFinder.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
+        given(courseReader.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
+        given(courseReader.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
 
         given(progressQueryPort.getProgress(5001L, COURSE_ID_1)).willReturn(new EnrollmentProgressDto(40));
         given(progressQueryPort.getProgress(5002L, COURSE_ID_2)).willReturn(new EnrollmentProgressDto(35));
 
         // when
-        Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
+        Page<EnrollmentListItemResult> result = enrollmentQueryService.getEnrollmentList(STUDENT_ID, status, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -111,7 +111,7 @@ class EnrollmentQueryUseCaseTest {
                 .willReturn(emptyPage);
 
         // when
-        Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(STUDENT_ID, status, pageable);
+        Page<EnrollmentListItemResult> result = enrollmentQueryService.getEnrollmentList(STUDENT_ID, status, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -126,7 +126,7 @@ class EnrollmentQueryUseCaseTest {
         given(enrollmentRepository.countByCourseId(courseId)).willReturn(5L);
 
         // when
-        long result = enrollmentQueryUseCase.getStudentCountForCourse(courseId);
+        long result = enrollmentQueryService.getStudentCountForCourse(courseId);
 
         // then
         assertThat(result).isEqualTo(5L);
@@ -147,7 +147,7 @@ class EnrollmentQueryUseCaseTest {
         given(progressQueryPort.getProgress(enrollmentId, courseId)).willReturn(new EnrollmentProgressDto(40));
 
         // when
-        EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetail(studentId, enrollmentId);
+        EnrollmentDetailResult result = enrollmentQueryService.getEnrollmentDetail(studentId, enrollmentId);
 
         // then
         assertThat(result).isNotNull();
@@ -169,7 +169,7 @@ class EnrollmentQueryUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> enrollmentQueryUseCase.getEnrollmentDetail(studentId, enrollmentId));
+                () -> enrollmentQueryService.getEnrollmentDetail(studentId, enrollmentId));
         assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 
@@ -189,7 +189,7 @@ class EnrollmentQueryUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> enrollmentQueryUseCase.getEnrollmentDetail(requestingStudentId, enrollmentId));
+                () -> enrollmentQueryService.getEnrollmentDetail(requestingStudentId, enrollmentId));
         assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 
@@ -207,7 +207,7 @@ class EnrollmentQueryUseCaseTest {
         given(progressQueryPort.getProgress(enrollmentId, courseId)).willReturn(new EnrollmentProgressDto(40));
 
         // when
-        EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetailByCourseId(studentId, courseId);
+        EnrollmentDetailResult result = enrollmentQueryService.getEnrollmentDetailByCourseId(studentId, courseId);
 
         // then
         assertThat(result).isNotNull();
@@ -229,7 +229,7 @@ class EnrollmentQueryUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> enrollmentQueryUseCase.getEnrollmentDetailByCourseId(studentId, courseId));
+                () -> enrollmentQueryService.getEnrollmentDetailByCourseId(studentId, courseId));
         assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 }

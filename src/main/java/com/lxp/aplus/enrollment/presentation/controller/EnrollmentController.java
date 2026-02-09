@@ -7,8 +7,8 @@ import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentCommandUseCase;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentQueryUseCase;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentCommandPort;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentQueryPort;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import com.lxp.aplus.enrollment.presentation.response.EnrollmentCancelResponse;
@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/enrollments")
 public class EnrollmentController {
 
-    private final EnrollmentQueryUseCase enrollmentQueryUseCase;
-    private final EnrollmentCommandUseCase enrollmentCommandUseCase;
+    private final EnrollmentQueryPort enrollmentQueryPort;
+    private final EnrollmentCommandPort enrollmentCommandPort;
 
     @GetMapping
     public ResponseEntity<ResultResponse<PageResponse<EnrollmentListItemResult>>> getEnrollmentList(
@@ -39,7 +39,7 @@ public class EnrollmentController {
             @RequestParam(required = false, defaultValue = "ENROLLED") EnrollmentStatus status,
             @PageableDefault(size = 10, page = 0) Pageable pageable
     ) {
-        Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(currentUser.id(), status, pageable);
+        Page<EnrollmentListItemResult> result = enrollmentQueryPort.getEnrollmentList(currentUser.id(), status, pageable);
         return ResponseEntity.ok(
                 ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENTS_SUCCESS, PageResponse.from(result))
         );
@@ -50,7 +50,7 @@ public class EnrollmentController {
             @Authenticated UserInfo currentUser,
             @PathVariable Long enrollmentId
     ) {
-        EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetail(currentUser.id(), enrollmentId);
+        EnrollmentDetailResult result = enrollmentQueryPort.getEnrollmentDetail(currentUser.id(), enrollmentId);
         return ResponseEntity.ok(
                 ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENT_DETAIL_SUCCESS, EnrollmentDetailResponse.from(result))
         );
@@ -61,7 +61,7 @@ public class EnrollmentController {
             @Authenticated UserInfo currentUser,
             @PathVariable Long courseId
     ) {
-        EnrollmentDetailResult result = enrollmentQueryUseCase.getEnrollmentDetailByCourseId(currentUser.id(), courseId);
+        EnrollmentDetailResult result = enrollmentQueryPort.getEnrollmentDetailByCourseId(currentUser.id(), courseId);
         return ResponseEntity.ok(
                 ResultResponse.of(EnrollmentResultCode.GET_ENROLLMENT_DETAIL_SUCCESS, EnrollmentDetailResponse.from(result))
         );
@@ -72,7 +72,7 @@ public class EnrollmentController {
             @Authenticated UserInfo currentUser,
             @PathVariable Long enrollmentId
     ) {
-        Enrollment canceledEnrollment = enrollmentCommandUseCase.cancel(enrollmentId, currentUser.id());
+        Enrollment canceledEnrollment = enrollmentCommandPort.cancel(enrollmentId, currentUser.id());
         EnrollmentCancelResponse response = EnrollmentCancelResponse.from(canceledEnrollment);
         return ResponseEntity
                 .status(EnrollmentResultCode.CANCEL_ENROLLMENT_REQUEST_ACCEPTED.getStatus())

@@ -1,11 +1,10 @@
-package com.lxp.aplus.enrollment.application.usecase;
+package com.lxp.aplus.enrollment.application.service;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
-import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
+import com.lxp.aplus.enrollment.application.port.out.CourseReader;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
-import com.lxp.aplus.enrollment.application.result.EnrollmentCreationResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -25,16 +24,16 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class EnrollmentCommandUseCaseTest {
+class EnrollmentCommandServiceTest {
 
     @InjectMocks
-    private EnrollmentCommandUseCase enrollmentCommandUseCase;
+    private EnrollmentCommandService enrollmentCommandService;
 
     @Mock
     private EnrollmentRepository enrollmentRepository;
 
     @Mock
-    private CourseFinder courseFinder;
+    private CourseReader courseReader;
 
     @Captor
     private ArgumentCaptor<Enrollment> enrollmentCaptor;
@@ -50,12 +49,12 @@ class EnrollmentCommandUseCaseTest {
         EnrollmentCommand command = new EnrollmentCommand(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
         Enrollment createdEnrollment = Enrollment.create(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
+        given(courseReader.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(false);
         given(enrollmentRepository.save(any(Enrollment.class))).willReturn(createdEnrollment);
 
         // when
-        Long resultId = enrollmentCommandUseCase.enroll(command);
+        Long resultId = enrollmentCommandService.enroll(command);
 
         // then
         verify(enrollmentRepository).save(enrollmentCaptor.capture());
@@ -72,10 +71,10 @@ class EnrollmentCommandUseCaseTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.empty());
+        given(courseReader.findCourseById(COURSE_ID_1)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> enrollmentCommandUseCase.enroll(command))
+        assertThatThrownBy(() -> enrollmentCommandService.enroll(command))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(EnrollmentErrorCode.ENROLLMENT_COURSE_NOT_FOUND);
@@ -87,11 +86,11 @@ class EnrollmentCommandUseCaseTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
 
-        given(courseFinder.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
+        given(courseReader.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> enrollmentCommandUseCase.enroll(command))
+        assertThatThrownBy(() -> enrollmentCommandService.enroll(command))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(EnrollmentErrorCode.ENROLLMENT_ALREADY_ENROLLED);

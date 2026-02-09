@@ -2,7 +2,7 @@ package com.lxp.aplus.enrollment.application.listener;
 
 import com.lxp.aplus.common.event.PaymentCompletedEvent;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentCommandUseCase;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentCommandPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PaymentCompletedEventListener {
 
-    private final EnrollmentCommandUseCase enrollmentCommandUseCase;
+    private final EnrollmentCommandPort enrollmentCommandPort;
 
     /**
      * PaymentCompletedEvent를 비동기 및 재시도 가능하게 처리하여 수강 신청 로직을 실행.
@@ -46,7 +46,7 @@ public class PaymentCompletedEventListener {
                 event.courseId(),
                 event.orderItemId()
         );
-        enrollmentCommandUseCase.enroll(command);
+        enrollmentCommandPort.enroll(command);
         log.info("수강 신청 처리 완료 for studentId: {}, courseId: {}", event.studentId(), event.courseId());
     }
 
