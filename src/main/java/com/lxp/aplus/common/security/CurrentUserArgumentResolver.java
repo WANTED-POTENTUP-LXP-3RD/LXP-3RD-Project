@@ -3,7 +3,7 @@ package com.lxp.aplus.common.security;
 import com.lxp.aplus.user.domain.Role;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
+import com.lxp.aplus.user.application.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

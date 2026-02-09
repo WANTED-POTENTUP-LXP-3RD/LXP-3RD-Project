@@ -101,7 +101,7 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 {
-  "nickName": "updatedNickname",
+  "nickname": "updatedNickname",
   "email": "updated@example.com"
 }
 

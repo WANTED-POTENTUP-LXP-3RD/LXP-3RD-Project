@@ -4,9 +4,14 @@ import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.UserResultCode;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.UserInfo;
-import com.lxp.aplus.user.application.dto.*;
-import com.lxp.aplus.user.application.usecase.UserCommandUseCase;
-import com.lxp.aplus.user.application.usecase.UserQueryUseCase;
+import com.lxp.aplus.user.application.dto.response.UserResponse;
+import com.lxp.aplus.user.application.dto.request.UpdateMyInfoRequest;
+import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
+import com.lxp.aplus.user.application.dto.request.ChangeMyPasswordRequest;
+import com.lxp.aplus.user.application.dto.request.ChangePasswordRequest;
+import com.lxp.aplus.user.application.dto.request.DeleteUserRequest;
+import com.lxp.aplus.user.application.port.in.UserCommandUseCase;
+import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -98,4 +103,3 @@ public class UserController {
 
     
 }
-

@@ -4,7 +4,7 @@ import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.UserErrorCode;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
+import com.lxp.aplus.user.application.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
