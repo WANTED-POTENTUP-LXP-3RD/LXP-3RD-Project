@@ -15,6 +15,7 @@ public interface CourseRepository {
     Optional<Course> findPublishedWithCurriculumById(Long courseId);
     Page<Course> findAllByInstructorIdExcludingDeleted(Long instructorId, Pageable pageable);
     Page<Course> findAllPublished(Pageable pageable);
+    Page<Course> findAllPublishedWithFilters(String title, Long categoryId, CourseLevel level, Pageable pageable);
     int countLecturesByCourseId(Long courseId);
     List<Lecture> findAllLecturesWithResourcesByCourseId(Long courseId);
     List<Course> findByIdIn(List<Long> ids);

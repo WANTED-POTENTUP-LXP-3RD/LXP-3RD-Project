@@ -2,6 +2,7 @@ package com.lxp.aplus.course.infrastructure.persistence;
 
 import com.lxp.aplus.course.application.port.in.dto.ResourceSummary;
 import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;
 import com.lxp.aplus.course.domain.Lecture;
 import org.springframework.data.domain.Page;
@@ -54,4 +55,10 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
 
     @Query("SELECT l.totalDurationSeconds FROM Lecture l JOIN l.lectureResources lr WHERE lr.id = :lectureResourceId")
     Optional<Integer> findLectureDurationByResourceId(@Param("lectureResourceId") Long lectureResourceId);
+
+    @Query("SELECT c FROM Course c WHERE c.courseStatus = 'PUBLISHED' " +
+            "AND (:title IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
+            "AND (:categoryId IS NULL OR c.categoryId = :categoryId) " +
+            "AND (:level IS NULL OR c.courseLevel = :level)")
+    Page<Course> findAllPublishedWithFilters(@Param("title") String title, @Param("categoryId") Long categoryId, @Param("level") CourseLevel level, Pageable pageable);
 }
