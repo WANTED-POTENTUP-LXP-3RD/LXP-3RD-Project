@@ -1,7 +1,7 @@
 package com.lxp.aplus.category.presentation.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.lxp.aplus.category.application.dto.response.CategoryResult;
+import com.lxp.aplus.category.application.dto.result.CategoryResult;
 import lombok.Builder;
 
 import java.util.List;

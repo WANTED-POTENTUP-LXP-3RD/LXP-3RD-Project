@@ -1,6 +1,6 @@
 package com.lxp.aplus.category.application.service;
 
-import com.lxp.aplus.category.application.dto.response.CategoryResult;
+import com.lxp.aplus.category.application.dto.result.CategoryResult;
 import com.lxp.aplus.category.application.internal.dto.CategoryInternalResult;
 import com.lxp.aplus.category.application.port.in.CategoryQueryUseCase;
 import com.lxp.aplus.category.domain.Category;
