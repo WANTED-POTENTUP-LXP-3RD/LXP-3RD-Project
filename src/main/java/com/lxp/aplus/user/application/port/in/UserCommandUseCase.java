@@ -8,6 +8,7 @@ import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
 import com.lxp.aplus.user.application.dto.request.WithdrawUserRequest;
 import com.lxp.aplus.user.application.dto.response.UserResponse;
 import com.lxp.aplus.user.domain.InstructorApplicationStatus;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationResponse;
 
 public interface UserCommandUseCase {
     UserResponse createUser(CreateUserRequest request);
@@ -16,7 +17,7 @@ public interface UserCommandUseCase {
 
     UserResponse addInstructorRole(Long userId);
 
-    void applyForInstructor(Long userId);
+    InstructorApplicationResponse applyForInstructor(Long userId);
 
     void processInstructorApplication(Long userId, Long applicationId, InstructorApplicationStatus status);
 

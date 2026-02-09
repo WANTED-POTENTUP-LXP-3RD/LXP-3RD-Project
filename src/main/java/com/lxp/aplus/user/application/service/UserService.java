@@ -10,6 +10,7 @@ import com.lxp.aplus.user.application.dto.request.CreateUserRequest;
 import com.lxp.aplus.user.application.dto.request.DeleteUserRequest;
 import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
 import com.lxp.aplus.user.application.dto.request.WithdrawUserRequest;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationResponse;
 import com.lxp.aplus.user.application.dto.response.UserResponse;
 import com.lxp.aplus.user.application.port.in.UserCommandUseCase;
 import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
@@ -123,13 +124,14 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
 
     @Override
     @Transactional
-    public void applyForInstructor(Long userId) {
+    public InstructorApplicationResponse applyForInstructor(Long userId) {
         // 이미 신청한 경우 확인
         if (instructorApplicationRepository.findByUserId(userId).isPresent()) {
             throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_EXISTS);
         }
         InstructorApplication application = InstructorApplication.create(userId);
-        instructorApplicationRepository.save(application);
+        InstructorApplication savedApplication = instructorApplicationRepository.save(application);
+        return InstructorApplicationResponse.from(savedApplication);
     }
 
     private UserResponse addRole(Long userId, RoleType roleType) {

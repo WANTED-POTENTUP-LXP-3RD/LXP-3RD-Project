@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationResponse;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -110,9 +112,9 @@ public class UserController {
      * POST /api/users/instructor/applications
      */
     @PostMapping("/instructor/applications")
-    public ResponseEntity<ResultResponse<Void>> applyForInstructor(@Authenticated Long userId) {
-        userCommandUseCase.applyForInstructor(userId);
-        return ResponseEntity.ok(ResultResponse.from(UserResultCode.INSTRUCTOR_APPLICATION_SUCCESS));
+    public ResponseEntity<ResultResponse<InstructorApplicationResponse>> applyForInstructor(@Authenticated Long userId) {
+        InstructorApplicationResponse response = userCommandUseCase.applyForInstructor(userId);
+        return ResponseEntity.ok(ResultResponse.of(UserResultCode.INSTRUCTOR_APPLICATION_SUCCESS, response));
     }
 
     /**
