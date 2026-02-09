@@ -1,4 +1,4 @@
-package com.lxp.aplus.category.application.result;
+package com.lxp.aplus.category.application.dto.result;
 
 import com.lxp.aplus.category.domain.Category;
 

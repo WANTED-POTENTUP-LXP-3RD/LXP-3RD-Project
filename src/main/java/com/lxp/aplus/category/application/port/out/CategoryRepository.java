@@ -1,4 +1,6 @@
-package com.lxp.aplus.category.domain;
+package com.lxp.aplus.category.application.port.out;
+
+import com.lxp.aplus.category.domain.Category;
 
 import java.util.List;
 import java.util.Optional;
