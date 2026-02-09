@@ -1,4 +1,4 @@
-package com.lxp.aplus.progress.presentation.response;
+package com.lxp.aplus.progress.application.dto.response;
 
 import com.lxp.aplus.progress.domain.Progress;
 import lombok.Getter;
