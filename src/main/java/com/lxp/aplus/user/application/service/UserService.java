@@ -119,7 +119,7 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
     @Override
     @Transactional
     public UserResponse addInstructorRole(Long userId) {
-        return addRole(userId, RoleType.INSTRUCTOR);
+        return addRole(userId);
     }
 
     @Override
@@ -134,11 +134,11 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
         return InstructorApplicationResponse.from(savedApplication);
     }
 
-    private UserResponse addRole(Long userId, RoleType roleType) {
+    private UserResponse addRole(Long userId) {
         User user = userRepository.findUserWithRolesById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        user.addRole(roleType);
+        user.addRole(RoleType.INSTRUCTOR);
         return UserResponse.from(user);
     }
 
@@ -187,16 +187,11 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
         InstructorApplication application = instructorApplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_NOT_FOUND));
 
-        // 이미 처리된 신청은 수정할 수 없음
-        if (application.getStatus() != InstructorApplicationStatus.PENDING) {
-            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_PROCESSED);
-        }
-
         if (status == InstructorApplicationStatus.APPROVED) {
             application.approve();
             instructorApplicationRepository.save(application);
             // 역할 추가
-            addRole(application.getUserId(), RoleType.INSTRUCTOR);
+            addRole(application.getUserId());
         } else if (status == InstructorApplicationStatus.REJECTED) {
             application.reject();
             instructorApplicationRepository.save(application);

@@ -19,9 +19,9 @@ public enum UserErrorCode implements ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "EU009", "유효하지 않은 Refresh Token입니다."),
     NOT_INSTRUCTOR(HttpStatus.FORBIDDEN, "EU010", "강사 권한이 필요합니다."),
     INSTRUCTOR_APPLICATION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "EU011", "이미 강사 신청이 존재합니다."),
-    INSTRUCTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "EU013", "강사 신청을 찾을 수 없습니다."),
-    NOT_ADMIN(HttpStatus.FORBIDDEN, "EU014", "관리자 권한이 필요합니다."),
-    INSTRUCTOR_APPLICATION_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "EU015", "이미 처리된 강사 신청입니다.");
+    INSTRUCTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "EU012", "강사 신청을 찾을 수 없습니다."),
+    NOT_ADMIN(HttpStatus.FORBIDDEN, "EU013", "관리자 권한이 필요합니다."),
+    INSTRUCTOR_APPLICATION_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "EU014", "이미 처리된 강사 신청입니다.");
 
     private final HttpStatus status;
     private final String code;

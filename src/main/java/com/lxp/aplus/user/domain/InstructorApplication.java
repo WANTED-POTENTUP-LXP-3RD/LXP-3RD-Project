@@ -1,6 +1,8 @@
 package com.lxp.aplus.user.domain;
 
 import com.lxp.aplus.common.domain.BaseAggregateRoot;
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.UserErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,10 +34,16 @@ public class InstructorApplication extends BaseAggregateRoot {
     }
 
     public void approve() {
+        if (this.status != InstructorApplicationStatus.PENDING) {
+            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_PROCESSED);
+        }
         this.status = InstructorApplicationStatus.APPROVED;
     }
 
     public void reject() {
+        if (this.status != InstructorApplicationStatus.PENDING) {
+            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_PROCESSED);
+        }
         this.status = InstructorApplicationStatus.REJECTED;
     }
 }
