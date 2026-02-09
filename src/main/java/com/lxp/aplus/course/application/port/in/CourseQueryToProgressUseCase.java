@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CourseQueryToProgressUseCase {
     ResourceDuration getLectureDuration(Long resourceId);
+    List<ResourceSummary> findLectureSummariesByCourseId(Long courseId);
 }
