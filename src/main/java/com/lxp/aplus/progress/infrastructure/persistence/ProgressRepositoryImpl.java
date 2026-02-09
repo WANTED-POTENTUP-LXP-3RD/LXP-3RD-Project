@@ -1,7 +1,7 @@
 package com.lxp.aplus.progress.infrastructure.persistence;
 
 import com.lxp.aplus.progress.domain.Progress;
-import com.lxp.aplus.progress.domain.ProgressRepository;
+import com.lxp.aplus.progress.application.port.out.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

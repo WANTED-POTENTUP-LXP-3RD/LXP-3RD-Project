@@ -5,7 +5,7 @@ import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.LearningProgress;
 import com.lxp.aplus.progress.domain.Progress;
-import com.lxp.aplus.progress.domain.ProgressRepository;
+import com.lxp.aplus.progress.application.port.out.ProgressRepository;
 import com.lxp.aplus.progress.domain.vo.LectureSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

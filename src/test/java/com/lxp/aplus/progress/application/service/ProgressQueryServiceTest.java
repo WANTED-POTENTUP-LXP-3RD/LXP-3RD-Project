@@ -9,7 +9,7 @@ import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.Progress;
-import com.lxp.aplus.progress.domain.ProgressRepository;
+import com.lxp.aplus.progress.application.port.out.ProgressRepository;
 import com.lxp.aplus.course.domain.ResourceType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -13,6 +13,7 @@ import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.application.result.ReviewStat;
 import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 import java.util.Collections;
@@ -42,8 +43,8 @@ public class CourseQueryUseCase {
         return convertToCourseResponse(courses, pageable);
     }
 
-    public Page<CourseResult> getPublishedCourses(Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllPublished(pageable);
+    public Page<CourseResult> getPublishedCourses(String title, Long categoryId, CourseLevel level, Pageable pageable) {
+        Page<Course> courses = courseRepository.findAllPublishedWithFilters(title, categoryId, level, pageable);
         return convertToCourseResponse(courses, pageable);
     }
 

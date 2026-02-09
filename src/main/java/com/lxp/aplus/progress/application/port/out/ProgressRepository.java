@@ -1,4 +1,6 @@
-package com.lxp.aplus.progress.domain;
+package com.lxp.aplus.progress.application.port.out;
+
+import com.lxp.aplus.progress.domain.Progress;
 
 import java.util.List;
 import java.util.Optional;

@@ -11,7 +11,7 @@ import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.out.dto.LectureDurationDto;
 import com.lxp.aplus.progress.domain.Progress;
-import com.lxp.aplus.progress.domain.ProgressRepository;
+import com.lxp.aplus.progress.application.port.out.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
