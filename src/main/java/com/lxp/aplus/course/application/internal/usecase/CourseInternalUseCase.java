@@ -1,6 +1,7 @@
 package com.lxp.aplus.course.application.internal.usecase;
 
 import com.lxp.aplus.course.application.internal.dto.CourseInternalResult;
+import com.lxp.aplus.course.application.port.in.dto.ResourceSummary;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.user.application.internal.dto.UserInternalResult;
@@ -31,5 +32,9 @@ public class CourseInternalUseCase {
                         Course::getId,
                         CourseInternalResult::from
                 ));
+    }
+
+    public List<ResourceSummary> findLectureSummariesByCourseId(Long courseId) {
+        return courseRepository.findLectureSummariesByCourseId(courseId);
     }
 }
