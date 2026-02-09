@@ -2,11 +2,10 @@ package com.lxp.aplus.payment.application.usecase;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.PaymentErrorCode;
-import com.lxp.aplus.order.domain.OrderItem;
 import com.lxp.aplus.payment.application.port.out.EnrollmentCommandPort;
 import com.lxp.aplus.payment.application.port.out.OrderQueryPort;
 import com.lxp.aplus.payment.application.port.out.dto.PaymentOrderItemDto;
-import com.lxp.aplus.payment.application.result.OrderCreateResult;
+import com.lxp.aplus.payment.application.port.out.dto.PaymentOrderDto;
 import com.lxp.aplus.payment.application.command.PaymentConfirmCommand;
 import com.lxp.aplus.payment.application.command.PaymentPrepareCommand;
 import com.lxp.aplus.payment.application.port.out.OrderCommandPort;
@@ -35,8 +34,8 @@ public class PaymentCommandUseCase {
 
     public PaymentPrepareResponse prepare(PaymentPrepareCommand command) {
 
-        // 1. Order 생성 (From Order BC)
-        OrderCreateResult orderResult = orderCommandPort.createOrderFromCourseIds(
+        // 1. Order 생성
+        PaymentOrderDto orderResult = orderCommandPort.createOrder(
                 command.userId(),
                 command.courseIds()
         );
@@ -64,13 +63,13 @@ public class PaymentCommandUseCase {
         // 3. 도메인 불변성 검증 -> 상태 변경
         payment.approve(command.paymentKey(), command.amount());
 
-        // 4. Order BC에 완료 통보 (결제 성공 후 Order 상태를 COMPLETED로 변경 요청)
+        // 4. 주문 완료 통보
         orderCommandPort.completeOrder(command.orderId(), payment.getPaymentId(), command.amount());
 
         // 5. Payment 저장
         paymentRepository.save(payment);
 
-        List<Long> courseIds = orderQueryPort.getCourseIdsByOrderId(command.orderId());
+        //List<Long> courseIds = orderQueryPort.getCourseIdsByOrderId(command.orderId());
 
         // 6. 수강 권한 부여
         // TODO: 향후 이벤트로 처리

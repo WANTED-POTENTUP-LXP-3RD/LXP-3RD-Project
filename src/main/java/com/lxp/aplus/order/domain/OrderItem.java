@@ -1,7 +1,7 @@
 package com.lxp.aplus.order.domain;
 
 import com.lxp.aplus.common.domain.BaseTimeEntity;
-import com.lxp.aplus.order.application.CoursePrice;
+import com.lxp.aplus.order.application.port.out.dto.CoursePrice;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

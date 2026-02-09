@@ -3,18 +3,33 @@ package com.lxp.aplus.payment.infrastructure.adapter.module;
 import com.lxp.aplus.order.application.internal.dto.OrderInternalResult;
 import com.lxp.aplus.order.application.internal.dto.OrderItemInternalResult;
 import com.lxp.aplus.order.application.internal.usecase.OrderInternalUseCase;
+import com.lxp.aplus.payment.application.port.out.OrderCommandPort;
 import com.lxp.aplus.payment.application.port.out.OrderQueryPort;
+import com.lxp.aplus.payment.application.port.out.dto.PaymentOrderDto;
 import com.lxp.aplus.payment.application.port.out.dto.PaymentOrderItemDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class OrderModuleAdapter implements OrderQueryPort {
+public class OrderModuleAdapter implements OrderCommandPort, OrderQueryPort {
 
     private final OrderInternalUseCase orderInternalUseCase;
+
+    // --- 명령 ---
+    @Override
+    public PaymentOrderDto createOrder(Long userId, List<Long> courseIds) {
+        orderInternalUseCase.createOrder(userId, courseIds);
+        return null;
+    }
+
+    @Override
+    public void completeOrder(String orderId, String approvedPaymentId, BigDecimal approvedAmount) {
+
+    }
 
     // --- 조회 ---
     @Override
