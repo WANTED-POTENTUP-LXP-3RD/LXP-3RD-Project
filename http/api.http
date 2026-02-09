@@ -7,7 +7,7 @@
 @contentType = application/json
 
 ### 테스트용 사용자 정보 (통일)
-@testEmail = test2@example.com
+@testEmail = test3@example.com
 @testPassword = password123
 @testName = 테스트 사용자2
 @testNickName = testuser2

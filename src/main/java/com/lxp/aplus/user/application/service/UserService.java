@@ -10,12 +10,16 @@ import com.lxp.aplus.user.application.dto.request.CreateUserRequest;
 import com.lxp.aplus.user.application.dto.request.DeleteUserRequest;
 import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
 import com.lxp.aplus.user.application.dto.request.WithdrawUserRequest;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationResponse;
 import com.lxp.aplus.user.application.dto.response.UserResponse;
 import com.lxp.aplus.user.application.port.in.UserCommandUseCase;
 import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.application.port.out.UserRepository;
+import com.lxp.aplus.user.application.port.out.InstructorApplicationRepository;
+import com.lxp.aplus.user.domain.InstructorApplication;
+import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService implements UserCommandUseCase, UserQueryUseCase {
     private final UserRepository userRepository;
+    private final InstructorApplicationRepository instructorApplicationRepository;
     private final CustomPasswordEncoder customPasswordEncoder;
 
     // ========== Query Methods (조회) ==========
@@ -114,14 +119,26 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
     @Override
     @Transactional
     public UserResponse addInstructorRole(Long userId) {
-        return addRole(userId, RoleType.INSTRUCTOR);
+        return addRole(userId);
     }
 
-    private UserResponse addRole(Long userId, RoleType roleType) {
+    @Override
+    @Transactional
+    public InstructorApplicationResponse applyForInstructor(Long userId) {
+        // 이미 신청한 경우 확인
+        if (instructorApplicationRepository.findByUserId(userId).isPresent()) {
+            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_EXISTS);
+        }
+        InstructorApplication application = InstructorApplication.create(userId);
+        InstructorApplication savedApplication = instructorApplicationRepository.save(application);
+        return InstructorApplicationResponse.from(savedApplication);
+    }
+
+    private UserResponse addRole(Long userId) {
         User user = userRepository.findUserWithRolesById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        user.addRole(roleType);
+        user.addRole(RoleType.INSTRUCTOR);
         return UserResponse.from(user);
     }
 
@@ -162,5 +179,22 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         user.delete();
+    }
+
+    @Override
+    @Transactional
+    public void processInstructorApplication(Long userId, Long applicationId, InstructorApplicationStatus status) {
+        InstructorApplication application = instructorApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_NOT_FOUND));
+
+        if (status == InstructorApplicationStatus.APPROVED) {
+            application.approve();
+            instructorApplicationRepository.save(application);
+            // 역할 추가
+            addRole(application.getUserId());
+        } else if (status == InstructorApplicationStatus.REJECTED) {
+            application.reject();
+            instructorApplicationRepository.save(application);
+        }
     }
 }
