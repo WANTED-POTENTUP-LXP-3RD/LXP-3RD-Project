@@ -86,4 +86,25 @@ public class S3PresignedUrlGenerator implements PresignedUrlGenerator {
         expiration.setTime(expTimeMillis);
         return expiration;
     }
+
+    // 썸네일 PresignedURL 발급을 위한 메서드 재정의
+
+    @Override
+    public PresignedUrlResult generatePutUrlWithKey(String key, String contentType) {
+        Date expiration = getExpiration();
+
+        GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(bucket, key)
+                .withMethod(HttpMethod.PUT)
+                .withExpiration(expiration);
+
+        URL url = amazonS3Client.generatePresignedUrl(req);
+
+        return new PresignedUrlResult(
+                url.toExternalForm(),
+                key,
+                "PUT",
+                expireMilliSeconds / 1000
+        );
+    }
+
 }
