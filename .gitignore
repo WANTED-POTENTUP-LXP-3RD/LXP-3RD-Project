@@ -42,3 +42,4 @@ out/
 ./.env
 .env
 /src/main/resources/static/uploads
+/src/main/generated
