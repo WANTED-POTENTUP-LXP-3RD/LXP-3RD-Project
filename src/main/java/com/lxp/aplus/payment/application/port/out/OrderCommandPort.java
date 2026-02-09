@@ -18,8 +18,8 @@ public interface OrderCommandPort {
      */
     void completeOrder(String orderId, String approvedPaymentId, BigDecimal approvedAmount);
 
-    /*
-     * 주문ID로 주문 항목 조회
-     */
-    List<OrderItem> getOrderItemsOfOrder(String orderId);
+    ///*
+    // * 주문ID로 주문 항목 조회
+    // */
+    //List<OrderItem> getOrderItemsOfOrder(String orderId);
 }
