@@ -1,4 +1,4 @@
-package com.lxp.aplus.progress.presentation.response;
+package com.lxp.aplus.progress.application.dto.response;
 
 import lombok.Getter;
 
@@ -11,13 +11,13 @@ public class CourseProgressResponse {
     private final int overallProgressRate;
     private final Long lastWatchedResourceId;
     private final LocalDateTime lastWatchedAt;
-    private final List<LectureProgressResponse> lectureProgresses;
+    private final List<ResourceProgressResponse> resourceProgresses;
 
-    public CourseProgressResponse(Long enrollmentId, int overallProgressRate, Long lastWatchedResourceId, LocalDateTime lastWatchedAt, List<LectureProgressResponse> lectureProgresses) {
+    public CourseProgressResponse(Long enrollmentId, int overallProgressRate, Long lastWatchedResourceId, LocalDateTime lastWatchedAt, List<ResourceProgressResponse> resourceProgresses) {
         this.enrollmentId = enrollmentId;
         this.overallProgressRate = overallProgressRate;
         this.lastWatchedResourceId = lastWatchedResourceId;
         this.lastWatchedAt = lastWatchedAt;
-        this.lectureProgresses = lectureProgresses;
+        this.resourceProgresses = resourceProgresses;
     }
 }

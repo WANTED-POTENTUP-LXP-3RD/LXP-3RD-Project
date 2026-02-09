@@ -1,15 +1,16 @@
-package com.lxp.aplus.progress.application.usecase;
+package com.lxp.aplus.progress.application.service;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.progress.application.port.EnrollmentStatusDto;
-import com.lxp.aplus.progress.application.port.EnrollmentReader;
-import com.lxp.aplus.progress.application.port.LectureProvider;
-import com.lxp.aplus.progress.application.port.LectureSummaryDto;
+import com.lxp.aplus.progress.application.dto.response.CourseProgressResponse;
+import com.lxp.aplus.progress.application.dto.response.ResourceProgressResponse;
+import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
+import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
+import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
+import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.Progress;
-import com.lxp.aplus.progress.domain.ProgressRepository;
-import com.lxp.aplus.progress.presentation.response.CourseProgressResponse;
-import com.lxp.aplus.progress.presentation.response.LectureProgressResponse;
+import com.lxp.aplus.progress.application.port.out.ProgressRepository;
+import com.lxp.aplus.course.domain.ResourceType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +26,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class ProgressQueryUseCaseTest {
+class ProgressQueryServiceTest {
 
     @InjectMocks
-    private ProgressQueryUseCase progressQueryUseCase;
+    private ProgressQueryService progressQueryService;
 
     @Mock
     private ProgressRepository progressRepository;
     @Mock
     private EnrollmentReader enrollmentReader;
     @Mock
-    private LectureProvider lectureProvider;
+    private LectureQueryPort lectureProvider;
 
     @Test
     @DisplayName("성공 - 도메인 객체를 통해 학습 이력을 정확히 조회한다")
@@ -50,8 +50,8 @@ class ProgressQueryUseCaseTest {
 
         EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
         List<LectureSummaryDto> lectureDetails = List.of(
-                new LectureSummaryDto(resourceId1, "Lecture 1", 100),
-                new LectureSummaryDto(resourceId2, "Lecture 2", 200)
+                new LectureSummaryDto(resourceId1, "Lecture 1", 100, ResourceType.VIDEO),
+                new LectureSummaryDto(resourceId2, "Lecture 2", 200, ResourceType.VIDEO)
         );
 
         Progress progress1 = Progress.of(enrollmentId, resourceId1);
@@ -64,7 +64,7 @@ class ProgressQueryUseCaseTest {
         given(progressRepository.findByEnrollmentId(enrollmentId)).willReturn(progresses);
 
         // when
-        CourseProgressResponse response = progressQueryUseCase.getCourseProgress(userId, courseId);
+        CourseProgressResponse response = progressQueryService.getCourseProgress(userId, courseId);
 
         // then
         assertThat(response).isNotNull();
@@ -73,18 +73,18 @@ class ProgressQueryUseCaseTest {
         assertThat(response.getLastWatchedResourceId()).isEqualTo(resourceId1);
         assertThat(response.getLastWatchedAt()).isNotNull();
 
-        List<LectureProgressResponse> lectureProgresses = response.getLectureProgresses();
-        assertThat(lectureProgresses).hasSize(2);
+        List<ResourceProgressResponse> resourceProgresses = response.getResourceProgresses();
+        assertThat(resourceProgresses).hasSize(2);
 
-        LectureProgressResponse lp1 = lectureProgresses.get(0);
-        assertThat(lp1.getResourceId()).isEqualTo(resourceId1);
-        assertThat(lp1.isCompleted()).isTrue();
-        assertThat(lp1.getProgressRate()).isEqualTo(100);
+        ResourceProgressResponse rp1 = resourceProgresses.get(0);
+        assertThat(rp1.getResourceId()).isEqualTo(resourceId1);
+        assertThat(rp1.isCompleted()).isTrue();
+        assertThat(rp1.getProgressRate()).isEqualTo(100);
 
-        LectureProgressResponse lp2 = lectureProgresses.get(1);
-        assertThat(lp2.getResourceId()).isEqualTo(resourceId2);
-        assertThat(lp2.isCompleted()).isFalse();
-        assertThat(lp2.getProgressRate()).isEqualTo(0);
+        ResourceProgressResponse rp2 = resourceProgresses.get(1);
+        assertThat(rp2.getResourceId()).isEqualTo(resourceId2);
+        assertThat(rp2.isCompleted()).isFalse();
+        assertThat(rp2.getProgressRate()).isEqualTo(0);
     }
 
     @Test
@@ -97,7 +97,7 @@ class ProgressQueryUseCaseTest {
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> progressQueryUseCase.getCourseProgress(userId, courseId));
+                () -> progressQueryService.getCourseProgress(userId, courseId));
         assertThat(exception.getErrorCode()).isEqualTo(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS);
     }
 }
