@@ -10,10 +10,11 @@ import org.springframework.http.HttpStatus;
 public enum CourseResultCode implements ResultCode {
     COURSE_REGISTER_SUCCESS(HttpStatus.CREATED, "SC001", "강좌가 정상적으로 등록되었습니다."),
     COURSE_UPDATE_SUCCESS(HttpStatus.OK, "SC002", "강좌 정보가 수정되었습니다."),
-    COURSE_READ_SUCCESS(HttpStatus.OK, "SC003","강좌 조회에 성공했습니다."),
+    COURSE_READ_SUCCESS(HttpStatus.OK, "SC003", "강좌 조회에 성공했습니다."),
     COURSE_LIST_SUCCESS(HttpStatus.OK, "SC004", "강좌 목록 조회에 성공했습니다."),
     COURSE_DELETE_SUCCESS(HttpStatus.OK, "SC005", "강좌가 삭제되었습니다."),
-    COURSE_PUBLISH_SUCCESS(HttpStatus.OK, "SC006", "강좌가 정상적으로 게시되었습니다.");
+    COURSE_PUBLISH_SUCCESS(HttpStatus.OK, "SC006", "강좌가 정상적으로 게시되었습니다."),
+    COURSE_THUMBNAIL_PRESIGN_SUCCESS(HttpStatus.OK, "SC007", "강좌 썸네일 업로드 URL 발급에 성공했습니다.");
 
     private final HttpStatus status;
     private final String code;
