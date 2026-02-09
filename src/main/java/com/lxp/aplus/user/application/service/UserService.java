@@ -18,6 +18,7 @@ import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.application.port.out.UserRepository;
 import com.lxp.aplus.user.application.port.out.InstructorApplicationRepository;
 import com.lxp.aplus.user.domain.InstructorApplication;
+import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -176,5 +177,27 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         user.delete();
+    }
+
+    @Override
+    @Transactional
+    public void processInstructorApplication(Long userId, Long applicationId, InstructorApplicationStatus status) {
+        InstructorApplication application = instructorApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_NOT_FOUND));
+
+        // 이미 처리된 신청은 수정할 수 없음
+        if (application.getStatus() != InstructorApplicationStatus.PENDING) {
+            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_PROCESSED);
+        }
+
+        if (status == InstructorApplicationStatus.APPROVED) {
+            application.approve();
+            instructorApplicationRepository.save(application);
+            // 역할 추가
+            addRole(application.getUserId(), RoleType.INSTRUCTOR);
+        } else if (status == InstructorApplicationStatus.REJECTED) {
+            application.reject();
+            instructorApplicationRepository.save(application);
+        }
     }
 }

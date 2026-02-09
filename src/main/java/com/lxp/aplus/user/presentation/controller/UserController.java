@@ -2,9 +2,11 @@ package com.lxp.aplus.user.presentation.controller;
 
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.UserResultCode;
+import com.lxp.aplus.common.security.AdminOnly;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.InstructorOnly;
 import com.lxp.aplus.common.security.UserInfo;
+import com.lxp.aplus.user.application.dto.request.InstructorApplicationProcessRequest;
 import com.lxp.aplus.user.application.dto.response.UserResponse;
 import com.lxp.aplus.user.application.dto.request.UpdateMyInfoRequest;
 import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
@@ -13,6 +15,7 @@ import com.lxp.aplus.user.application.dto.request.ChangePasswordRequest;
 import com.lxp.aplus.user.application.dto.request.DeleteUserRequest;
 import com.lxp.aplus.user.application.port.in.UserCommandUseCase;
 import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
+import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -110,5 +113,22 @@ public class UserController {
     public ResponseEntity<ResultResponse<Void>> applyForInstructor(@Authenticated Long userId) {
         userCommandUseCase.applyForInstructor(userId);
         return ResponseEntity.ok(ResultResponse.from(UserResultCode.INSTRUCTOR_APPLICATION_SUCCESS));
+    }
+
+    /**
+     * 강사 신청 처리 API (관리자용)
+     * PATCH /api/users/instructor/applications/{applicationId}
+     */
+    @AdminOnly
+    @PatchMapping("/instructor/applications/{applicationId}")
+    public ResponseEntity<ResultResponse<Void>> processInstructorApplication(
+            @Authenticated Long userId,
+            @PathVariable Long applicationId,
+            @Valid @RequestBody InstructorApplicationProcessRequest request) {
+        userCommandUseCase.processInstructorApplication(userId, applicationId, request.status());
+        UserResultCode resultCode = request.status() == InstructorApplicationStatus.APPROVED
+                ? UserResultCode.INSTRUCTOR_APPLICATION_APPROVED
+                : UserResultCode.INSTRUCTOR_APPLICATION_REJECTED;
+        return ResponseEntity.ok(ResultResponse.from(resultCode));
     }
 }
