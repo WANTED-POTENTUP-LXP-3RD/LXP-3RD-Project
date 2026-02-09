@@ -19,7 +19,6 @@ public class LectureProviderPlaceholder implements LectureProvider {
         return new LectureDurationDto(courseQueryToProgressUseCase.getLectureDuration(resourceId).totalDurationSeconds());
     }
 
-
     @Override
     public List<LectureSummaryDto> getLectureDetailsByCourseId(Long courseId) {
         return courseQueryToProgressUseCase.findLectureSummariesByCourseId(courseId).stream().map(LectureSummaryDto::from).toList();

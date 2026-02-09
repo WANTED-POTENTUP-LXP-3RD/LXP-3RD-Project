@@ -6,15 +6,15 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record CategoryInternalDto(
+public record CategoryInternalResult(
         Long id,
         String name,
         Category parent,
         List<Category> children
 ) {
-        public static CategoryInternalDto from(Category category) {
+        public static CategoryInternalResult from(Category category) {
 
-            return CategoryInternalDto.builder()
+            return CategoryInternalResult.builder()
                     .id(category.getId())
                     .name(category.getName())
                     .parent(category.getParent())
