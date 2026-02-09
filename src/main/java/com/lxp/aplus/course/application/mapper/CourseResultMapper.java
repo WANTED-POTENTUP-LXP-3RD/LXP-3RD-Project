@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.application.mapper;
 
-import com.lxp.aplus.course.application.dto.ReviewStat;
+import com.lxp.aplus.course.application.result.ReviewStat;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;

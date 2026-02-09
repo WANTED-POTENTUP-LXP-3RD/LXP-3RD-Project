@@ -11,6 +11,7 @@ import com.lxp.aplus.course.application.port.out.UserQueryPort;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
+import com.lxp.aplus.course.application.result.ReviewStat;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseRepository;
 import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
@@ -74,7 +75,7 @@ public class CourseQueryUseCase {
                             categoryNamesMap.get(course.getCategoryId()),
                             instructorName,
                             studentCountMap.getOrDefault(course.getId(), 0),
-                            com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfo)
+                            ReviewStat.from(reviewInfo)
                     );
                 })
                 .toList();
@@ -95,7 +96,7 @@ public class CourseQueryUseCase {
 
         Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
                 .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
-        com.lxp.aplus.course.application.dto.ReviewStat reviewStat = com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
+        ReviewStat reviewStat = ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
 
         List<String> categoryNames = getCategoryNames(course.getCategoryId());
 
@@ -116,7 +117,7 @@ public class CourseQueryUseCase {
 
         Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(List.of(courseId)).stream()
                 .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
-        com.lxp.aplus.course.application.dto.ReviewStat reviewStat = com.lxp.aplus.course.application.dto.ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
+        ReviewStat reviewStat = ReviewStat.from(reviewInfoMap.getOrDefault(course.getId(), ReviewSummary.defaultValue()));
 
         course.validateOwner(instructorId);
 
