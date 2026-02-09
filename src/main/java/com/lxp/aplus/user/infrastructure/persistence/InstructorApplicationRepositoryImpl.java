@@ -1,0 +1,29 @@
+package com.lxp.aplus.user.infrastructure.persistence;
+
+import com.lxp.aplus.user.application.port.out.InstructorApplicationRepository;
+import com.lxp.aplus.user.domain.InstructorApplication;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class InstructorApplicationRepositoryImpl implements InstructorApplicationRepository {
+    private final InstructorApplicationJpaRepository jpaRepository;
+
+    @Override
+    public InstructorApplication save(InstructorApplication application) {
+        return jpaRepository.save(application);
+    }
+
+    @Override
+    public Optional<InstructorApplication> findById(Long id) {
+        return jpaRepository.findById(id);
+    }
+
+    @Override
+    public Optional<InstructorApplication> findByUserId(Long userId) {
+        return jpaRepository.findByUserId(userId);
+    }
+}
