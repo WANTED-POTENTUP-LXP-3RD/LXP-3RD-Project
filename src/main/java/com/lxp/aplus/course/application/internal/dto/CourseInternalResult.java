@@ -10,7 +10,8 @@ public record CourseInternalResult(
         String title,
         int price,
         CourseStatus courseStatus,
-        Long instructorId
+        Long instructorId,
+        Long categoryId
 ) {
     public static CourseInternalResult from(Course course) {
         return CourseInternalResult.builder()
@@ -19,6 +20,7 @@ public record CourseInternalResult(
                 .price(course.getPrice())
                 .courseStatus(course.getCourseStatus())
                 .instructorId(course.getInstructorId())
+                .categoryId(course.getCategoryId())
                 .build();
     }
 }
