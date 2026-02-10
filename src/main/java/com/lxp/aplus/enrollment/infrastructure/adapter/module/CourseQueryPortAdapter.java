@@ -1,14 +1,12 @@
 package com.lxp.aplus.enrollment.infrastructure.adapter.module;
 
 import com.lxp.aplus.category.application.internal.usecase.CategoryInternalUseCase;
-import com.lxp.aplus.category.domain.Category;
 import com.lxp.aplus.course.application.internal.usecase.CourseInternalUseCase;
 import com.lxp.aplus.enrollment.application.port.out.CourseQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -38,18 +36,12 @@ public class CourseQueryPortAdapter implements CourseQueryPort {
                 .map(course -> course.categoryId())
                 .filter(categoryId -> categoryId != null)
                 .flatMap(categoryInternalUseCase::findByIdWithParent)
-                .map(category -> buildCategoryNames(category.name(), category.parent()))
+                .map(category -> {
+                    if (category.parentName() == null) {
+                        return List.of(category.name());
+                    }
+                    return List.of(category.parentName(), category.name());
+                })
                 .orElse(Collections.emptyList());
-    }
-
-    private List<String> buildCategoryNames(String leafName, Category parent) {
-        List<String> names = new ArrayList<>();
-        names.add(leafName);
-        var current = parent;
-        while (current != null) {
-            names.add(0, current.getName());
-            current = current.getParent();
-        }
-        return names;
     }
 }
