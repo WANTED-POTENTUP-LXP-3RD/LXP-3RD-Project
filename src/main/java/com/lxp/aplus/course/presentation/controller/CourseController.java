@@ -112,12 +112,12 @@ public class CourseController {
 
     @GetMapping("/api/courses")
     public ResponseEntity<ResultResponse<PageResponse<CourseResponse>>> getPublishedCourses(
-            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) CourseLevel level,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<CourseResult> result = courseQueryUseCase.getPublishedCourses(title, categoryId, level, pageable);
+        Page<CourseResult> result = courseQueryUseCase.getPublishedCourses(keyword, categoryId, level, pageable);
         Page<CourseResponse> responsePage = result.map(CourseResponse::from);
 
         return ResponseEntity
