@@ -9,7 +9,7 @@ public record EnrollmentDetailResponse(
         Long studentId,
         Long courseId,
         EnrollmentStatus status,
-        int progressRate,
+        int overallProgressRate,
         LocalDateTime createdAt,
         LocalDateTime expiredAt
 ) {
@@ -19,7 +19,7 @@ public record EnrollmentDetailResponse(
                 result.studentId(),
                 result.courseId(),
                 result.status(),
-                result.progressRate(),
+                result.overallProgressRate(),
                 result.createdAt(),
                 result.expiredAt()
         );
