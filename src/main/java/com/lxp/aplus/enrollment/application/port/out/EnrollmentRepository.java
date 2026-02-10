@@ -1,5 +1,8 @@
-package com.lxp.aplus.enrollment.domain;
+package com.lxp.aplus.enrollment.application.port.out;
 
+import com.lxp.aplus.enrollment.domain.Enrollment;
+import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
+import com.lxp.aplus.enrollment.domain.StudentCountDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -3,15 +3,15 @@ package com.lxp.aplus.enrollment.application.service;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.enrollment.application.port.in.EnrollmentQueryPort;
-import com.lxp.aplus.enrollment.application.port.out.CourseReader;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentQueryUseCase;
+import com.lxp.aplus.enrollment.application.port.out.CourseQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.port.out.ProgressQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.dto.EnrollmentProgressDto;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,22 +26,22 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class EnrollmentQueryService implements EnrollmentQueryPort {
+public class EnrollmentQueryService implements EnrollmentQueryUseCase {
 
     private final EnrollmentRepository enrollmentRepository;
-    private final CourseReader courseReader;
+    private final CourseQueryPort courseQueryPort;
     private final ProgressQueryPort progressQueryPort;
 
     public Page<EnrollmentListItemResult> getEnrollmentList(Long studentId, EnrollmentStatus status, Pageable pageable) {
         Page<Enrollment> enrollmentsPage = enrollmentRepository.findByStudentIdAndStatus(studentId, status, pageable);
 
-        // TODO: [성능 개선] N+1 쿼리 발생 지점. CourseReader에 findCoursesByIds(List<Long> courseIds)와 같은 배치 조회 기능 추가 필요.
+        // TODO: [성능 개선] N+1 쿼리 발생 지점. CourseQueryPort에 findCoursesByIds(List<Long> courseIds)와 같은 배치 조회 기능 추가 필요.
         List<EnrollmentListItemResult> content = enrollmentsPage.getContent().stream()
                 .map(enrollment -> {
-                    CourseSummary courseSummary = courseReader.findCourseById(enrollment.getCourseId())
+                    CourseSummary courseSummary = courseQueryPort.findCourseById(enrollment.getCourseId())
                             .orElseThrow(() -> new BusinessException(CourseErrorCode.COURSE_NOT_FOUND));
                     
-                    List<String> categoryNames = courseReader.findCategoryNamesByCourseId(enrollment.getCourseId());
+                    List<String> categoryNames = courseQueryPort.findCategoryNamesByCourseId(enrollment.getCourseId());
 
                     EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
 

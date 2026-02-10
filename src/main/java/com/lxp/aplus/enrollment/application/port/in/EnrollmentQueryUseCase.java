@@ -6,7 +6,7 @@ import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface EnrollmentQueryPort {
+public interface EnrollmentQueryUseCase {
     Page<EnrollmentListItemResult> getEnrollmentList(Long studentId, EnrollmentStatus status, Pageable pageable);
 
     EnrollmentDetailResult getEnrollmentDetail(Long studentId, Long enrollmentId);

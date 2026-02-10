@@ -4,7 +4,7 @@ import com.lxp.aplus.enrollment.application.internal.dto.EnrollmentInternalResul
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,14 +2,14 @@ package com.lxp.aplus.enrollment.application.service;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
-import com.lxp.aplus.enrollment.application.port.out.CourseReader;
+import com.lxp.aplus.enrollment.application.port.out.CourseQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.application.port.out.ProgressQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.dto.EnrollmentProgressDto;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class EnrollmentQueryServiceTest {
     private EnrollmentRepository enrollmentRepository;
 
     @Mock
-    private CourseReader courseReader;
+    private CourseQueryPort courseQueryPort;
 
     @Mock
     private ProgressQueryPort progressQueryPort;
@@ -71,13 +71,13 @@ class EnrollmentQueryServiceTest {
         given(enrollmentRepository.findByStudentIdAndStatus(STUDENT_ID, status, pageable))
                 .willReturn(enrollmentsPage);
 
-        given(courseReader.findCourseById(COURSE_ID_1))
+        given(courseQueryPort.findCourseById(COURSE_ID_1))
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_1, COURSE_NAME_1)));
-        given(courseReader.findCourseById(COURSE_ID_2))
+        given(courseQueryPort.findCourseById(COURSE_ID_2))
                 .willReturn(Optional.of(new CourseSummary(COURSE_ID_2, COURSE_NAME_2)));
 
-        given(courseReader.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
-        given(courseReader.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
+        given(courseQueryPort.findCategoryNamesByCourseId(COURSE_ID_1)).willReturn(categories1);
+        given(courseQueryPort.findCategoryNamesByCourseId(COURSE_ID_2)).willReturn(categories2);
 
         given(progressQueryPort.getProgress(5001L, COURSE_ID_1)).willReturn(new EnrollmentProgressDto(40));
         given(progressQueryPort.getProgress(5002L, COURSE_ID_2)).willReturn(new EnrollmentProgressDto(35));

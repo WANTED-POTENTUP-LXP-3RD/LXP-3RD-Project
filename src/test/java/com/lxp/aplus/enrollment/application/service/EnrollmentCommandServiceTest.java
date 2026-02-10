@@ -3,10 +3,10 @@ package com.lxp.aplus.enrollment.application.service;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
-import com.lxp.aplus.enrollment.application.port.out.CourseReader;
+import com.lxp.aplus.enrollment.application.port.out.CourseQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.CourseSummary;
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class EnrollmentCommandServiceTest {
     private EnrollmentRepository enrollmentRepository;
 
     @Mock
-    private CourseReader courseReader;
+    private CourseQueryPort courseQueryPort;
 
     @Captor
     private ArgumentCaptor<Enrollment> enrollmentCaptor;
@@ -49,7 +49,7 @@ class EnrollmentCommandServiceTest {
         EnrollmentCommand command = new EnrollmentCommand(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
         Enrollment createdEnrollment = Enrollment.create(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
 
-        given(courseReader.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
+        given(courseQueryPort.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(false);
         given(enrollmentRepository.save(any(Enrollment.class))).willReturn(createdEnrollment);
 
@@ -71,7 +71,7 @@ class EnrollmentCommandServiceTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
 
-        given(courseReader.findCourseById(COURSE_ID_1)).willReturn(Optional.empty());
+        given(courseQueryPort.findCourseById(COURSE_ID_1)).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> enrollmentCommandService.enroll(command))
@@ -86,7 +86,7 @@ class EnrollmentCommandServiceTest {
         // given
         EnrollmentCommand command = new EnrollmentCommand(STUDENT_ID, COURSE_ID_1, ORDER_ITEM_ID_1);
 
-        given(courseReader.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
+        given(courseQueryPort.findCourseById(COURSE_ID_1)).willReturn(Optional.of(new CourseSummary(COURSE_ID_1, "Test Course")));
         given(enrollmentRepository.existsByStudentIdAndCourseId(STUDENT_ID, COURSE_ID_1)).willReturn(true);
 
         // when & then
