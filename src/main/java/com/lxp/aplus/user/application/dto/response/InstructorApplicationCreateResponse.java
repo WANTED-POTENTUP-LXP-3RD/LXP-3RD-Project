@@ -5,20 +5,16 @@ import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 
 import java.time.LocalDateTime;
 
-public record InstructorApplicationResponse(
+public record InstructorApplicationCreateResponse(
         Long applicationId,
         Long userId,
-        String email,
-        String name,
         InstructorApplicationStatus status,
         LocalDateTime appliedAt
 ) {
-    public static InstructorApplicationResponse of(InstructorApplication application, String email, String name) {
-        return new InstructorApplicationResponse(
+    public static InstructorApplicationCreateResponse from(InstructorApplication application) {
+        return new InstructorApplicationCreateResponse(
                 application.getId(),
                 application.getUserId(),
-                email,
-                name,
                 application.getStatus(),
                 application.getCreatedAt()
         );

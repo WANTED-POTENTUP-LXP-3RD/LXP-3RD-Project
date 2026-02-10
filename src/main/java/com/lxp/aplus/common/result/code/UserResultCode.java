@@ -21,6 +21,7 @@ public enum UserResultCode implements ResultCode {
     LOGOUT_SUCCESS(HttpStatus.OK, "SU011", "로그아웃에 성공하였습니다."),
     TOKEN_REFRESH_SUCCESS(HttpStatus.OK, "SU012", "토큰이 재발급되었습니다."),
     INSTRUCTOR_APPLICATION_SUCCESS(HttpStatus.OK, "SU013", "강사 권한 요청이 정상적으로 접수되었습니다."),
+    INSTRUCTOR_APPLICATION_LIST_SUCCESS(HttpStatus.OK, "SU014", "강사 권한 요청 목록을 정상적으로 조회하였습니다."),
     INSTRUCTOR_APPLICATION_APPROVED(HttpStatus.OK, "SU015", "강사 권한이 수락되었습니다."),
     INSTRUCTOR_APPLICATION_REJECTED(HttpStatus.OK, "SU016", "강사 권한이 거절되었습니다.");
 
