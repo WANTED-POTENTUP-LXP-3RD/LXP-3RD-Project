@@ -112,11 +112,11 @@ public class Course extends BaseAggregateRoot {
             this.categoryId = command.categoryId();
         }
 
-        if (command.thumbnailUrl() != null) {
-            if (command.thumbnailUrl().isBlank()) {
+        if (command.thumbnailResourceKey() != null) {
+            if (command.thumbnailResourceKey().isBlank()) {
                 throw new BusinessException(GlobalErrorCode.INVALID_ARGUMENT);
             }
-            this.thumbnailResourceKey = command.thumbnailUrl();
+            this.thumbnailResourceKey = command.thumbnailResourceKey();
         }
 
         if (command.price() != null) {
