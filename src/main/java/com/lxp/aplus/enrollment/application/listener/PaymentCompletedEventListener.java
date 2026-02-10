@@ -2,7 +2,7 @@ package com.lxp.aplus.enrollment.application.listener;
 
 import com.lxp.aplus.common.event.PaymentCompletedEvent;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentCommandUseCase;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentCommandUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

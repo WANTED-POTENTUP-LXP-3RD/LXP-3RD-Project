@@ -6,15 +6,19 @@ import com.lxp.aplus.common.error.code.ProgressErrorCode;
 import com.lxp.aplus.progress.application.command.ProgressUpdateCommand;
 import com.lxp.aplus.progress.application.dto.response.ProgressUpdateResponse;
 import com.lxp.aplus.progress.application.port.in.ProgressCommandUseCase;
+import com.lxp.aplus.progress.application.port.out.EnrollmentCompletionPort;
 import com.lxp.aplus.progress.application.port.out.EnrollmentReader;
 import com.lxp.aplus.progress.application.port.out.LectureQueryPort;
 import com.lxp.aplus.progress.application.port.out.dto.EnrollmentStatusDto;
 import com.lxp.aplus.progress.application.port.out.dto.LectureDurationDto;
+import com.lxp.aplus.progress.application.port.out.dto.LectureSummaryDto;
 import com.lxp.aplus.progress.domain.Progress;
 import com.lxp.aplus.progress.application.port.out.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -24,6 +28,7 @@ public class ProgressCommandService implements ProgressCommandUseCase {
     private final ProgressRepository progressRepository;
     private final EnrollmentReader enrollmentReader;
     private final LectureQueryPort lectureProvider;
+    private final EnrollmentCompletionPort enrollmentCompletionPort;
 
     @Override
     public ProgressUpdateResponse updateProgress(Long userId, Long courseId, ProgressUpdateCommand command) {
@@ -45,6 +50,26 @@ public class ProgressCommandService implements ProgressCommandUseCase {
         progress.updateProgress(command.watchedDuration(), lectureDurationDto.totalDurationSeconds());
 
         Progress savedProgress = progressRepository.save(progress);
+        completeEnrollmentIfAllResourcesCompleted(enrollmentStatusDto.enrollmentId(), courseId);
         return ProgressUpdateResponse.from(savedProgress);
+    }
+
+    private void completeEnrollmentIfAllResourcesCompleted(Long enrollmentId, Long courseId) {
+        List<LectureSummaryDto> lectureDetails = lectureProvider.getLectureDetailsByCourseId(courseId);
+        if (lectureDetails.isEmpty()) {
+            return;
+        }
+
+        List<Progress> progresses = progressRepository.findByEnrollmentId(enrollmentId);
+        boolean allCompleted = lectureDetails.stream()
+                .allMatch(lecture -> progresses.stream()
+                        .filter(progress -> progress.getLectureResourceId().equals(lecture.resourceId()))
+                        .findFirst()
+                        .map(Progress::isCompleted)
+                        .orElse(false));
+
+        if (allCompleted) {
+            enrollmentCompletionPort.completeEnrollment(enrollmentId);
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.lxp.aplus.payment.infrastructure.adapter;
 
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import com.lxp.aplus.order.domain.OrderItem;
 import com.lxp.aplus.payment.application.port.out.EnrollmentCommandPort;
 import lombok.RequiredArgsConstructor;

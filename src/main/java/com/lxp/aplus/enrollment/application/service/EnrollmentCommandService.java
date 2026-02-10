@@ -1,13 +1,14 @@
-package com.lxp.aplus.enrollment.application.usecase;
+package com.lxp.aplus.enrollment.application.service;
 
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.EnrollmentErrorCode;
 import com.lxp.aplus.enrollment.application.command.EnrollmentCommand;
 import com.lxp.aplus.enrollment.application.event.EnrollmentCanceledEvent;
-import com.lxp.aplus.enrollment.application.port.out.CourseFinder;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentCommandUseCase;
+import com.lxp.aplus.enrollment.application.port.out.CourseQueryPort;
 import com.lxp.aplus.enrollment.application.port.out.ProgressQueryPort;
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,10 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class EnrollmentCommandUseCase{
+public class EnrollmentCommandService implements EnrollmentCommandUseCase {
 
     private final EnrollmentRepository enrollmentRepository;
-    private final CourseFinder courseFinder;
+    private final CourseQueryPort courseQueryPort;
     private final ProgressQueryPort progressQueryPort;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -39,7 +40,7 @@ public class EnrollmentCommandUseCase{
     public Long enroll(EnrollmentCommand command) {
         Long courseId = command.courseId();
 
-        courseFinder.findCourseById(courseId)
+        courseQueryPort.findCourseById(courseId)
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_COURSE_NOT_FOUND));
 
         if (enrollmentRepository.existsByStudentIdAndCourseId(command.studentId(), courseId)) {
