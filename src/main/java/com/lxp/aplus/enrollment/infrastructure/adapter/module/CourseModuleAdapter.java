@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-@Component("enrollmentCourseQueryPortAdapter")
+@Component("enrollmentCourseModuleAdapter")
 @RequiredArgsConstructor
-public class CourseQueryPortAdapter implements CourseQueryPort {
+public class CourseModuleAdapter implements CourseQueryPort {
 
     private final CourseInternalUseCase courseInternalUseCase;
     private final CategoryInternalUseCase categoryInternalUseCase;
