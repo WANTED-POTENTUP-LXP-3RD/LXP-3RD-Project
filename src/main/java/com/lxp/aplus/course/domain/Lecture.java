@@ -48,8 +48,10 @@ public class Lecture extends BaseTimeEntity {
         this.title = title;
         this.isPreview = isPreview;
         this.orderIndex = orderIndex;
-        this.lectureResources.add(resource);
-        this.totalDurationSeconds = resource.getVideoDuration().getDuration();
+
+        this.totalDurationSeconds = (resource.getVideoDuration() != null)
+                ? resource.getVideoDuration().getDuration()
+                : 0;
     }
 
     public static Lecture create(Section section, String title, LectureResourceV2 resource, boolean isPreview, int orderIndex) {
