@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserQueryPort {
-    public Map<Long, String> findUserNames(List<Long> userIds);
+    Map<Long, String> findUserNames(List<Long> userIds);
 }

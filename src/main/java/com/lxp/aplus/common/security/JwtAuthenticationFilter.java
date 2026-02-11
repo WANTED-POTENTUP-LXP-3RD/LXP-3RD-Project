@@ -1,6 +1,5 @@
 package com.lxp.aplus.common.security;
 
-import com.lxp.aplus.user.application.usecase.AuthQueryUseCase;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenStorage refreshTokenStorage;
-    private final AuthQueryUseCase authQueryUseCase;
     private final AccessTokenBlacklist accessTokenBlacklist;
 
     @Value("${jwt.header}")

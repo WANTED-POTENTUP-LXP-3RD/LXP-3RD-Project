@@ -1,7 +1,7 @@
 package com.lxp.aplus.category.infrastructure.persistence;
 
 import com.lxp.aplus.category.domain.Category;
-import com.lxp.aplus.category.domain.CategoryRepository;
+import com.lxp.aplus.category.application.port.out.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
