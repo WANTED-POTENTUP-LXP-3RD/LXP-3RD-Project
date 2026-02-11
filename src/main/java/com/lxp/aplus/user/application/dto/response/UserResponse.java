@@ -1,5 +1,6 @@
 package com.lxp.aplus.user.application.dto.response;
 
+import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 import com.lxp.aplus.user.domain.Role;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
@@ -17,9 +18,14 @@ public record UserResponse(
         UserStatus status,
         List<RoleType> roles,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        InstructorApplicationStatus instructorApplicationStatus
 ) {
     public static UserResponse from(User user) {
+        return from(user, null);
+    }
+
+    public static UserResponse from(User user, InstructorApplicationStatus instructorApplicationStatus) {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
@@ -32,8 +38,8 @@ public record UserResponse(
                         .map(Role::getRoleType)
                         .toList(),
                 user.getCreatedAt(),
-                user.getUpdatedAt()
+                user.getUpdatedAt(),
+                instructorApplicationStatus
         );
     }
 }
-

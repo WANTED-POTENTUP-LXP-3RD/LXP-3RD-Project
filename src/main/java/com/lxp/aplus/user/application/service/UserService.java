@@ -81,7 +81,13 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserResponse> findUserWithRolesById(Long id) {
-        return userRepository.findUserWithRolesById(id).map(UserResponse::from);
+        return userRepository.findUserWithRolesById(id)
+                .map(user -> {
+                    InstructorApplicationStatus status = instructorApplicationRepository.findByUserId(id)
+                            .map(InstructorApplication::getStatus)
+                            .orElse(InstructorApplicationStatus.NOT_APPLIED);
+                    return UserResponse.from(user, status);
+                });
     }
 
     @Override
