@@ -8,4 +8,7 @@ public interface PresignedUrlGenerator {
     PresignedUrlResult generatePutUrl(String originalFileName, String contentType);
 
     PresignedUrlResult generateDeleteUrl(String key);
+
+    PresignedUrlResult generatePutUrlWithKey(String key, String contentType);
+
 }
