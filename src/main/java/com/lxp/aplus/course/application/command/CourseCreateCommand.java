@@ -12,7 +12,6 @@ public record CourseCreateCommand(
         Long categoryId,
         int price,
         String thumbnailUrl,
-        MultipartFile thumbnailFile,
         CourseLevel courseLevel,
         String thumbnailResourceKey
 ) {
