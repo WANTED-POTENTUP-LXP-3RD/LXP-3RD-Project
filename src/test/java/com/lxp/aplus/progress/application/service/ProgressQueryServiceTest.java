@@ -48,7 +48,7 @@ class ProgressQueryServiceTest {
         Long resourceId1 = 301L;
         Long resourceId2 = 302L;
 
-        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, false);
         List<LectureSummaryDto> lectureDetails = List.of(
                 new LectureSummaryDto(resourceId1, "Lecture 1", 100, ResourceType.VIDEO),
                 new LectureSummaryDto(resourceId2, "Lecture 2", 200, ResourceType.VIDEO)
