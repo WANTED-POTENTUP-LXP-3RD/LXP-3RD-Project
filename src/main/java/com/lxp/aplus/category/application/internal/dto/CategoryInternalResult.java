@@ -14,6 +14,9 @@ public record CategoryInternalResult(
         List<Long> childrenIds
 ) {
         public static CategoryInternalResult from(Category category) {
+            if (category == null) {
+                return null;
+            }
             String parentName = category.getParent() != null ? category.getParent().getName() : null;
             List<Long> childrenIds = category.getChildren().stream()
                     .map(Category::getId)
