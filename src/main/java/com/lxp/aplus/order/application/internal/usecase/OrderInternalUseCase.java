@@ -13,10 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderInternalUseCase {
 
     private final OrderRepository orderRepository;
@@ -38,6 +40,9 @@ public class OrderInternalUseCase {
         return new OrderInternalResult(order.getOrderId(), order.getUserId(), orderItems);
     }
 
+    /*
+     * 주문 생성
+     */
     public OrderInternalResult createOrder(Long userId, List<Long> courseIds) {
 
         // 1. Course 가격 조회
@@ -53,5 +58,16 @@ public class OrderInternalUseCase {
         orderRepository.save(order);
 
         return PaymentOrderDto.of(order.getOrderId(), order.getAmount());
+    }
+
+    /*
+     * 주문 완료 처리
+     */
+    public void completeOrder(String orderId, String approvedPaymentId, BigDecimal approvedAmount) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(OrderErrorCode.ORDER_NOT_FOUND));
+
+        order.completeWithApprovedPayment(approvedPaymentId, approvedAmount);
     }
 }

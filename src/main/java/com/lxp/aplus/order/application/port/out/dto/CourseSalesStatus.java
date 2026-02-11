@@ -1,4 +1,4 @@
-package com.lxp.aplus.order.application.port.out;
+package com.lxp.aplus.order.application.port.out.dto;
 
 import com.lxp.aplus.course.domain.CourseStatus;
 
