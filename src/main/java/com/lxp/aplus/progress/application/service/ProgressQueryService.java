@@ -43,7 +43,9 @@ public class ProgressQueryService implements ProgressQueryUseCase {
         List<LectureSummary> lectureSummaries = toLectureSummaries(lectureDetails);
 
         LearningProgress learningProgress = new LearningProgress(enrollmentStatusDto.enrollmentId(), progresses);
-        int overallProgressRate = learningProgress.calculateOverallProgressRate(lectureSummaries);
+        int overallProgressRate = enrollmentStatusDto.isCompleted()
+                ? 100
+                : learningProgress.calculateOverallProgressRate(lectureSummaries);
         Optional<Progress> lastWatchedProgressOpt = learningProgress.findLastWatchedProgress();
         var progressByResourceId = learningProgress.mapProgressByResourceId();
         List<ResourceProgressResponse> resourceProgressResponses = lectureSummaries.stream()

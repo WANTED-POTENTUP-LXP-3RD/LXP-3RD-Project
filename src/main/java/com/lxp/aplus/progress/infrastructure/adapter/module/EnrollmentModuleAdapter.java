@@ -24,6 +24,6 @@ public class EnrollmentModuleAdapter implements EnrollmentReader {
 
     private EnrollmentStatusDto toEnrollmentStatusDto(EnrollmentInternalResult enrollment) {
         boolean expired = enrollment.expiredAt() != null && enrollment.expiredAt().isBefore(LocalDateTime.now());
-        return new EnrollmentStatusDto(enrollment.enrollmentId(), expired);
+        return new EnrollmentStatusDto(enrollment.enrollmentId(), enrollment.isCompleted(), expired);
     }
 }
