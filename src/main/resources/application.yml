@@ -30,3 +30,7 @@ cors:
 logging:
   level:
     org.springframework.security: DEBUG
+
+ai:
+  review:
+    base-url: http://localhost:8001

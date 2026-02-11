@@ -49,6 +49,7 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2'
     implementation "org.flywaydb:flyway-core"
     runtimeOnly "org.flywaydb:flyway-mysql"
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
