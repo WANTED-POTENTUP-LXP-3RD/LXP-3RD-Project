@@ -1,14 +1,29 @@
 package com.lxp.aplus.user.presentation.controller;
 
+import com.lxp.aplus.common.result.PageResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.UserResultCode;
+import com.lxp.aplus.common.security.AdminOnly;
 import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.UserInfo;
-import com.lxp.aplus.user.application.dto.*;
-import com.lxp.aplus.user.application.usecase.UserCommandUseCase;
-import com.lxp.aplus.user.application.usecase.UserQueryUseCase;
+import com.lxp.aplus.user.application.dto.request.InstructorApplicationProcessRequest;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationCreateResponse;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationResponse;
+import com.lxp.aplus.user.application.dto.response.UserResponse;
+import com.lxp.aplus.user.application.dto.request.UpdateMyInfoRequest;
+import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
+import com.lxp.aplus.user.application.dto.request.ChangeMyPasswordRequest;
+import com.lxp.aplus.user.application.dto.request.ChangePasswordRequest;
+import com.lxp.aplus.user.application.dto.request.DeleteUserRequest;
+import com.lxp.aplus.user.application.port.in.UserCommandUseCase;
+import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
+import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -96,6 +111,44 @@ public class UserController {
         return ResponseEntity.ok(ResultResponse.of(UserResultCode.USER_ROLE_ADD_SUCCESS, response));
     }
 
-    
-}
+    /**
+     * 강사 권한 요청 API
+     * POST /api/users/instructor/applications
+     */
+    @PostMapping("/instructor/applications")
+    public ResponseEntity<ResultResponse<InstructorApplicationCreateResponse>> applyForInstructor(@Authenticated Long userId) {
+        InstructorApplicationCreateResponse response = userCommandUseCase.applyForInstructor(userId);
+        return ResponseEntity.ok(ResultResponse.of(UserResultCode.INSTRUCTOR_APPLICATION_SUCCESS, response));
+    }
 
+    /**
+     * 강사 신청 목록 조회 API (관리자용)
+     * GET /api/users/instructor/applications
+     */
+    @AdminOnly
+    @GetMapping("/instructor/applications")
+    public ResponseEntity<ResultResponse<PageResponse<InstructorApplicationResponse>>> getInstructorApplications(
+            @Authenticated Long userId,
+            @RequestParam(required = false) InstructorApplicationStatus status,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<InstructorApplicationResponse> result = userQueryUseCase.getInstructorApplications(status, pageable);
+        return ResponseEntity.ok(ResultResponse.of(UserResultCode.INSTRUCTOR_APPLICATION_LIST_SUCCESS, PageResponse.from(result)));
+    }
+
+    /**
+     * 강사 신청 처리 API (관리자용)
+     * PATCH /api/users/instructor/applications/{applicationId}
+     */
+    @AdminOnly
+    @PatchMapping("/instructor/applications/{applicationId}")
+    public ResponseEntity<ResultResponse<Void>> processInstructorApplication(
+            @Authenticated Long userId,
+            @PathVariable Long applicationId,
+            @Valid @RequestBody InstructorApplicationProcessRequest request) {
+        userCommandUseCase.processInstructorApplication(userId, applicationId, request.status());
+        UserResultCode resultCode = request.status() == InstructorApplicationStatus.APPROVED
+                ? UserResultCode.INSTRUCTOR_APPLICATION_APPROVED
+                : UserResultCode.INSTRUCTOR_APPLICATION_REJECTED;
+        return ResponseEntity.ok(ResultResponse.from(resultCode));
+    }
+}

@@ -1,6 +1,6 @@
 package com.lxp.aplus.course.presentation.response;
 
-import com.lxp.aplus.course.application.dto.ReviewStat;
+import com.lxp.aplus.course.application.result.ReviewStat;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseStatus;

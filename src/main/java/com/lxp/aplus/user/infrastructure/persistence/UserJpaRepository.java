@@ -1,7 +1,7 @@
 package com.lxp.aplus.user.infrastructure.persistence;
 
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
+import com.lxp.aplus.user.application.port.out.UserRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

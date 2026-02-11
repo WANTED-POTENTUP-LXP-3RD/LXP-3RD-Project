@@ -9,7 +9,7 @@ import com.lxp.aplus.order.application.port.out.CourseQueryPort;
 import com.lxp.aplus.order.application.port.out.CourseSalesStatus;
 import com.lxp.aplus.order.application.port.out.CourseSnapshot;
 import com.lxp.aplus.user.domain.User;
-import com.lxp.aplus.user.domain.UserRepository;
+import com.lxp.aplus.user.application.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
