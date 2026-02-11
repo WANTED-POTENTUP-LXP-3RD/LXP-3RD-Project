@@ -91,12 +91,12 @@ class EnrollmentQueryServiceTest {
 
         EnrollmentListItemResult result1 = result.getContent().get(0);
         assertThat(result1.courseId()).isEqualTo(COURSE_ID_1);
-        assertThat(result1.progressRate()).isEqualTo(40);
+        assertThat(result1.overallProgressRate()).isEqualTo(40);
         assertThat(result1.categories()).containsExactly("프로그래밍", "백엔드");
 
         EnrollmentListItemResult result2 = result.getContent().get(1);
         assertThat(result2.courseId()).isEqualTo(COURSE_ID_2);
-        assertThat(result2.progressRate()).isEqualTo(35);
+        assertThat(result2.overallProgressRate()).isEqualTo(35);
         assertThat(result2.categories()).containsExactly("프로그래밍", "프론트엔드");
     }
 
@@ -154,7 +154,7 @@ class EnrollmentQueryServiceTest {
         assertThat(result.enrollmentId()).isEqualTo(enrollmentId);
         assertThat(result.studentId()).isEqualTo(studentId);
         assertThat(result.courseId()).isEqualTo(courseId);
-        assertThat(result.progressRate()).isEqualTo(40);
+        assertThat(result.overallProgressRate()).isEqualTo(40);
         assertThat(result.status()).isEqualTo(EnrollmentStatus.ENROLLED);
     }
 
@@ -214,7 +214,7 @@ class EnrollmentQueryServiceTest {
         assertThat(result.enrollmentId()).isEqualTo(enrollmentId);
         assertThat(result.studentId()).isEqualTo(studentId);
         assertThat(result.courseId()).isEqualTo(courseId);
-        assertThat(result.progressRate()).isEqualTo(40);
+        assertThat(result.overallProgressRate()).isEqualTo(40);
         assertThat(result.status()).isEqualTo(EnrollmentStatus.ENROLLED);
     }
 

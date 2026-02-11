@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/uploads/courses/thumbnails")
+@RequestMapping("/api/instructor/resource")
 public class CourseThumbnailUploadController {
 
     private final CourseThumbnailPresignUseCase courseThumbnailPresignUseCase;
 
     @InstructorOnly
-    @PostMapping("/presign")
+    @PostMapping("/thumbnail")
     public ResponseEntity<CourseThumbnailPresignResult> presign(
             @Authenticated Long instructorId,
             @RequestBody @Valid CourseThumbnailPresignCommand command
