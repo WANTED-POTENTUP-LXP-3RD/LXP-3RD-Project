@@ -1,7 +1,6 @@
 package com.lxp.aplus.enrollment.application.internal.dto;
 
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -11,7 +10,7 @@ public record EnrollmentInternalResult(
         Long enrollmentId,
         Long studentId,
         Long courseId,
-        EnrollmentStatus status,
+        boolean isCompleted,
         LocalDateTime createdAt,
         LocalDateTime expiredAt
 ) {
@@ -20,7 +19,7 @@ public record EnrollmentInternalResult(
                 .enrollmentId(enrollment.getId())
                 .studentId(enrollment.getStudentId())
                 .courseId(enrollment.getCourseId())
-                .status(enrollment.getStatus())
+                .isCompleted(enrollment.getStatus() == com.lxp.aplus.enrollment.domain.EnrollmentStatus.COMPLETED)
                 .createdAt(enrollment.getCreatedAt())
                 .expiredAt(enrollment.getExpiredAt())
                 .build();
