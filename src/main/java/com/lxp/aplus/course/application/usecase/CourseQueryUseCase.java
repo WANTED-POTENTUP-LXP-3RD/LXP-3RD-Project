@@ -5,7 +5,7 @@ import com.lxp.aplus.common.error.code.CourseErrorCode;
 import com.lxp.aplus.common.error.code.UserErrorCode;
 import com.lxp.aplus.course.application.mapper.CourseResultMapper;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;
-import com.lxp.aplus.course.application.port.out.EnrollmentQueryPort;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import com.lxp.aplus.course.application.port.out.ReviewQueryPort;
 import com.lxp.aplus.course.application.port.out.UserQueryPort;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
@@ -13,7 +13,9 @@ import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.application.result.ReviewStat;
 import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.domain.CourseLevel;
 import com.lxp.aplus.course.domain.CourseRepository;
+import com.lxp.aplus.enrollment.domain.StudentCountDto;
 import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +36,7 @@ public class CourseQueryUseCase {
     private final CourseRepository courseRepository;
     private final UserQueryPort userQueryPort;
     private final CategoryQueryPort categoryQueryPort;
-    private final EnrollmentQueryPort enrollmentQueryPort;
+    private final EnrollmentRepository enrollmentRepository;
     private final ReviewQueryPort reviewQueryPort;
 
     public Page<CourseResult> getInstructorCourses(Long instructorId, Pageable pageable) {
@@ -42,8 +44,8 @@ public class CourseQueryUseCase {
         return convertToCourseResponse(courses, pageable);
     }
 
-    public Page<CourseResult> getPublishedCourses(Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllPublished(pageable);
+    public Page<CourseResult> getPublishedCourses(String title, Long categoryId, CourseLevel level, Pageable pageable) {
+        Page<Course> courses = courseRepository.findAllPublishedWithFilters(title, categoryId, level, pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
@@ -58,7 +60,8 @@ public class CourseQueryUseCase {
                 .toList();
 
         Map<Long, List<String>> categoryNamesMap = categoryQueryPort.getCategoryNamesBatch(categoryIds);
-        Map<Long, Integer> studentCountMap = enrollmentQueryPort.getStudentCountBatch(courseIds);
+        Map<Long, Integer> studentCountMap = enrollmentRepository.findStudentCountsByCourseIds(courseIds).stream()
+                .collect(Collectors.toMap(StudentCountDto::getCourseId, dto -> Math.toIntExact(dto.getCnt())));
         Map<Long, ReviewSummary> reviewInfoMap = reviewQueryPort.getReviewInfos(courseIds).stream()
                 .collect(Collectors.toMap(ReviewSummary::courseId, info -> info));
 
@@ -105,8 +108,8 @@ public class CourseQueryUseCase {
 
         int totalDuration = calculateTotalDuration(course);
 
-        boolean isPurchased = enrollmentQueryPort.isEnrolled(userId, courseId);
-        int studentCount = enrollmentQueryPort.getStudentCount(courseId);
+        boolean isPurchased = userId != null && enrollmentRepository.existsByStudentIdAndCourseId(userId, courseId);
+        int studentCount = Math.toIntExact(enrollmentRepository.countByCourseId(courseId));
         return courseResultMapper.toDetailResult(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
                 reviewStat);
     }
@@ -128,8 +131,8 @@ public class CourseQueryUseCase {
 
         int totalDuration = calculateTotalDuration(course);
 
-        boolean isPurchased = enrollmentQueryPort.isEnrolled(instructorId, courseId);
-        int studentCount = enrollmentQueryPort.getStudentCount(courseId);
+        boolean isPurchased = enrollmentRepository.existsByStudentIdAndCourseId(instructorId, courseId);
+        int studentCount = Math.toIntExact(enrollmentRepository.countByCourseId(courseId));
         return courseResultMapper.toDetailResult(course, categoryNames, instructorResult, isPurchased, studentCount, totalDuration,
                 reviewStat);
     }

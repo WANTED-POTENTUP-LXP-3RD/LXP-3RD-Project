@@ -10,17 +10,28 @@ import com.lxp.aplus.user.application.dto.request.CreateUserRequest;
 import com.lxp.aplus.user.application.dto.request.DeleteUserRequest;
 import com.lxp.aplus.user.application.dto.request.UpdateUserInfoRequest;
 import com.lxp.aplus.user.application.dto.request.WithdrawUserRequest;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationCreateResponse;
+import com.lxp.aplus.user.application.dto.response.InstructorApplicationResponse;
 import com.lxp.aplus.user.application.dto.response.UserResponse;
 import com.lxp.aplus.user.application.port.in.UserCommandUseCase;
 import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
 import com.lxp.aplus.user.domain.RoleType;
 import com.lxp.aplus.user.domain.User;
 import com.lxp.aplus.user.application.port.out.UserRepository;
+import com.lxp.aplus.user.application.port.out.InstructorApplicationRepository;
+import com.lxp.aplus.user.domain.InstructorApplication;
+import com.lxp.aplus.user.domain.InstructorApplicationStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * User 도메인의 통합 서비스
@@ -30,6 +41,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService implements UserCommandUseCase, UserQueryUseCase {
     private final UserRepository userRepository;
+    private final InstructorApplicationRepository instructorApplicationRepository;
     private final CustomPasswordEncoder customPasswordEncoder;
 
     // ========== Query Methods (조회) ==========
@@ -78,6 +90,34 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
         return userRepository.existsById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<InstructorApplicationResponse> getInstructorApplications(InstructorApplicationStatus status, Pageable pageable) {
+        Page<InstructorApplication> applications = (status != null)
+                ? instructorApplicationRepository.findAllByStatus(status, pageable)
+                : instructorApplicationRepository.findAll(pageable);
+
+        // userId 목록 추출
+        List<Long> userIds = applications.getContent().stream()
+                .map(InstructorApplication::getUserId)
+                .distinct()
+                .toList();
+
+        // user 정보 batch 조회
+        Map<Long, User> userMap = userRepository.findByIdIn(userIds).stream()
+                .collect(Collectors.toMap(User::getId, user -> user));
+
+        // InstructorApplicationListItem으로 변환
+        List<InstructorApplicationResponse> items = applications.getContent().stream()
+                .map(application -> {
+                    User user = userMap.get(application.getUserId());
+                    return InstructorApplicationResponse.of(application, user.getEmail(), user.getNickName());
+                })
+                .toList();
+
+        return new PageImpl<>(items, pageable, applications.getTotalElements());
+    }
+
     // ========== Command Methods (명령) ==========
 
     @Override
@@ -114,14 +154,26 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
     @Override
     @Transactional
     public UserResponse addInstructorRole(Long userId) {
-        return addRole(userId, RoleType.INSTRUCTOR);
+        return addRole(userId);
     }
 
-    private UserResponse addRole(Long userId, RoleType roleType) {
+    @Override
+    @Transactional
+    public InstructorApplicationCreateResponse applyForInstructor(Long userId) {
+        // 이미 신청한 경우 확인
+        if (instructorApplicationRepository.findByUserId(userId).isPresent()) {
+            throw new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_ALREADY_EXISTS);
+        }
+        InstructorApplication application = InstructorApplication.create(userId);
+        InstructorApplication savedApplication = instructorApplicationRepository.save(application);
+        return InstructorApplicationCreateResponse.from(savedApplication);
+    }
+
+    private UserResponse addRole(Long userId) {
         User user = userRepository.findUserWithRolesById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        user.addRole(roleType);
+        user.addRole(RoleType.INSTRUCTOR);
         return UserResponse.from(user);
     }
 
@@ -162,5 +214,22 @@ public class UserService implements UserCommandUseCase, UserQueryUseCase {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         user.delete();
+    }
+
+    @Override
+    @Transactional
+    public void processInstructorApplication(Long userId, Long applicationId, InstructorApplicationStatus status) {
+        InstructorApplication application = instructorApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.INSTRUCTOR_APPLICATION_NOT_FOUND));
+
+        if (status == InstructorApplicationStatus.APPROVED) {
+            application.approve();
+            instructorApplicationRepository.save(application);
+            // 역할 추가
+            addRole(application.getUserId());
+        } else if (status == InstructorApplicationStatus.REJECTED) {
+            application.reject();
+            instructorApplicationRepository.save(application);
+        }
     }
 }
