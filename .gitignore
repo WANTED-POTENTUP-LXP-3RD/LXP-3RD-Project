@@ -43,3 +43,37 @@ out/
 .env
 /src/main/resources/static/uploads
 /src/main/generated
+
+
+### macOS ###
+.DS_Store
+**/.DS_Store
+
+### Python / AI Server ###
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+*.log
+
+### FastAPI / uvicorn ###
+*.pid
+
+### Local files / temp ###
+files/
+http/files/
+F:/
+
+### Upload test files ###
+*.bin
+last.chunk
+
+### Environment ###
+.env.*
+!.env.template
