@@ -35,6 +35,7 @@ public class LectureCommandUseCase {
 
         LectureResourceV2 lectureResourceV2 = lectureResourceRepository.findByKey(command.resourceKey())
                 .orElseThrow(() -> new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_NOT_FOUND));
+
         if (lectureResourceV2.getLecture() != null) {
             throw new BusinessException(LectureResourceErrorCode.LECTURE_RESOURCE_ALREADY_USE);
         }
