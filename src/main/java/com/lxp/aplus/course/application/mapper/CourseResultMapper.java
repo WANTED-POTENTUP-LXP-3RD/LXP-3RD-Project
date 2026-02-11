@@ -5,6 +5,7 @@ import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.infrastructure.file.FileUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class CourseResultMapper {
 
     private final SectionResultMapper sectionResultMapper;
+    private final FileUrlGenerator fileUrlGenerator;
 
     public CourseResult toResult(Course course, List<String> categoryNames, String instructorName, int studentCount, ReviewStat reviewStat) {
         return CourseResult.builder()
@@ -44,7 +46,7 @@ public class CourseResultMapper {
                 .price(course.getPrice())
                 .status(course.getCourseStatus())
                 .level(course.getCourseLevel())
-                .thumbnailUrl(course.getThumbnailResourceKey())
+                .thumbnailUrl(course.getThumbnailResourceKey() != null ? fileUrlGenerator.generate(course.getThumbnailResourceKey()) : null)
                 .instructor(instructor)
                 .isPurchased(isPurchased)
                 .studentCount(studentCount)
