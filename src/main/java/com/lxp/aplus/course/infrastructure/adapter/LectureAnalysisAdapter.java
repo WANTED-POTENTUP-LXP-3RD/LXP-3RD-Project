@@ -3,7 +3,6 @@ package com.lxp.aplus.course.infrastructure.adapter;
 import com.lxp.aplus.course.application.port.out.LectureAnalysisPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,7 +18,6 @@ public class LectureAnalysisAdapter implements LectureAnalysisPort {
     private String callbackUrl;
 
     @Override
-    @Async
     public void startAnalysisAsync(Long lectureResourceId, String fileKey, String requestId) {
         String url = buildStartUrl();
         AnalysisStartRequest request = new AnalysisStartRequest(
@@ -28,12 +26,8 @@ public class LectureAnalysisAdapter implements LectureAnalysisPort {
                 callbackUrl,
                 requestId
         );
-
-        try {
-            restTemplate.postForEntity(url, request, Void.class);
-        } catch (Exception e) {
-            log.error("Failed to request analysis. lectureResourceId={}, requestId={}", lectureResourceId, requestId, e);
-        }
+        log.info("Requesting python analysis. lectureResourceId={}, requestId={}, callbackUrl={}", lectureResourceId, requestId, callbackUrl);
+        restTemplate.postForEntity(url, request, Void.class);
     }
 
     private String buildStartUrl() {

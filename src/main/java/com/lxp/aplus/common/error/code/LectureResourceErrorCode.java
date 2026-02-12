@@ -17,7 +17,8 @@ public enum LectureResourceErrorCode implements ErrorCode {
     LECTURE_RESOURCE_VIDEO_DURATION_NOT_FOUND(HttpStatus.NOT_FOUND, "ER007", "동영상 리소스는 duration 값이 필수 입니다."),
     FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "ER008", "파일 사이즈 용량을 초과했습니다."),
     LECTURE_RESOURCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "ER009", "key에 해당하는 파일을 찾을 수 없습니다."),
-    LECTURE_RESOURCE_ALREADY_USE(HttpStatus.BAD_REQUEST, "ER010", "이미 다른 강의에서 사용하고 있는 리소스입니다.")
+    LECTURE_RESOURCE_ALREADY_USE(HttpStatus.BAD_REQUEST, "ER010", "이미 다른 강의에서 사용하고 있는 리소스입니다."),
+    LECTURE_RESOURCE_ANALYSIS_ALREADY_PROCESSING(HttpStatus.CONFLICT, "ER011", "이미 분석이 진행중인 리소스입니다.")
     ;
 
     private final HttpStatus status;

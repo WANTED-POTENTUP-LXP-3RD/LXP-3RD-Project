@@ -1,5 +1,7 @@
 package com.lxp.aplus.course.application;
 
+import com.lxp.aplus.common.error.BusinessException;
+import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import com.lxp.aplus.course.application.port.out.LectureAnalysisPort;
 import com.lxp.aplus.course.application.usecase.LectureAnalysisCommandUseCase;
 import com.lxp.aplus.course.domain.AnalysisStatus;
@@ -21,8 +23,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
@@ -109,6 +113,96 @@ class LectureAnalysisIntegrationTest {
         assertThat(updated.getAnalysisStatus()).isEqualTo(AnalysisStatus.PROCESSING);
 
         verify(lectureAnalysisPort).startAnalysisAsync(eq(resource.getId()), eq(resource.getFileKey()), anyString());
+    }
+
+    @Test
+    @DisplayName("성공: 이미 PROCESSING 상태면 분석 시작 재호출이 차단된다")
+    void start_analysis_rejected_when_already_processing() {
+        LectureResourceV2 resource = createLectureResource();
+        lectureAnalysisCommandUseCase.startAnalysis(resource.getId());
+
+        assertThatThrownBy(() -> lectureAnalysisCommandUseCase.startAnalysis(resource.getId()))
+                .isInstanceOf(BusinessException.class)
+                .extracting(ex -> ((BusinessException) ex).getErrorCode())
+                .isEqualTo(LectureResourceErrorCode.LECTURE_RESOURCE_ANALYSIS_ALREADY_PROCESSING);
+    }
+
+    @Test
+    @DisplayName("성공: Python 호출 실패 시 상태가 FAILED로 변경된다")
+    void start_analysis_failed_when_python_request_fails() {
+        LectureResourceV2 resource = createLectureResource();
+        doThrow(new RuntimeException("python down"))
+                .when(lectureAnalysisPort)
+                .startAnalysisAsync(eq(resource.getId()), eq(resource.getFileKey()), anyString());
+
+        assertThatThrownBy(() -> lectureAnalysisCommandUseCase.startAnalysis(resource.getId()))
+                .isInstanceOf(BusinessException.class)
+                .extracting(ex -> ((BusinessException) ex).getErrorCode())
+                .isEqualTo(LectureResourceErrorCode.STORAGE_CLIENT_INTERNAL_ERROR);
+
+        flushAndClear();
+        LectureResourceV2 updated = lectureResourceRepository.findById(resource.getId()).orElseThrow();
+        assertThat(updated.getAnalysisStatus()).isEqualTo(AnalysisStatus.FAILED);
+    }
+
+    @Test
+    @DisplayName("성공: 중복 callback은 무해 처리된다")
+    void callback_duplicate_is_ignored() {
+        LectureResourceV2 resource = createLectureResource();
+
+        LectureAnalysisCallbackRequest first = new LectureAnalysisCallbackRequest(
+                resource.getId(),
+                "req-dup-1",
+                AnalysisStatus.SUCCESS,
+                List.of(new LectureAnalysisCallbackRequest.KeywordRequest("자바", new BigDecimal("0.95"))),
+                null
+        );
+
+        LectureAnalysisCallbackRequest duplicate = new LectureAnalysisCallbackRequest(
+                resource.getId(),
+                "req-dup-1",
+                AnalysisStatus.SUCCESS,
+                List.of(new LectureAnalysisCallbackRequest.KeywordRequest("파이썬", new BigDecimal("0.99"))),
+                null
+        );
+
+        lectureAnalysisCommandUseCase.handleCallback(callbackSecret, first.toCommand());
+        lectureAnalysisCommandUseCase.handleCallback(callbackSecret, duplicate.toCommand());
+        flushAndClear();
+
+        var keywords = lectureKeywordJpaRepository.findByLectureResourceId(resource.getId());
+        assertThat(keywords).hasSize(1);
+        assertThat(keywords.get(0).getKeyword()).isEqualTo("자바");
+    }
+
+    @Test
+    @DisplayName("성공: FAILED 이후 SUCCESS 콜백이 오면 복구 반영된다")
+    void callback_success_after_failed_is_applied() {
+        LectureResourceV2 resource = createLectureResource();
+
+        LectureAnalysisCallbackRequest failed = new LectureAnalysisCallbackRequest(
+                resource.getId(),
+                "req-recover-1",
+                AnalysisStatus.FAILED,
+                null,
+                "temporary timeout"
+        );
+
+        LectureAnalysisCallbackRequest success = new LectureAnalysisCallbackRequest(
+                resource.getId(),
+                "req-recover-1",
+                AnalysisStatus.SUCCESS,
+                List.of(new LectureAnalysisCallbackRequest.KeywordRequest("복구", new BigDecimal("0.91"))),
+                null
+        );
+
+        lectureAnalysisCommandUseCase.handleCallback(callbackSecret, failed.toCommand());
+        lectureAnalysisCommandUseCase.handleCallback(callbackSecret, success.toCommand());
+        flushAndClear();
+
+        LectureResourceV2 updated = lectureResourceRepository.findById(resource.getId()).orElseThrow();
+        assertThat(updated.getAnalysisStatus()).isEqualTo(AnalysisStatus.SUCCESS);
+        assertThat(lectureKeywordJpaRepository.findByLectureResourceId(resource.getId())).hasSize(1);
     }
 
     private LectureResourceV2 createLectureResource() {
