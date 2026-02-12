@@ -45,8 +45,8 @@ public class CourseRepositoryImpl implements CourseRepository {
     }
 
     @Override
-    public Page<Course> findAllPublishedWithFilters(String title, Long categoryId, CourseLevel level, Pageable pageable) {
-        return jpaRepository.findAllPublishedWithFilters(title, categoryId, level, pageable);
+    public Page<Course> findAllPublishedWithFilters(String title, List<Long> categoryIds, CourseLevel level, Pageable pageable) {
+        return jpaRepository.findAllPublishedWithFilters(title, categoryIds, level, pageable);
     }
 
     @Override

@@ -6,5 +6,5 @@ import java.util.Map;
 public interface CategoryQueryPort {
     List<String> findCategoryWithParentNames(Long categoryId);
     Map<Long, List<String>> getCategoryNamesBatch(List<Long> categoryIds);
-
+    List<Long> getCategoryIds(Long categoryId);
 }
