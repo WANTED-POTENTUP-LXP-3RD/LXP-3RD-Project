@@ -43,3 +43,10 @@ out/
 .env
 /src/main/resources/static/uploads
 /src/main/generated
+
+/python-ai/.venv/
+/python-ai/__pycache__/
+/python-ai/.env
+/python-ai/tmp/
+/python-ai/*.mp3
+/python-ai/*.wav
