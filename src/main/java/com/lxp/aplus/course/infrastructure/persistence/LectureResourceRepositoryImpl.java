@@ -21,4 +21,9 @@ public class LectureResourceRepositoryImpl implements LectureResourceRepository 
     public Optional<LectureResourceV2> findByKey(String key) {
         return lectureResourceJpaRepository.findByFileKey(key);
     }
+
+    @Override
+    public Optional<LectureResourceV2> findById(Long id) {
+        return lectureResourceJpaRepository.findById(id);
+    }
 }

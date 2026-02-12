@@ -45,6 +45,7 @@ public class SecurityConfig {
                         // ===== 인증 불필요한 엔드포인트 (Public) =====
                         .requestMatchers("/uploads/**").permitAll()                     // 정적 리소스
                         .requestMatchers("/api/auth/**").permitAll()                    // 인증 관련 API
+                        .requestMatchers("/api/internal/v1/analysis/callback").permitAll() // 분석 콜백
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()  // 카테고리 조회
                         .requestMatchers(HttpMethod.GET, "/api/courses", "/api/courses/**").permitAll()  // 강좌 조회
                         
@@ -93,4 +94,3 @@ public class SecurityConfig {
         return source;
     }
 }
-

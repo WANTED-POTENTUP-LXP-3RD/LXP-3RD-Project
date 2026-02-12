@@ -12,7 +12,9 @@ public enum LectureResultCode implements ResultCode {
     LECTURE_UPDATE_SUCCESS(HttpStatus.OK, "SL002", "강의 정보가 수정되었습니다."),
     LECTURE_READ_SUCCESS(HttpStatus.OK, "SL003", "강의 정보에 성공했습니다."),
     LECTURE_DELETE_SUCCESS(HttpStatus.OK, "SL004", "강의가 정상적으로 삭제되었습니다."),
-    LECTURE_RESOURCE_REGISTER_SUCCESS(HttpStatus.CREATED, "SL005", "강의 리소스가 정상적으로 등록되었습니다.");
+    LECTURE_RESOURCE_REGISTER_SUCCESS(HttpStatus.CREATED, "SL005", "강의 리소스가 정상적으로 등록되었습니다."),
+    LECTURE_ANALYSIS_START_SUCCESS(HttpStatus.ACCEPTED, "SL006", "분석을 시작했습니다."),
+    LECTURE_ANALYSIS_CALLBACK_SUCCESS(HttpStatus.OK, "SL007", "분석 결과를 수신했습니다.");
 
     private final HttpStatus status;
     private final String code;

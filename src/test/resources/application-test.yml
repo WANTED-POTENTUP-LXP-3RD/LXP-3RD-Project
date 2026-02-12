@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+  flyway:
+    enabled: false
+
+analysis:
+  python-base-url: http://localhost:8001
+  callback-url: http://localhost:8080/api/internal/v1/analysis/callback
+  callback-secret: test-secret
+
+cloud:
+  aws:
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: test-bucket
+      expire_seconds: 120000
+
+storage:
+  type: s3
+
+app:
+  cdn:
+    base-url: http://localhost:8080/uploads
+
+file:
+  storage:
+    base-path: /tmp
+    public-url-prefix: /uploads
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: test-access-key
+  secret-key: test-secret-key
+  bucket: test-bucket
+  resource_expire_seconds: 120

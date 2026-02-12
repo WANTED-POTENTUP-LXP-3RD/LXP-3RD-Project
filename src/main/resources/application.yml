@@ -30,3 +30,8 @@ cors:
 logging:
   level:
     org.springframework.security: DEBUG
+
+analysis:
+  python-base-url: ${ANALYSIS_PYTHON_BASE_URL:http://localhost:8001}
+  callback-url: ${ANALYSIS_CALLBACK_URL:http://localhost:8081/api/internal/v1/analysis/callback}
+  callback-secret: ${ANALYSIS_CALLBACK_SECRET:change-me}

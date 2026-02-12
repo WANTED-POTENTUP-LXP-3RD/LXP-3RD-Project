@@ -1,0 +1,53 @@
+package com.lxp.aplus.course.infrastructure.adapter;
+
+import com.lxp.aplus.course.application.port.out.LectureAnalysisPort;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Slf4j
+@Component
+public class LectureAnalysisAdapter implements LectureAnalysisPort {
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${analysis.python-base-url}")
+    private String pythonBaseUrl;
+
+    @Value("${analysis.callback-url}")
+    private String callbackUrl;
+
+    @Override
+    @Async
+    public void startAnalysisAsync(Long lectureResourceId, String fileKey, String requestId) {
+        String url = buildStartUrl();
+        AnalysisStartRequest request = new AnalysisStartRequest(
+                lectureResourceId,
+                fileKey,
+                callbackUrl,
+                requestId
+        );
+
+        try {
+            restTemplate.postForEntity(url, request, Void.class);
+        } catch (Exception e) {
+            log.error("Failed to request analysis. lectureResourceId={}, requestId={}", lectureResourceId, requestId, e);
+        }
+    }
+
+    private String buildStartUrl() {
+        if (pythonBaseUrl.endsWith("/")) {
+            return pythonBaseUrl.substring(0, pythonBaseUrl.length() - 1) + "/internal/analysis/start";
+        }
+        return pythonBaseUrl + "/internal/analysis/start";
+    }
+
+    private record AnalysisStartRequest(
+            Long lectureResourceId,
+            String fileKey,
+            String callbackUrl,
+            String requestId
+    ) {
+    }
+}

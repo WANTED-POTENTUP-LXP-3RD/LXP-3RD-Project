@@ -37,6 +37,10 @@ public class LectureResourceV2 extends BaseTimeEntity {
     @Column(name = "is_downloadable")
     private boolean isDownloadable;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "analysis_status", nullable = false)
+    private AnalysisStatus analysisStatus = AnalysisStatus.NONE;
+
     private LectureResourceV2(
             String originalFileName,
             String fileKey,
@@ -49,6 +53,7 @@ public class LectureResourceV2 extends BaseTimeEntity {
         this.resourceType = resourceType;
         this.videoDuration = videoDuration;
         this.isDownloadable = isDownloadable;
+        this.analysisStatus = AnalysisStatus.NONE;
     }
 
     public static LectureResourceV2 create(
@@ -76,5 +81,9 @@ public class LectureResourceV2 extends BaseTimeEntity {
 
     void assignToLecture(Lecture lecture) {
         this.lecture = lecture;
+    }
+
+    public void updateAnalysisStatus(AnalysisStatus status) {
+        this.analysisStatus = status;
     }
 }
