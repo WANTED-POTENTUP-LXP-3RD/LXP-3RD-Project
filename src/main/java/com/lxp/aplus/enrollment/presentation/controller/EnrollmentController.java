@@ -36,7 +36,7 @@ public class EnrollmentController {
     @GetMapping
     public ResponseEntity<ResultResponse<PageResponse<EnrollmentListItemResult>>> getEnrollmentList(
             @Authenticated UserInfo currentUser,
-            @RequestParam(required = false, defaultValue = "ENROLLED") EnrollmentStatus status,
+            @RequestParam(required = false) EnrollmentStatus status,
             @PageableDefault(size = 10, page = 0) Pageable pageable
     ) {
         Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(currentUser.id(), status, pageable);

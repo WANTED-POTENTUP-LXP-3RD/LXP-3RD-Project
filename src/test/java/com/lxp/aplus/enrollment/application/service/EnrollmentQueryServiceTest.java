@@ -68,7 +68,7 @@ class EnrollmentQueryServiceTest {
 
         List<Enrollment> enrollments = List.of(enrollment1, enrollment2);
         Page<Enrollment> enrollmentsPage = new PageImpl<>(enrollments, pageable, enrollments.size());
-        given(enrollmentRepository.findByStudentIdAndStatus(STUDENT_ID, status, pageable))
+        given(enrollmentRepository.findByStudentIdAndStatusIn(STUDENT_ID, List.of(status), pageable))
                 .willReturn(enrollmentsPage);
 
         given(courseQueryPort.findCourseById(COURSE_ID_1))
@@ -107,7 +107,7 @@ class EnrollmentQueryServiceTest {
         EnrollmentStatus status = EnrollmentStatus.ENROLLED;
         Pageable pageable = PageRequest.of(0, 10);
         Page<Enrollment> emptyPage = new PageImpl<>(List.of(), pageable, 0);
-        given(enrollmentRepository.findByStudentIdAndStatus(STUDENT_ID, status, pageable))
+        given(enrollmentRepository.findByStudentIdAndStatusIn(STUDENT_ID, List.of(status), pageable))
                 .willReturn(emptyPage);
 
         // when

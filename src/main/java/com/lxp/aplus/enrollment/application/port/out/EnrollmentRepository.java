@@ -21,7 +21,7 @@ public interface EnrollmentRepository {
 
     Optional<Enrollment> findByStudentIdAndCourseId(Long studentId, Long courseId);
 
-    Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable);
+    Page<Enrollment> findByStudentIdAndStatusIn(Long studentId, List<EnrollmentStatus> statuses, Pageable pageable);
 
     long countByCourseId(Long courseId);
 

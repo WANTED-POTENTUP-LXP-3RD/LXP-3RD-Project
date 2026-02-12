@@ -11,7 +11,7 @@ public record EnrollmentInternalResult(
         Long enrollmentId,
         Long studentId,
         Long courseId,
-        EnrollmentStatus status,
+        boolean isCompleted,
         LocalDateTime createdAt,
         LocalDateTime expiredAt
 ) {
@@ -20,7 +20,7 @@ public record EnrollmentInternalResult(
                 .enrollmentId(enrollment.getId())
                 .studentId(enrollment.getStudentId())
                 .courseId(enrollment.getCourseId())
-                .status(enrollment.getStatus())
+                .isCompleted(enrollment.getStatus() == EnrollmentStatus.COMPLETED)
                 .createdAt(enrollment.getCreatedAt())
                 .expiredAt(enrollment.getExpiredAt())
                 .build();

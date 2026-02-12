@@ -44,8 +44,8 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
     }
 
     @Override
-    public Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable) {
-        return jpaRepository.findByStudentIdAndStatus(studentId, status, pageable);
+    public Page<Enrollment> findByStudentIdAndStatusIn(Long studentId, List<EnrollmentStatus> statuses, Pageable pageable) {
+        return jpaRepository.findByStudentIdAndStatusIn(studentId, statuses, pageable);
     }
 
     @Override

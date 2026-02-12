@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +34,8 @@ public class EnrollmentQueryService implements EnrollmentQueryUseCase {
     private final ProgressQueryPort progressQueryPort;
 
     public Page<EnrollmentListItemResult> getEnrollmentList(Long studentId, EnrollmentStatus status, Pageable pageable) {
-        Page<Enrollment> enrollmentsPage = enrollmentRepository.findByStudentIdAndStatus(studentId, status, pageable);
+        List<EnrollmentStatus> statuses = resolveStatuses(status);
+        Page<Enrollment> enrollmentsPage = enrollmentRepository.findByStudentIdAndStatusIn(studentId, statuses, pageable);
 
         // TODO: [성능 개선] N+1 쿼리 발생 지점. CourseQueryPort에 findCoursesByIds(List<Long> courseIds)와 같은 배치 조회 기능 추가 필요.
         List<EnrollmentListItemResult> content = enrollmentsPage.getContent().stream()
@@ -44,11 +46,12 @@ public class EnrollmentQueryService implements EnrollmentQueryUseCase {
                     List<String> categoryNames = courseQueryPort.findCategoryNamesByCourseId(enrollment.getCourseId());
 
                     EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
+                    int overallProgressRate = enrollment.getStatus() == EnrollmentStatus.COMPLETED ? 100 : progress.overallProgressRate();
 
                     return EnrollmentListItemResult.of(
                             enrollment,
                             courseSummary,
-                            progress.overallProgressRate(),
+                            overallProgressRate,
                             categoryNames
                     );
                 })
@@ -64,8 +67,9 @@ public class EnrollmentQueryService implements EnrollmentQueryUseCase {
         enrollment.validateOwner(studentId);
 
         EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
+        int overallProgressRate = enrollment.getStatus() == EnrollmentStatus.COMPLETED ? 100 : progress.overallProgressRate();
 
-        return EnrollmentDetailResult.of(enrollment, progress.overallProgressRate());
+        return EnrollmentDetailResult.of(enrollment, overallProgressRate);
     }
 
     public EnrollmentDetailResult getEnrollmentDetailByCourseId(Long studentId, Long courseId) {
@@ -73,12 +77,22 @@ public class EnrollmentQueryService implements EnrollmentQueryUseCase {
                 .orElseThrow(() -> new BusinessException(EnrollmentErrorCode.ENROLLMENT_NOT_FOUND_OR_NO_ACCESS));
 
         EnrollmentProgressDto progress = progressQueryPort.getProgress(enrollment.getId(), enrollment.getCourseId());
+        int overallProgressRate = enrollment.getStatus() == EnrollmentStatus.COMPLETED ? 100 : progress.overallProgressRate();
 
-        return EnrollmentDetailResult.of(enrollment, progress.overallProgressRate());
+        return EnrollmentDetailResult.of(enrollment, overallProgressRate);
     }
 
     public long getStudentCountForCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
+    }
+
+    private List<EnrollmentStatus> resolveStatuses(EnrollmentStatus status) {
+        if (status != null) {
+            return List.of(status);
+        }
+        return Arrays.stream(EnrollmentStatus.values())
+                .filter(EnrollmentStatus::isActive)
+                .toList();
     }
 
 }

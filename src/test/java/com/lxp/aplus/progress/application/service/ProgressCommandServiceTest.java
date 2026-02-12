@@ -58,7 +58,7 @@ class ProgressCommandServiceTest {
         int watchedDuration = 60;
         int totalDuration = 300;
 
-        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, false);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId, watchedDuration);
         LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
 
@@ -94,7 +94,7 @@ class ProgressCommandServiceTest {
         int watchedDuration = 300;
         int totalDuration = 300;
 
-        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, false);
         Progress existingProgress = Progress.of(enrollmentId, resourceId);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId, watchedDuration);
         LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
@@ -141,7 +141,7 @@ class ProgressCommandServiceTest {
         Long courseId = 100L;
         Long enrollmentId = 200L;
         ProgressUpdateCommand command = new ProgressUpdateCommand(300L, 150);
-        EnrollmentStatusDto expiredEnrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, true);
+        EnrollmentStatusDto expiredEnrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, true);
 
         given(enrollmentReader.findEnrollment(userId, courseId)).willReturn(Optional.of(expiredEnrollmentStatusDto));
 
@@ -162,7 +162,7 @@ class ProgressCommandServiceTest {
         int watchedDuration = 301;
         int totalDuration = 300;
 
-        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, false);
         Progress existingProgress = Progress.of(enrollmentId, resourceId);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId, watchedDuration);
         LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
@@ -189,7 +189,7 @@ class ProgressCommandServiceTest {
         int watchedDuration = 300;
         int totalDuration = 300;
 
-        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, false);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId2, watchedDuration);
         LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
 
@@ -228,7 +228,7 @@ class ProgressCommandServiceTest {
         int watchedDuration = 150;
         int totalDuration = 300;
 
-        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false);
+        EnrollmentStatusDto enrollmentStatusDto = new EnrollmentStatusDto(enrollmentId, false, false);
         ProgressUpdateCommand command = new ProgressUpdateCommand(resourceId2, watchedDuration);
         LectureDurationDto lectureDurationDto = new LectureDurationDto(totalDuration);
 
