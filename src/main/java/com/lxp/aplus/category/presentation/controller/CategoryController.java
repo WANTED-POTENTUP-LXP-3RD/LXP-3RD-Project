@@ -1,7 +1,7 @@
 package com.lxp.aplus.category.presentation.controller;
 
-import com.lxp.aplus.category.application.result.CategoryResult;
-import com.lxp.aplus.category.application.usecase.CategoryQueryUseCase;
+import com.lxp.aplus.category.application.dto.result.CategoryResult;
+import com.lxp.aplus.category.application.port.in.CategoryQueryUseCase;
 import com.lxp.aplus.category.presentation.response.CategoryResponse;
 import com.lxp.aplus.common.result.ResultResponse;
 import com.lxp.aplus.common.result.code.CategoryResultCode;

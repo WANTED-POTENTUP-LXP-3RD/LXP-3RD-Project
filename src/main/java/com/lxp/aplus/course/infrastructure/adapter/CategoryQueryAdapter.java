@@ -1,7 +1,7 @@
 package com.lxp.aplus.course.infrastructure.adapter;
 
+import com.lxp.aplus.category.application.port.out.CategoryRepository;
 import com.lxp.aplus.category.domain.Category;
-import com.lxp.aplus.category.domain.CategoryRepository;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.CategoryErrorCode;
 import com.lxp.aplus.course.application.port.out.CategoryQueryPort;

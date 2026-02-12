@@ -1,10 +1,11 @@
 package com.lxp.aplus.course.application.mapper;
 
-import com.lxp.aplus.course.application.dto.ReviewStat;
+import com.lxp.aplus.course.application.result.ReviewStat;
 import com.lxp.aplus.course.application.result.CourseDetailResult;
 import com.lxp.aplus.course.application.result.CourseResult;
 import com.lxp.aplus.course.application.result.InstructorResult;
 import com.lxp.aplus.course.domain.Course;
+import com.lxp.aplus.course.infrastructure.file.FileUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class CourseResultMapper {
-
     private final SectionResultMapper sectionResultMapper;
 
     public CourseResult toResult(Course course, List<String> categoryNames, String instructorName, int studentCount, ReviewStat reviewStat) {

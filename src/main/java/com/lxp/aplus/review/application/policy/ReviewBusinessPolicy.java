@@ -6,7 +6,7 @@ import com.lxp.aplus.common.error.code.ReviewErrorCode;
 import com.lxp.aplus.course.domain.Course;
 import com.lxp.aplus.course.domain.CourseStatus;
 import com.lxp.aplus.review.application.port.out.CourseQueryPort;
-import com.lxp.aplus.review.application.port.out.EnrollmentQueryPort;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ReviewBusinessPolicy {
     private final ReviewsRepository reviewRepository;
-    private final EnrollmentQueryPort enrollmentQueryPort;
+    private final EnrollmentRepository enrollmentRepository;
     private final CourseQueryPort courseQueryPort;
 
     //생성 검증
@@ -41,7 +41,7 @@ public class ReviewBusinessPolicy {
 
     //수강중인 강좌 검증
     public void validateEnrolled(Long userId, Long courseId) {
-        if (!enrollmentQueryPort.existsEnrollment(userId, courseId)) {
+        if (!enrollmentRepository.existsByStudentIdAndCourseId(userId, courseId)) {
             throw new BusinessException(ReviewErrorCode.CANT_REVIEW_IN_NOT_ENROLLED);
         }
     }

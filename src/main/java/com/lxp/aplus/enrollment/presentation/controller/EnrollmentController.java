@@ -7,8 +7,8 @@ import com.lxp.aplus.common.security.Authenticated;
 import com.lxp.aplus.common.security.UserInfo;
 import com.lxp.aplus.enrollment.application.result.EnrollmentDetailResult;
 import com.lxp.aplus.enrollment.application.result.EnrollmentListItemResult;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentCommandUseCase;
-import com.lxp.aplus.enrollment.application.usecase.EnrollmentQueryUseCase;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentCommandUseCase;
+import com.lxp.aplus.enrollment.application.port.in.EnrollmentQueryUseCase;
 import com.lxp.aplus.enrollment.domain.Enrollment;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import com.lxp.aplus.enrollment.presentation.response.EnrollmentCancelResponse;
@@ -36,7 +36,7 @@ public class EnrollmentController {
     @GetMapping
     public ResponseEntity<ResultResponse<PageResponse<EnrollmentListItemResult>>> getEnrollmentList(
             @Authenticated UserInfo currentUser,
-            @RequestParam(required = false, defaultValue = "ENROLLED") EnrollmentStatus status,
+            @RequestParam(required = false) EnrollmentStatus status,
             @PageableDefault(size = 10, page = 0) Pageable pageable
     ) {
         Page<EnrollmentListItemResult> result = enrollmentQueryUseCase.getEnrollmentList(currentUser.id(), status, pageable);

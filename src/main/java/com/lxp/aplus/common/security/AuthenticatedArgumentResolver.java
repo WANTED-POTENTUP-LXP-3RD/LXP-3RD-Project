@@ -3,7 +3,7 @@ package com.lxp.aplus.common.security;
 import com.lxp.aplus.common.error.BusinessException;
 import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.user.application.dto.AuthUser;
-import com.lxp.aplus.user.application.usecase.UserQueryUseCase;
+import com.lxp.aplus.user.application.port.in.UserQueryUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

@@ -15,17 +15,17 @@ public record EnrollmentListItemResult(
         String courseName,
         List<String> categories,
         EnrollmentStatus status,
-        int progressRate,
+        int overallProgressRate,
         LocalDateTime expiredAt
 ) {
-    public static EnrollmentListItemResult of(Enrollment enrollment, CourseSummary courseSummary, int progressRate, List<String> categories) {
+    public static EnrollmentListItemResult of(Enrollment enrollment, CourseSummary courseSummary, int overallProgressRate, List<String> categories) {
         return new EnrollmentListItemResult(
                 enrollment.getId(),
                 enrollment.getCourseId(),
                 courseSummary.courseName(),
                 categories,
                 enrollment.getStatus(),
-                progressRate,
+                overallProgressRate,
                 enrollment.getExpiredAt()
         );
     }

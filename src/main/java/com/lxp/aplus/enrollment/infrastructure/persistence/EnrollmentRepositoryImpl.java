@@ -1,7 +1,7 @@
 package com.lxp.aplus.enrollment.infrastructure.persistence;
 
 import com.lxp.aplus.enrollment.domain.Enrollment;
-import com.lxp.aplus.enrollment.domain.EnrollmentRepository;
+import com.lxp.aplus.enrollment.application.port.out.EnrollmentRepository;
 import com.lxp.aplus.enrollment.domain.EnrollmentStatus;
 import com.lxp.aplus.enrollment.domain.StudentCountDto;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +44,8 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
     }
 
     @Override
-    public Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable) {
-        return jpaRepository.findByStudentIdAndStatus(studentId, status, pageable);
+    public Page<Enrollment> findByStudentIdAndStatusIn(Long studentId, List<EnrollmentStatus> statuses, Pageable pageable) {
+        return jpaRepository.findByStudentIdAndStatusIn(studentId, statuses, pageable);
     }
 
     @Override

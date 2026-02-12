@@ -7,8 +7,8 @@
 @contentType = application/json
 
 ### 테스트용 사용자 정보 (통일)
-@testEmail = test2@example.com
-@testPassword = password123
+@testEmail = admin@example.com
+@testPassword = admin
 @testName = 테스트 사용자2
 @testNickName = testuser2
 @testPhoneNumber = 010-1234-5679
@@ -101,7 +101,7 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 {
-  "nickName": "updatedNickname",
+  "nickname": "updatedNickname",
   "email": "updated@example.com"
 }
 
