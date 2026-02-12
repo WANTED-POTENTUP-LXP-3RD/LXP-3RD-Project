@@ -24,6 +24,7 @@ HTTP_CONNECT_TIMEOUT = float(os.getenv("JAVA_CONNECT_TIMEOUT", "5"))
 HTTP_READ_TIMEOUT = float(os.getenv("JAVA_READ_TIMEOUT", "30"))
 ANALYSIS_CALLBACK_SECRET = os.getenv("ANALYSIS_CALLBACK_SECRET", "")
 S3_OBJECT_BASE_URL = os.getenv("S3_OBJECT_BASE_URL", "")
+FFMPEG_BINARY = os.getenv("FFMPEG_BINARY", "ffmpeg")
 
 AUDIO_OUTPUT_DIR = os.getenv("AUDIO_OUTPUT_DIR", "./audio-output")
 AUDIO_SAMPLE_RATE = int(os.getenv("AUDIO_SAMPLE_RATE", "16000"))
@@ -128,7 +129,7 @@ def extract_audio_from_video(video_source: str) -> str:
                 vn=None,
             )
             .overwrite_output()
-            .run(capture_stdout=True, capture_stderr=True)
+            .run(capture_stdout=True, capture_stderr=True, cmd=FFMPEG_BINARY)
         )
     except ffmpeg.Error as exc:
         stderr = exc.stderr.decode("utf-8", errors="ignore") if exc.stderr else ""

@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -112,7 +113,7 @@ class LectureAnalysisIntegrationTest {
         LectureResourceV2 updated = lectureResourceRepository.findById(resource.getId()).orElseThrow();
         assertThat(updated.getAnalysisStatus()).isEqualTo(AnalysisStatus.PROCESSING);
 
-        verify(lectureAnalysisPort).startAnalysisAsync(eq(resource.getId()), eq(resource.getFileKey()), anyString());
+        verify(lectureAnalysisPort).startAnalysisAsync(eq(resource.getId()), contains(resource.getFileKey()), anyString());
     }
 
     @Test
@@ -133,7 +134,7 @@ class LectureAnalysisIntegrationTest {
         LectureResourceV2 resource = createLectureResource();
         doThrow(new RuntimeException("python down"))
                 .when(lectureAnalysisPort)
-                .startAnalysisAsync(eq(resource.getId()), eq(resource.getFileKey()), anyString());
+                .startAnalysisAsync(eq(resource.getId()), contains(resource.getFileKey()), anyString());
 
         assertThatThrownBy(() -> lectureAnalysisCommandUseCase.startAnalysis(resource.getId()))
                 .isInstanceOf(BusinessException.class)

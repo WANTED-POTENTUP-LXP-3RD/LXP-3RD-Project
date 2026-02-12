@@ -18,11 +18,11 @@ public class LectureAnalysisAdapter implements LectureAnalysisPort {
     private String callbackUrl;
 
     @Override
-    public void startAnalysisAsync(Long lectureResourceId, String fileKey, String requestId) {
+    public void startAnalysisAsync(Long lectureResourceId, String videoUrl, String requestId) {
         String url = buildStartUrl();
         AnalysisStartRequest request = new AnalysisStartRequest(
                 lectureResourceId,
-                fileKey,
+                videoUrl,
                 callbackUrl,
                 requestId
         );
@@ -39,7 +39,7 @@ public class LectureAnalysisAdapter implements LectureAnalysisPort {
 
     private record AnalysisStartRequest(
             Long lectureResourceId,
-            String fileKey,
+            String videoUrl,
             String callbackUrl,
             String requestId
     ) {

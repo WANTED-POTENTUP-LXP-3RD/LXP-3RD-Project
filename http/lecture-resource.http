@@ -26,7 +26,7 @@ Accept: application/json
 {
 "fileName" : "공고시간표(2018.07.11).zip",
 "contentType" : "application/zip",
-"size" : 15553000,
+"size" : 155530,
 "duration" : 600,
 "isDownloadable" : true
 }

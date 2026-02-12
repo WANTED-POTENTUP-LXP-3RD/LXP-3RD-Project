@@ -5,6 +5,7 @@ import com.lxp.aplus.common.error.code.GlobalErrorCode;
 import com.lxp.aplus.common.error.code.LectureResourceErrorCode;
 import com.lxp.aplus.course.application.command.SaveLectureAnalysisCallbackCommand;
 import com.lxp.aplus.course.application.port.out.LectureAnalysisPort;
+import com.lxp.aplus.course.application.port.out.PresignedUrlGenerator;
 import com.lxp.aplus.course.application.result.LectureAnalysisStartResult;
 import com.lxp.aplus.course.domain.AnalysisStatus;
 import com.lxp.aplus.course.domain.LectureKeyword;
@@ -28,6 +29,7 @@ public class LectureAnalysisCommandUseCase {
     private final LectureResourceRepository lectureResourceRepository;
     private final LectureKeywordRepository lectureKeywordRepository;
     private final LectureAnalysisPort lectureAnalysisPort;
+    private final PresignedUrlGenerator presignedUrlGenerator;
 
     @Value("${analysis.callback-secret}")
     private String callbackSecret;
@@ -43,8 +45,9 @@ public class LectureAnalysisCommandUseCase {
         lectureResource.updateAnalysisStatus(AnalysisStatus.PROCESSING);
 
         String requestId = UUID.randomUUID().toString();
+        String videoUrl = presignedUrlGenerator.generateGetUrl(lectureResource.getFileKey()).url();
         try {
-            lectureAnalysisPort.startAnalysisAsync(lectureResource.getId(), lectureResource.getFileKey(), requestId);
+            lectureAnalysisPort.startAnalysisAsync(lectureResource.getId(), videoUrl, requestId);
         } catch (Exception e) {
             lectureResource.updateAnalysisStatus(AnalysisStatus.FAILED);
             log.error("Analysis start request failed. lectureResourceId={}, requestId={}", lectureResourceId, requestId, e);
