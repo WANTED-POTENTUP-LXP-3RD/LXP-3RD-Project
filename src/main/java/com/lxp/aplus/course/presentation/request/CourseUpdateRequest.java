@@ -9,7 +9,7 @@ public record CourseUpdateRequest(
         String description,
         Long categoryId,
         CourseLevel courseLevel,
-        String thumbnailUrl,
+        String thumbnailResourceKey,
         Integer price
 ) {
     public CourseUpdateCommand toCommand() {
@@ -19,7 +19,7 @@ public record CourseUpdateRequest(
                 .description(this.description)
                 .categoryId(this.categoryId)
                 .courseLevel(this.courseLevel)
-                .thumbnailUrl(this.thumbnailUrl)
+                .thumbnailResourceKey(this.thumbnailResourceKey)
                 .price(this.price)
                 .build();
     }

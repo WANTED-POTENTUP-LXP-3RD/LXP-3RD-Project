@@ -136,3 +136,8 @@ Authorization: Bearer {{accessToken}}
 {
     "courseIds" :[1,2,3]
 }
+
+### 리뷰 인사이트 (7일 내)
+GET {{baseUrl}}/api/courses/{{courseId}}/review/summary?day=7
+Accept: application/json
+Authorization: Bearer {{accessToken}}

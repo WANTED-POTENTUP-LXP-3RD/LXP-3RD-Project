@@ -4,7 +4,10 @@ import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.domain.ReviewsRepository;
 import com.lxp.aplus.review.domain.constant.ReviewStatus;
 import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
+import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewAnalyzeItem;
 import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -55,5 +58,10 @@ public class ReviewsRepositoryImpl implements ReviewsRepository {
     @Override
     public List<ReviewSummary> getReviewInfoInCourse(List<Long> courseId) {
         return reviewJpaRepository.getReviewInfosInCourse(courseId);
+    }
+
+    @Override
+    public List<ReviewAnalyzeItem> findAnalyzeItems(Long courseId, LocalDateTime from) {
+        return reviewJpaRepository.findAnalyzeItems(courseId, from);
     }
 }

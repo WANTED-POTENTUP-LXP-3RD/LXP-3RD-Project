@@ -10,6 +10,6 @@ public record CourseUpdateCommand(
         String description,
         Long categoryId,
         Integer price,
-        String thumbnailUrl,
+        String thumbnailResourceKey,
         CourseLevel courseLevel
 ) {}

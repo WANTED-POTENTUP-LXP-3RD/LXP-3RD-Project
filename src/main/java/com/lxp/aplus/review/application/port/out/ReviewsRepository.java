@@ -1,10 +1,8 @@
-package com.lxp.aplus.review.domain;
+package com.lxp.aplus.review.application.port.out;
 
+import com.lxp.aplus.review.domain.Reviews;
 import com.lxp.aplus.review.infrastructure.dto.ReviewWroteDto;
-import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewAnalyzeItem;
 import com.lxp.aplus.review.infrastructure.persistence.dto.ReviewSummary;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -19,5 +17,4 @@ public interface ReviewsRepository {
     void deleteReview(Reviews review);
     List<ReviewWroteDto> checkReviewedByCourseIds(List<Long> courseIds, Long userId);
     List<ReviewSummary> getReviewInfoInCourse(List<Long> courseId);
-    List<ReviewAnalyzeItem> findAnalyzeItems(Long courseId, LocalDateTime from);
 }
