@@ -58,7 +58,11 @@ public interface CourseJpaRepository extends JpaRepository<Course, Long> {
 
     @Query("SELECT c FROM Course c WHERE c.courseStatus = 'PUBLISHED' " +
             "AND (:title IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
-            "AND (:categoryId IS NULL OR c.categoryId = :categoryId) " +
+            "AND (:categoryIds IS NULL OR c.categoryId IN :categoryIds) " + // [변경] IN 절 사용
             "AND (:level IS NULL OR c.courseLevel = :level)")
-    Page<Course> findAllPublishedWithFilters(@Param("title") String title, @Param("categoryId") Long categoryId, @Param("level") CourseLevel level, Pageable pageable);
+    Page<Course> findAllPublishedWithFilters(
+            @Param("title") String title,
+            @Param("categoryIds") List<Long> categoryIds, // [변경] 파라미터 타입 변경
+            @Param("level") CourseLevel level,
+            Pageable pageable);
 }

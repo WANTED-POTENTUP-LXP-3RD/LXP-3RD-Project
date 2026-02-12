@@ -53,4 +53,19 @@ public class CategoryQueryAdapter implements CategoryQueryPort {
         return List.of(category.getName());
     }
 
+    @Override
+    public List<Long> getCategoryIds(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new BusinessException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        List<Long> ids = new ArrayList<>();
+        ids.add(category.getId());
+
+        // 부모가 없으면 대분류이므로 자식(소분류)들을 모두 추가
+        if (category.getParent() == null) {
+            category.getChildren().forEach(child -> ids.add(child.getId()));
+        }
+
+        return ids;
+    }
 }

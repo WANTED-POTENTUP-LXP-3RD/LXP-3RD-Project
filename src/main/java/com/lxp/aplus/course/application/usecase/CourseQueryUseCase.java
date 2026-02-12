@@ -45,7 +45,12 @@ public class CourseQueryUseCase {
     }
 
     public Page<CourseResult> getPublishedCourses(String title, Long categoryId, CourseLevel level, Pageable pageable) {
-        Page<Course> courses = courseRepository.findAllPublishedWithFilters(title, categoryId, level, pageable);
+        List<Long> categoryIds = null;
+        if (categoryId != null) {
+            categoryIds = categoryQueryPort.getCategoryIds(categoryId);
+        }
+
+        Page<Course> courses = courseRepository.findAllPublishedWithFilters(title, categoryIds, level, pageable);
         return convertToCourseResponse(courses, pageable);
     }
 
