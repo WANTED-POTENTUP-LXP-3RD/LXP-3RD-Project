@@ -14,9 +14,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class CourseResultMapper {
-
     private final SectionResultMapper sectionResultMapper;
-    private final FileUrlGenerator fileUrlGenerator;
 
     public CourseResult toResult(Course course, List<String> categoryNames, String instructorName, int studentCount, ReviewStat reviewStat) {
         return CourseResult.builder()
@@ -46,7 +44,7 @@ public class CourseResultMapper {
                 .price(course.getPrice())
                 .status(course.getCourseStatus())
                 .level(course.getCourseLevel())
-                .thumbnailUrl(course.getThumbnailResourceKey() != null ? fileUrlGenerator.generate(course.getThumbnailResourceKey()) : null)
+                .thumbnailUrl(course.getThumbnailResourceKey())
                 .instructor(instructor)
                 .isPurchased(isPurchased)
                 .studentCount(studentCount)
